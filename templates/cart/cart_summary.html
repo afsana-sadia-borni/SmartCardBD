@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 fw-bold">Shopping Cart</h2>
+
+    {% if cart_products %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                {% for product in cart_products %}
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-3 col-md-2">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/150" class="img-fluid rounded" alt="No image">
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-9 col-md-5">
+                                    <h5 class="fw-bold mb-1">{{ product.name }}</h5>
+                                    <p class="text-primary fw-semibold mb-0">৳ {{ product.price }}</p>
+                                </div>
+
+                                <div class="col-12 col-md-5 mt-3 mt-md-0 d-flex align-items-center justify-content-between justify-content-md-end gap-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small">Qty:</span>
+                                        {% for key, value in quantities.items %}
+                                            {% if key == product.id|slugify %}
+                                                {% if value.quantity %}
+                                                    <span class="badge bg-secondary fs-6">{{ value.quantity }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary fs-6">{{ value }}</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <button class="btn btn-danger btn-sm delete-product" type="button" data-index="{{ product.id }}">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm p-4">
+                    <h4 class="fw-bold mb-3">Order Summary</h4>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fs-5 text-muted">Total:</span>
+                        <span class="fs-4 fw-bold text-success">৳ {{ totals }}</span>
+                    </div>
+                    <a href="#" class="btn btn-warning w-100 py-2 fw-bold text-dark">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <h4 class="text-muted mb-3">Your cart is currently empty!</h4>
+                <a href="{% url 'home' %}" class="btn btn-primary">Continue Shopping</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+    $(document).on('click', '.delete-product', function(e){
+        e.preventDefault();
+        var p_id = $(this).data('index');
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_delete' %}",
+            data: {
+                product_id: p_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+            success: function(json){
+                location.reload();
+            },
+            error: function(xhr, errmsg, err){
+                console.log(err);
+            }
+        });
+    });
+</script>
+{% endblock %}

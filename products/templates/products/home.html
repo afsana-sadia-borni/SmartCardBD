@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Welcome to SmartCart BD 🛒</h1>
+        <p class="lead text-muted">Your Smart Online Shopping Platform</p>
+    </div>
+
+    <h3 class="mb-4 fw-bold">Featured Products</h3>
+
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card product-card h-100 shadow-sm">
+                    <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.title }}" style="height: 220px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 220px;">
+                                <span>No Image</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ product.title }}</h5>
+                            <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
+                            <p class="card-text fw-bold text-primary h5">৳{{ product.price }}</p>
+                        </div>
+                    </a>
+
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary w-100">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted fs-5">No products found in the database!</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
