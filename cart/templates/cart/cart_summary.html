@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static shop_tags %}
+
+{% block title %}Your cart | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container js-cart-page">
+    <h2 class="fw-bold mb-4"><i class="bi bi-cart3"></i> Shopping cart</h2>
+
+    {% if cart|length %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="bg-body rounded-4 shadow-sm">
+                    {% for item in cart %}
+                        {% with product=item.product %}
+                        <div class="js-cart-row d-flex flex-wrap align-items-center gap-3 p-3 {% if not forloop.last %}border-bottom{% endif %}"
+                             data-product-id="{{ product.id }}"
+                             data-update-url="{% url 'cart_update' %}"
+                             data-remove-url="{% url 'cart_remove' %}">
+                            <a href="{{ product.get_absolute_url }}">
+                                <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="cart-thumb" alt="{{ product.title }}">
+                            </a>
+                            <div class="flex-grow-1" style="min-width: 160px;">
+                                <a href="{{ product.get_absolute_url }}" class="fw-semibold text-body text-decoration-none">{{ product.title }}</a>
+                                <div class="small text-body-secondary">
+                                    {{ item.price|taka }} each
+                                    {% if product.has_discount %}<span class="price-old ms-1">{{ product.price|taka }}</span>{% endif %}
+                                </div>
+                                {% if not item.available %}
+                                    <div class="small text-danger"><i class="bi bi-exclamation-circle"></i> Only {{ product.stock }} left in stock</div>
+                                {% elif product.low_stock %}
+                                    <div class="small text-warning-emphasis">Only {{ product.stock }} left</div>
+                                {% endif %}
+                            </div>
+                            <div class="input-group input-group-sm qty-group">
+                                <button class="btn btn-outline-secondary js-qty-btn" type="button" data-step="-1" aria-label="Decrease quantity"><i class="bi bi-dash"></i></button>
+                                <input type="number" class="form-control js-qty-input" value="{{ item.quantity }}" min="1" max="{{ product.stock }}" aria-label="Quantity">
+                                <button class="btn btn-outline-secondary js-qty-btn" type="button" data-step="1" aria-label="Increase quantity"><i class="bi bi-plus"></i></button>
+                            </div>
+                            <div class="fw-bold text-end js-item-subtotal" style="min-width: 90px;">{{ item.subtotal|taka }}</div>
+                            <button class="btn btn-link text-danger js-remove-item p-1" type="button" aria-label="Remove {{ product.title }}"><i class="bi bi-trash3"></i></button>
+                        </div>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+                <a href="{% url 'product_list' %}" class="btn btn-link mt-2 px-0"><i class="bi bi-arrow-left"></i> Continue shopping</a>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="bg-body rounded-4 shadow-sm p-4 position-sticky" style="top: 90px;">
+                    <h5 class="fw-bold mb-3">Order summary</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-body-secondary">Subtotal</span>
+                        <span class="js-cart-subtotal">{{ cart.get_subtotal|taka }}</span>
+                    </div>
+                    {% with coupon=cart.coupon %}
+                        <div class="d-flex justify-content-between mb-2 text-success js-discount-row {% if not coupon %}d-none{% endif %}">
+                            <span>Discount {% if coupon %}<span class="badge text-bg-success">{{ coupon.code }}</span>{% endif %}</span>
+                            <span class="js-cart-discount">-{{ cart.get_discount|taka }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 small text-body-secondary">
+                            <span>Shipping</span><span>Calculated at checkout</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fw-semibold">Total</span>
+                            <span class="fs-4 fw-bold js-cart-total">{{ cart.get_total|taka }}</span>
+                        </div>
+
+                        {% if coupon %}
+                            <form method="post" action="{% url 'coupon_remove' %}" class="mb-3">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-secondary w-100" type="submit"><i class="bi bi-x"></i> Remove coupon {{ coupon.code }}</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'coupon_apply' %}" class="input-group input-group-sm mb-3">
+                                {% csrf_token %}
+                                <input type="text" name="code" class="form-control text-uppercase" placeholder="Coupon code" aria-label="Coupon code" required>
+                                <button class="btn btn-outline-dark" type="submit">Apply</button>
+                            </form>
+                        {% endif %}
+                    {% endwith %}
+
+                    <a href="{% url 'checkout' %}" class="btn btn-warning w-100 py-2 fw-bold">Proceed to checkout <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="bg-body rounded-4 shadow-sm text-center py-5">
+            <i class="bi bi-cart-x display-3 text-body-secondary"></i>
+            <h4 class="mt-3">Your cart is empty</h4>
+            <p class="text-body-secondary">Looks like you haven't added anything yet.</p>
+            <a href="{% url 'product_list' %}" class="btn btn-warning fw-semibold">Start shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

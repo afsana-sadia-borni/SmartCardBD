@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+
+{% block title %}My account | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px;">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">My account</h2>
+            <small class="text-body-secondary">{{ user.email }}</small>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'account_change_password' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-key"></i> Change password</a>
+            <a href="{% url 'account_email' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-envelope"></i> Email</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><a href="{% url 'order_list' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-box-seam fs-3 text-warning"></i><div class="fw-semibold">My orders</div><small class="text-body-secondary">Track &amp; manage</small></a></div>
+        <div class="col-md-4"><a href="{% url 'wishlist' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-heart fs-3 text-danger"></i><div class="fw-semibold">Wishlist</div><small class="text-body-secondary">{{ wishlist_count }} saved item{{ wishlist_count|pluralize }}</small></a></div>
+        <div class="col-md-4"><a href="{% url 'address_add' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-geo-alt fs-3 text-primary"></i><div class="fw-semibold">Add address</div><small class="text-body-secondary">For faster checkout</small></a></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Addresses</h5>
+                    <a href="{% url 'address_add' %}" class="btn btn-sm btn-dark"><i class="bi bi-plus"></i> New</a>
+                </div>
+                {% for address in addresses %}
+                    <div class="border rounded-3 p-3 mb-2 {% if address.is_default %}border-warning{% endif %}">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ address.full_name }}</strong>
+                            {% if address.is_default %}<span class="badge text-bg-warning">Default</span>{% endif %}
+                        </div>
+                        <div class="small text-body-secondary">{{ address.phone }}<br>{{ address.address_line }}, {{ address.area }}, {{ address.district }}</div>
+                        <div class="d-flex gap-2 mt-2">
+                            <a href="{% url 'address_edit' address.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            {% if not address.is_default %}
+                                <form method="post" action="{% url 'address_make_default' address.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Make default</button></form>
+                            {% endif %}
+                            <form method="post" action="{% url 'address_delete' address.pk %}" onsubmit="return confirm('Delete this address?');">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit">Delete</button></form>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-body-secondary small mb-0">No saved addresses yet. Addresses you use at checkout can be saved here.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Recent orders</h5>
+                    <a href="{% url 'order_list' %}" class="small">View all</a>
+                </div>
+                {% for order in recent_orders %}
+                    <a href="{{ order.get_absolute_url }}" class="d-flex justify-content-between align-items-center border-bottom py-2 text-decoration-none text-body small">
+                        <span><span class="font-monospace fw-semibold">{{ order.order_number }}</span><br><span class="text-body-secondary">{{ order.created_at|date:"d M Y" }}</span></span>
+                        <span class="text-end">{{ order.total|taka }}<br>{% include 'orders/_status_badge.html' %}</span>
+                    </a>
+                {% empty %}
+                    <p class="text-body-secondary small mb-0">You haven't placed any orders yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

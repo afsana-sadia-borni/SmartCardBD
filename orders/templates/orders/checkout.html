@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+
+{% block title %}Checkout | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container js-checkout"
+     data-amount="{{ cart.get_total }}"
+     data-inside="{{ shipping_inside_dhaka }}"
+     data-outside="{{ shipping_outside_dhaka }}"
+     data-free-min="{{ free_shipping_min }}">
+    <h2 class="fw-bold mb-4">Checkout</h2>
+
+    {% if not user.is_authenticated %}
+        <div class="alert alert-light border d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span><i class="bi bi-person"></i> Have an account? Log in to track orders and save addresses.</span>
+            <a href="{% url 'account_login' %}?next={% url 'checkout' %}" class="btn btn-sm btn-dark">Log in</a>
+        </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="bg-body rounded-4 shadow-sm p-4 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt"></i> Delivery address</h5>
+                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                    <div class="row g-3">
+                        {% for field in form %}
+                            {% if field.name != 'payment_method' and field.name != 'save_address' %}
+                                <div class="{% if field.name == 'address_line' or field.name == 'note' %}col-12{% else %}col-md-6{% endif %}">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% for error in field.errors %}<div class="small text-danger">{{ error }}</div>{% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        {% if form.save_address %}
+                            <div class="col-12 form-check ms-1">
+                                {{ form.save_address }}
+                                <label class="form-check-label" for="{{ form.save_address.id_for_label }}">{{ form.save_address.label }}</label>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="bg-body rounded-4 shadow-sm p-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-credit-card"></i> Payment method</h5>
+                    {% for radio in form.payment_method %}
+                        <label class="payment-option d-flex align-items-center gap-3 border p-3 mb-2" for="{{ radio.id_for_label }}">
+                            {{ radio.tag }}
+                            <span>
+                                <strong>{{ radio.choice_label }}</strong><br>
+                                <small class="text-body-secondary">
+                                    {% if radio.data.value == 'cod' %}Pay in cash when your order arrives.{% else %}Pay securely with bKash, Nagad, Rocket or card via SSLCommerz.{% endif %}
+                                </small>
+                            </span>
+                        </label>
+                    {% endfor %}
+                    {% for error in form.payment_method.errors %}<div class="small text-danger">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="bg-body rounded-4 shadow-sm p-4 position-sticky" style="top: 90px;">
+                    <h5 class="fw-bold mb-3">Your order</h5>
+                    {% for item in cart %}
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="me-2">{{ item.product.title }} <span class="text-body-secondary">× {{ item.quantity }}</span></span>
+                            <span class="text-nowrap">{{ item.subtotal|taka }}</span>
+                        </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2"><span class="text-body-secondary">Subtotal</span><span>{{ cart.get_subtotal|taka }}</span></div>
+                    {% if cart.get_discount %}
+                        <div class="d-flex justify-content-between mb-2 text-success"><span>Discount ({{ cart.coupon.code }})</span><span>-{{ cart.get_discount|taka }}</span></div>
+                    {% endif %}
+                    <div class="d-flex justify-content-between mb-2"><span class="text-body-secondary">Shipping</span><span class="js-shipping">-</span></div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-semibold">Total</span>
+                        <span class="fs-4 fw-bold js-grand-total">{{ cart.get_total|taka }}</span>
+                    </div>
+                    <p class="small text-body-secondary">
+                        Shipping: {{ shipping_inside_dhaka|taka }} inside Dhaka, {{ shipping_outside_dhaka|taka }} elsewhere. Free over {{ free_shipping_min|taka }}.
+                    </p>
+                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold"><i class="bi bi-lock"></i> Place order</button>
+                    <a href="{% url 'cart_summary' %}" class="btn btn-link w-100 mt-1">Back to cart</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

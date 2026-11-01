@@ -1,0 +1,22 @@
+{% load humanize %}Hi {{ order.full_name }},
+
+Thank you for shopping with {{ site_name }}! We have received your order.
+
+Order number: {{ order.order_number }}
+Payment: {{ order.get_payment_method_display }} ({{ order.get_payment_status_display }})
+
+Items:
+{% for item in order.items.all %}  - {{ item.product_title }} x {{ item.quantity }} = BDT {{ item.subtotal|floatformat:2|intcomma }}
+{% endfor %}
+Subtotal: BDT {{ order.subtotal|floatformat:2|intcomma }}{% if order.discount %}
+Discount: -BDT {{ order.discount|floatformat:2|intcomma }}{% endif %}
+Shipping: BDT {{ order.shipping_cost|floatformat:2|intcomma }}
+Total:    BDT {{ order.total|floatformat:2|intcomma }}
+
+Delivery to:
+{{ order.full_name }}, {{ order.phone }}
+{{ order.address_line }}, {{ order.area }}, {{ order.district }}
+
+We will let you know when your order ships.
+
+- {{ site_name }}

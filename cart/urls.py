@@ -1,8 +1,12 @@
 from django.urls import path
+
 from . import views
 
 urlpatterns = [
     path('', views.cart_summary, name='cart_summary'),
     path('add/', views.cart_add, name='cart_add'),
-    path('delete/', views.cart_delete, name='cart_delete'),  # Ei line-ti add koro
+    path('update/', views.cart_update, name='cart_update'),
+    path('remove/', views.cart_remove, name='cart_remove'),
+    path('coupon/apply/', views.coupon_apply, name='coupon_apply'),
+    path('coupon/remove/', views.coupon_remove, name='coupon_remove'),
 ]

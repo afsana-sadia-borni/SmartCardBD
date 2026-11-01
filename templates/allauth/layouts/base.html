@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{# Renders all django-allauth pages (login, signup, password reset, ...) inside the site layout. #}
+
+{% block title %}{% block head_title %}{% endblock head_title %} | SmartCart BD{% endblock %}
+
+{% block before_content %}
+<div class="container">
+    <div class="auth-card bg-body rounded-4 shadow-sm p-4 p-md-5 mx-auto">
+{% endblock %}
+
+{% block after_content %}
+    </div>
+</div>
+{% endblock %}

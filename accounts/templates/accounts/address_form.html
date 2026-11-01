@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if address %}Edit{% else %}New{% endif %} address | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 640px;">
+    <a href="{% url 'profile' %}" class="small"><i class="bi bi-arrow-left"></i> My account</a>
+    <div class="bg-body rounded-4 shadow-sm p-4 mt-2">
+        <h4 class="fw-bold mb-3">{% if address %}Edit address{% else %}New address{% endif %}</h4>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+                {% for field in form %}
+                    {% if field.name == 'is_default' %}
+                        <div class="col-12 form-check ms-1">
+                            {{ field }} <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        </div>
+                    {% else %}
+                        <div class="{% if field.name == 'address_line' %}col-12{% else %}col-md-6{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                            {% for error in field.errors %}<div class="small text-danger">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-warning fw-semibold mt-4">Save address</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

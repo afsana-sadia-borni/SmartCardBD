@@ -1,33 +1,138 @@
 {% extends 'base.html' %}
+{% load static shop_tags %}
+
+{% block title %}{{ product.title }} | SmartCart BD{% endblock %}
+{% block meta_description %}{{ product.description|truncatewords:25 }}{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row">
-        <!-- Product Image -->
-        <div class="col-md-6 mb-4">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
-            {% else %}
-                <img src="https://via.placeholder.com/500" class="img-fluid rounded shadow" alt="No image">
-            {% endif %}
-        </div>
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active text-truncate" style="max-width: 50vw;">{{ product.title }}</li>
+        </ol>
+    </nav>
 
-        <!-- Product Details -->
-        <div class="col-md-6">
-            <h2 class="display-5 fw-bold">{{ product.name }}</h2>
-            <h3 class="text-primary my-3">৳ {{ product.price }}</h3>
-            <p class="lead text-muted">{{ product.description }}</p>
+    <div class="bg-body rounded-4 shadow-sm p-3 p-md-4 mb-4">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
+                     class="img-fluid rounded-3 w-100 product-thumb" alt="{{ product.title }}">
+            </div>
 
-            <hr class="my-4">
+            <div class="col-md-6">
+                <a href="{{ product.category.get_absolute_url }}" class="badge text-bg-light text-decoration-none mb-2">{{ product.category.name }}</a>
+                {% if product.brand %}<span class="small text-body-secondary ms-1">Brand: <strong>{{ product.brand }}</strong></span>{% endif %}
+                <h1 class="h2 fw-bold mt-1">{{ product.title }}</h1>
 
-            <!-- Updated Add to Cart Form -->
-            <form action="{% url 'cart_add' %}" method="POST" class="d-flex align-items-center gap-3">
-                {% csrf_token %}
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-                <input type="number" name="product_qty" value="1" min="1" class="form-control text-center" style="width: 80px;">
-                <button type="submit" class="btn btn-success btn-lg">Add to Cart 🛒</button>
-            </form>
+                <div class="mb-3">
+                    {% if product.review_count %}
+                        <a href="#reviews" class="text-decoration-none">{% stars product.avg_rating product.review_count %}</a>
+                        <span class="small text-body-secondary ms-1">{{ product.avg_rating|floatformat:1 }} / 5</span>
+                    {% else %}
+                        <span class="small text-body-secondary">No reviews yet</span>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex align-items-baseline gap-2 mb-3">
+                    <span class="display-6 fw-bold text-warning-emphasis">{{ product.final_price|taka }}</span>
+                    {% if product.has_discount %}
+                        <span class="price-old fs-5">{{ product.price|taka }}</span>
+                        <span class="badge text-bg-danger">Save {{ product.discount_percent }}%</span>
+                    {% endif %}
+                </div>
+
+                <p class="mb-3">
+                    {% if not product.in_stock %}
+                        <span class="badge text-bg-secondary"><i class="bi bi-x-circle"></i> Out of stock</span>
+                    {% elif product.low_stock %}
+                        <span class="badge text-bg-warning"><i class="bi bi-exclamation-triangle"></i> Only {{ product.stock }} left - order soon</span>
+                    {% else %}
+                        <span class="badge text-bg-success"><i class="bi bi-check-circle"></i> In stock</span>
+                    {% endif %}
+                </p>
+
+                <form class="js-add-to-cart d-flex flex-wrap align-items-center gap-2 mb-3" action="{% url 'cart_add' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <label for="qty" class="visually-hidden">Quantity</label>
+                    <input type="number" id="qty" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control text-center" style="width: 90px;" {% if not product.in_stock %}disabled{% endif %}>
+                    <button type="submit" class="btn btn-warning btn-lg fw-semibold flex-grow-1" {% if not product.in_stock %}disabled{% endif %}>
+                        <i class="bi bi-cart-plus"></i> Add to cart
+                    </button>
+                </form>
+
+                {% if user.is_authenticated %}
+                    <button type="button" class="btn btn-outline-danger js-wishlist-toggle" data-url="{% url 'wishlist_toggle' product.id %}" aria-pressed="{{ in_wishlist|yesno:'true,false' }}">
+                        <i class="bi bi-heart{% if in_wishlist %}-fill{% endif %}"></i>
+                        <span class="js-wishlist-label">{% if in_wishlist %}In wishlist{% else %}Add to wishlist{% endif %}</span>
+                    </button>
+                {% else %}
+                    <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}" class="btn btn-outline-danger"><i class="bi bi-heart"></i> Log in to save</a>
+                {% endif %}
+
+                <ul class="list-unstyled small text-body-secondary mt-4 mb-0">
+                    <li><i class="bi bi-truck me-2"></i>Delivery in 1-2 days inside Dhaka, 3-5 days elsewhere</li>
+                    <li><i class="bi bi-cash-coin me-2"></i>Cash on Delivery available</li>
+                    <li><i class="bi bi-gift me-2"></i>Free delivery on orders over ৳2,000</li>
+                </ul>
+            </div>
         </div>
     </div>
+
+    <div class="bg-body rounded-4 shadow-sm p-3 p-md-4 mb-4">
+        <h4 class="fw-bold">Description</h4>
+        <p class="mb-0" style="white-space: pre-line;">{{ product.description }}</p>
+    </div>
+
+    {% if bought_together %}
+        <section class="mb-4">
+            <h4 class="fw-bold mb-3">Frequently bought together</h4>
+            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 row-cols-xl-4 g-3">
+                {% for product in bought_together %}<div class="col">{% include 'partials/product_card.html' %}</div>{% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <div class="bg-body rounded-4 shadow-sm p-3 p-md-4 mb-4" id="reviews">
+        <h4 class="fw-bold mb-3">Ratings &amp; reviews</h4>
+        {% if can_review %}
+            <form method="post" action="{% url 'add_review' product.slug %}" class="border rounded-3 p-3 mb-4">
+                {% csrf_token %}
+                <h6 class="fw-semibold">{% if user_review %}Update your review{% else %}Write a review{% endif %}</h6>
+                <div class="row g-2">
+                    <div class="col-sm-3">{{ review_form.rating }}</div>
+                    <div class="col-sm-9">{{ review_form.comment }}</div>
+                </div>
+                <button class="btn btn-dark btn-sm mt-2" type="submit">Submit review</button>
+            </form>
+        {% elif user.is_authenticated %}
+            <p class="small text-body-secondary"><i class="bi bi-info-circle"></i> You can review this product once it's been delivered to you.</p>
+        {% endif %}
+
+        {% for review in reviews %}
+            <div class="border-bottom py-3">
+                <div class="d-flex justify-content-between">
+                    <div>{% stars review.rating %} <strong class="ms-2">{{ review.user.first_name|default:review.user.email|truncatechars:20 }}</strong></div>
+                    <small class="text-body-secondary">{{ review.created_at|date:"d M Y" }}</small>
+                </div>
+                {% if review.comment %}<p class="mb-0 mt-2">{{ review.comment }}</p>{% endif %}
+                <small class="text-success"><i class="bi bi-patch-check-fill"></i> Verified purchase</small>
+            </div>
+        {% empty %}
+            <p class="text-body-secondary mb-0">No reviews yet.</p>
+        {% endfor %}
+    </div>
+
+    {% if similar_products %}
+        <section>
+            <h4 class="fw-bold mb-3">You may also like</h4>
+            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 row-cols-xl-4 g-3">
+                {% for product in similar_products %}<div class="col">{% include 'partials/product_card.html' %}</div>{% endfor %}
+            </div>
+        </section>
+    {% endif %}
 </div>
 {% endblock %}

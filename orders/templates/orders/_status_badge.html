@@ -1,0 +1,2 @@
+<span class="badge {% if order.status == 'delivered' %}text-bg-success{% elif order.status == 'cancelled' %}text-bg-danger{% elif order.status == 'shipped' %}text-bg-info{% elif order.status == 'confirmed' %}text-bg-primary{% else %}text-bg-warning{% endif %}">{{ order.get_status_display }}</span>
+{% if order.payment_status == 'paid' %}<span class="badge text-bg-light border">Paid</span>{% elif order.payment_status == 'failed' %}<span class="badge text-bg-light border text-danger">Payment failed</span>{% endif %}

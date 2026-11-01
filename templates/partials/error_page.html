@@ -1,0 +1,13 @@
+{# Shared body for 400/403/404/500 pages. The 500 page renders without a request, so keep this free of request-dependent logic. #}
+<div class="container">
+    <div class="bg-body rounded-4 shadow-sm text-center py-5 px-3 mx-auto" style="max-width: 640px;">
+        <i class="bi bi-{{ icon }} text-warning" style="font-size: 4rem;"></i>
+        <p class="display-5 fw-bold mb-1">{{ code }}</p>
+        <h1 class="h4 fw-bold">{{ heading }}</h1>
+        <p class="text-body-secondary mb-4">{{ message }}</p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a href="{% url 'home' %}" class="btn btn-warning fw-semibold"><i class="bi bi-house"></i> Go to home</a>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-dark"><i class="bi bi-grid"></i> Browse products</a>
+        </div>
+    </div>
+</div>

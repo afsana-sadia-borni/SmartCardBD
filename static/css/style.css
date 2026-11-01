@@ -1,0 +1,208 @@
+:root {
+    --scb-radius: 0.75rem;
+    --scb-sidebar-width: 250px;
+    --scb-topbar-height: 56px;
+}
+
+/* App layout: top bar + sidebar on every page */
+.app-content { min-width: 0; }
+
+.sidebar-heading {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    margin: 1.25rem 0 0.35rem 0.75rem;
+}
+.sidebar-nav > .sidebar-heading:first-child { margin-top: 0; }
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 0;
+    background: transparent;
+    color: var(--bs-body-color);
+    text-decoration: none;
+    font-size: 0.925rem;
+    text-align: left;
+}
+.sidebar-link:hover { background: var(--bs-tertiary-bg); }
+.sidebar-link.active {
+    background: rgba(255, 193, 7, 0.18);
+    font-weight: 600;
+}
+.sidebar-link.active i { color: #b58100; }
+
+.app-sidebar { width: var(--scb-sidebar-width); }
+@media (min-width: 992px) {
+    .app-sidebar {
+        flex: 0 0 var(--scb-sidebar-width);
+        position: sticky;
+        top: var(--scb-topbar-height);
+        height: calc(100vh - var(--scb-topbar-height));
+        overflow-y: auto;
+        scrollbar-width: thin;
+        /* Bootstrap makes .offcanvas-lg transparent on large screens */
+        background-color: var(--bs-body-bg) !important;
+    }
+    .app-sidebar .offcanvas-body { padding: 1rem !important; }
+}
+
+/* Product cards */
+.product-card {
+    border: 0;
+    border-radius: var(--scb-radius);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12) !important;
+}
+.product-card .card-img-top,
+.product-thumb {
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    background: #f1f3f5;
+}
+.product-card .card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.5em;
+    line-height: 1.25;
+}
+.product-card .badge-corner {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 2;
+}
+.product-card .wishlist-corner {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+}
+.btn-wishlist {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.92);
+    border: 0;
+    color: #dc3545;
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.12);
+}
+.btn-wishlist:hover { transform: scale(1.08); }
+
+.price-old {
+    text-decoration: line-through;
+    color: var(--bs-secondary-color);
+    font-size: 0.875em;
+}
+
+.stars { letter-spacing: 1px; font-size: 0.9em; }
+
+/* Hero */
+.hero {
+    border-radius: var(--scb-radius);
+    background: linear-gradient(120deg, #212529 0%, #343a40 55%, #ffc107 160%);
+    color: #fff;
+}
+
+.category-pill {
+    border-radius: 2rem;
+    white-space: nowrap;
+}
+.scroll-x {
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+/* Cart */
+.qty-group { width: 8.5rem; }
+.qty-group input { text-align: center; }
+.qty-group input::-webkit-outer-spin-button,
+.qty-group input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qty-group input[type=number] { -moz-appearance: textfield; }
+.cart-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem; }
+
+/* Order tracking timeline */
+.order-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    counter-reset: step;
+}
+.order-steps::before {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    left: 12%;
+    right: 12%;
+    height: 3px;
+    background: var(--bs-border-color);
+}
+.order-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    font-size: 0.875rem;
+}
+.order-step .dot {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bs-secondary-bg);
+    border: 3px solid var(--bs-border-color);
+    position: relative;
+}
+.order-step.done .dot {
+    background: var(--bs-success);
+    border-color: var(--bs-success);
+    color: #fff;
+}
+
+/* Auth pages (django-allauth) */
+.auth-card { max-width: 440px; }
+.auth-card input:not([type=checkbox]):not([type=radio]):not([type=hidden]),
+.auth-card select {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+.auth-card input:focus {
+    outline: 0;
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+.auth-card label { font-weight: 500; margin-bottom: 0.25rem; }
+.auth-card .errorlist { color: var(--bs-danger); list-style: none; padding: 0; font-size: 0.875rem; margin: 0.25rem 0; }
+.auth-card .helptext, .auth-card .form-text { font-size: 0.8rem; color: var(--bs-secondary-color); }
+.auth-card a { color: #b58100; }
+
+.payment-option {
+    cursor: pointer;
+    border-radius: var(--scb-radius);
+}
+.payment-option:has(input:checked) {
+    border-color: #ffc107 !important;
+    background: rgba(255, 193, 7, 0.08);
+}
+
+.stat-card { border-radius: var(--scb-radius); }

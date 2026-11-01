@@ -1,0 +1,41 @@
+{% load static shop_tags %}
+<div class="card product-card h-100 shadow-sm position-relative">
+    {% if product.has_discount %}
+        <span class="badge text-bg-danger badge-corner">-{{ product.discount_percent }}%</span>
+    {% elif not product.in_stock %}
+        <span class="badge text-bg-secondary badge-corner">Out of stock</span>
+    {% endif %}
+    {% if user.is_authenticated %}
+        <div class="wishlist-corner">
+            <button type="button" class="btn-wishlist js-wishlist-toggle" data-url="{% url 'wishlist_toggle' product.id %}" aria-label="Toggle wishlist">
+                <i class="bi bi-heart{% if product.id in wishlist_ids %}-fill{% endif %}"></i>
+            </button>
+        </div>
+    {% endif %}
+    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body">
+        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
+             class="card-img-top" alt="{{ product.title }}" loading="lazy">
+    </a>
+    <div class="card-body d-flex flex-column p-3">
+        <small class="text-body-secondary">{{ product.brand|default:product.category.name }}</small>
+        <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body">
+            <h6 class="card-title fw-semibold mt-1 mb-2">{{ product.title }}</h6>
+        </a>
+        {% if product.review_count %}
+            <div class="mb-2">{% stars product.avg_rating product.review_count %}</div>
+        {% endif %}
+        <div class="mt-auto">
+            <span class="fw-bold fs-5 text-warning-emphasis">{{ product.final_price|taka }}</span>
+            {% if product.has_discount %}<span class="price-old ms-1">{{ product.price|taka }}</span>{% endif %}
+        </div>
+        <form class="js-add-to-cart mt-2" action="{% url 'cart_add' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn btn-sm btn-dark w-100" {% if not product.in_stock %}disabled{% endif %}>
+                <i class="bi bi-cart-plus"></i> {% if product.in_stock %}Add to cart{% else %}Out of stock{% endif %}
+            </button>
+        </form>
+    </div>
+</div>

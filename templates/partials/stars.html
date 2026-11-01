@@ -1,0 +1,1 @@
+<span class="stars text-warning" title="{{ rating|floatformat:1 }} out of 5">{% for icon in icons %}<i class="bi bi-{{ icon }}"></i>{% endfor %}</span>{% if count is not None %} <small class="text-body-secondary">({{ count }})</small>{% endif %}

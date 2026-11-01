@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+
+{% block title %}Dashboard | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h2 class="fw-bold mb-0"><i class="bi bi-graph-up-arrow"></i> Store dashboard</h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'admin:orders_order_changelist' %}?status__exact=pending" class="btn btn-warning btn-sm">Pending orders ({{ pending_orders }})</a>
+            <a href="{% url 'admin:index' %}" class="btn btn-outline-dark btn-sm">Admin panel</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><div class="stat-card bg-body shadow-sm p-3 h-100"><small class="text-body-secondary">Today's orders</small><div class="fs-3 fw-bold">{{ today_orders }}</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card bg-body shadow-sm p-3 h-100"><small class="text-body-secondary">Today's revenue</small><div class="fs-3 fw-bold">{{ today_revenue|taka }}</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card bg-body shadow-sm p-3 h-100"><small class="text-body-secondary">This month</small><div class="fs-3 fw-bold">{{ month_revenue|taka }}</div></div></div>
+        <div class="col-6 col-lg-3"><div class="stat-card bg-body shadow-sm p-3 h-100"><small class="text-body-secondary">Total orders</small><div class="fs-3 fw-bold">{{ total_orders }}</div></div></div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <h5 class="fw-bold">Sales - last 30 days</h5>
+                <canvas id="salesChart" height="120"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <h5 class="fw-bold">Orders by status</h5>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <h5 class="fw-bold">Top products</h5>
+                <ol class="list-group list-group-flush list-group-numbered">
+                    {% for p in top_products %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start px-0">
+                            <div class="ms-2 me-auto small">{{ p.product_title }}<div class="text-body-secondary">{{ p.revenue|taka }}</div></div>
+                            <span class="badge text-bg-dark rounded-pill">{{ p.units }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-body-secondary small">No sales yet.</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <h5 class="fw-bold"><i class="bi bi-exclamation-triangle text-warning"></i> Low stock</h5>
+                <ul class="list-group list-group-flush">
+                    {% for p in low_stock %}
+                        <li class="list-group-item d-flex justify-content-between px-0 small">
+                            <a href="{% url 'admin:products_product_change' p.id %}" class="text-body">{{ p.title }}</a>
+                            <span class="badge {% if p.stock == 0 %}text-bg-danger{% else %}text-bg-warning{% endif %}">{{ p.stock }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-body-secondary small">All products are well stocked.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <h5 class="fw-bold">Recent orders</h5>
+                <ul class="list-group list-group-flush">
+                    {% for order in recent_orders %}
+                        <li class="list-group-item px-0 small d-flex justify-content-between align-items-center">
+                            <a href="{% url 'admin:orders_order_change' order.id %}" class="font-monospace">{{ order.order_number }}</a>
+                            <span>{{ order.total|taka }} {% include 'orders/_status_badge.html' %}</span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item px-0 text-body-secondary small">No orders yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const sales = {{ sales_chart|safe }};
+    const status = {{ status_chart|safe }};
+    new Chart(document.getElementById('salesChart'), {
+        data: {
+            labels: sales.labels,
+            datasets: [
+                { type: 'bar', label: 'Revenue (৳)', data: sales.revenue, backgroundColor: 'rgba(255, 193, 7, 0.7)', yAxisID: 'y' },
+                { type: 'line', label: 'Orders', data: sales.orders, borderColor: '#212529', tension: 0.3, yAxisID: 'y1' },
+            ],
+        },
+        options: {
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                y: { beginAtZero: true, position: 'left' },
+                y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { precision: 0 } },
+            },
+        },
+    });
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: status.labels,
+            datasets: [{ data: status.data, backgroundColor: ['#ffc107', '#0d6efd', '#0dcaf0', '#198754', '#dc3545'] }],
+        },
+        options: { plugins: { legend: { position: 'bottom' } } },
+    });
+</script>
+{% endblock %}
