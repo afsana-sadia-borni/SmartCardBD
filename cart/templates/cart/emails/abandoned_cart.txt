@@ -1,0 +1,12 @@
+{% load shop_tags %}Hi{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+You left these in your cart at {{ site_name }}:
+{% for product in products %}
+- {{ product.title }}: {{ product.final_price|taka }}{% endfor %}
+
+They're still available, but stock is limited. Finish your order here:
+/cart/
+
+Cash on Delivery is available all over Bangladesh.
+
+- {{ site_name }}
