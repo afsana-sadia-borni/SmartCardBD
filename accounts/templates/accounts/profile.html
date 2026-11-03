@@ -22,6 +22,49 @@
         <div class="col-md-4"><a href="{% url 'address_add' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-geo-alt fs-3 text-primary"></i><div class="fw-semibold">Add address</div><small class="text-body-secondary">For faster checkout</small></a></div>
     </div>
 
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="loyalty-card rounded-4 shadow-sm p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="small text-white-50">Reward points</div>
+                        <div class="display-6 fw-bold">{{ loyalty.points|num }}</div>
+                        <div class="small">Worth {{ loyalty.points_value|taka }} off your next order</div>
+                    </div>
+                    <i class="bi bi-star-fill fs-1 text-warning"></i>
+                </div>
+                <p class="small text-white-50 mt-3 mb-0">Earn 1 point for every ৳100 you spend (added when your order is delivered). Every 100 points = ৳50 off at checkout.</p>
+                {% if point_history %}
+                    <details class="mt-2 small"><summary>Points history</summary>
+                        <ul class="list-unstyled mt-2 mb-0">
+                            {% for t in point_history %}<li class="d-flex justify-content-between"><span>{{ t.reason }}</span><span class="{% if t.points > 0 %}text-warning{% endif %}">{% if t.points > 0 %}+{% endif %}{{ t.points|num }}</span></li>{% endfor %}
+                        </ul>
+                    </details>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="bg-body rounded-4 shadow-sm p-4 h-100">
+                <h5 class="fw-bold"><i class="bi bi-people text-warning"></i> Invite friends, get {{ 100|taka }}</h5>
+                <p class="small text-body-secondary">When a friend signs up with your code and their first order is delivered, you both get a {{ 100|taka }} coupon.</p>
+                <div class="input-group input-group-sm mb-2">
+                    <span class="input-group-text">Your code</span>
+                    <input type="text" class="form-control fw-bold font-monospace" value="{{ loyalty.referral_code }}" readonly aria-label="Your referral code">
+                    <button class="btn btn-dark js-copy-link" type="button" data-url="{{ referral_link }}"><i class="bi bi-link-45deg"></i> Copy link</button>
+                </div>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-sm btn-success" href="https://wa.me/?text={{ 'Join SmartCart BD with my link and get ৳100 off: '|urlencode }}{{ referral_link|urlencode }}" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> Share</a>
+                    <a class="btn btn-sm btn-primary" href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link|urlencode }}" target="_blank" rel="noopener"><i class="bi bi-facebook"></i> Share</a>
+                </div>
+                <p class="small text-body-secondary mt-2 mb-0">{{ referral_count|num }} friend{{ referral_count|pluralize }} joined with your code.</p>
+                {% if coupons %}
+                    <hr><div class="small fw-semibold mb-1">Your coupons</div>
+                    {% for c in coupons %}<span class="badge text-bg-success me-1 font-monospace">{{ c.code }} · {{ c.value|taka }}</span>{% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     <div class="row g-4">
         <div class="col-lg-6">
             <div class="bg-body rounded-4 shadow-sm p-4 h-100">
@@ -35,7 +78,7 @@
                             <strong>{{ address.full_name }}</strong>
                             {% if address.is_default %}<span class="badge text-bg-warning">Default</span>{% endif %}
                         </div>
-                        <div class="small text-body-secondary">{{ address.phone }}<br>{{ address.address_line }}, {{ address.area }}, {{ address.district }}</div>
+                        <div class="small text-body-secondary">{{ address.phone }}<br>{{ address.address_line }}, {{ address.area }}{% if address.upazila %}, {{ address.upazila }}{% endif %}, {{ address.district }}</div>
                         <div class="d-flex gap-2 mt-2">
                             <a href="{% url 'address_edit' address.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
                             {% if not address.is_default %}

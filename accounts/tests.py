@@ -8,7 +8,7 @@ from products.models import Category, Product
 
 from .models import Address, Wishlist
 
-ADDRESS = {'full_name': 'Karim', 'phone': '01812345678', 'district': 'Sylhet', 'area': 'Zindabazar',
+ADDRESS = {'full_name': 'Karim', 'phone': '01812345678', 'district': 'Sylhet', 'upazila': 'Balaganj', 'area': 'Zindabazar',
            'address_line': 'House 5'}
 
 

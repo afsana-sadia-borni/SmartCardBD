@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Unsubscribe | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 560px;">
+    <div class="bg-body rounded-4 shadow-sm p-4 text-center">
+        <i class="bi bi-envelope-x fs-1 text-warning"></i>
+        <h1 class="h4 fw-bold mt-2">Unsubscribe {{ subscriber.email }}?</h1>
+        <p class="text-body-secondary">You won't get deal emails from us any more.</p>
+        <form method="post">{% csrf_token %}<button class="btn btn-dark" type="submit">Unsubscribe</button></form>
+    </div>
+</div>
+{% endblock %}

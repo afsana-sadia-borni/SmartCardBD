@@ -10,4 +10,12 @@ urlpatterns = [
     path('addresses/<int:pk>/default/', views.address_make_default, name='address_make_default'),
     path('wishlist/', views.wishlist, name='wishlist'),
     path('wishlist/toggle/<int:product_id>/', views.wishlist_toggle, name='wishlist_toggle'),
+    path('notifications/', views.notifications, name='notifications'),
+    path('notifications/<int:pk>/', views.notification_open, name='notification_open'),
+    path('notifications/read/', views.notifications_mark_read, name='notifications_mark_read'),
+]
+
+newsletter_urlpatterns = [
+    path('subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+    path('unsubscribe/<str:token>/', views.newsletter_unsubscribe, name='newsletter_unsubscribe'),
 ]
