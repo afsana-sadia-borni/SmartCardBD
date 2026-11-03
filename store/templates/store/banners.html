@@ -1,0 +1,32 @@
+{% extends 'store/base.html' %}
+{% load shop_tags %}
+
+{% block title %}Home banners{% endblock %}
+{% block page_title %}Home banners{% endblock %}
+{% block page_subtitle %}The big slides at the top of the home page.{% endblock %}
+
+{% block content %}
+<div class="store-card">
+    <div class="store-card-header"><h2>Slides, in order</h2><a href="{% url 'store:banner_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New banner</a></div>
+    <div class="table-responsive">
+        <table class="table table-hover store-table">
+            <thead><tr><th>Banner</th><th>Button</th><th>Showing</th><th></th></tr></thead>
+            <tbody>
+                {% for b in banners %}
+                    <tr>
+                        <td><div class="d-flex align-items-center gap-3"><img src="{{ b.image.url|webp:400 }}" alt="" class="thumb-wide"><span><span class="fw-semibold">{{ b.title }}</span><br><small class="text-body-secondary">{{ b.subtitle }}</small></span></div></td>
+                        <td class="small">{{ b.button_text }}<br><span class="text-body-secondary">{{ b.link_url|default:"-" }}</span></td>
+                        <td>{% if b.is_active %}<span class="badge text-bg-success">On</span>{% else %}<span class="badge text-bg-secondary">Off</span>{% endif %}{% if b.ends_at %}<br><small class="text-body-secondary">until {{ b.ends_at|date:"d M" }}</small>{% endif %}</td>
+                        <td class="text-end text-nowrap">
+                            <a href="{% url 'store:banner_edit' b.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i> Edit</a>
+                            <form method="post" action="{% url 'store:banner_delete' b.pk %}" class="d-inline" data-confirm="Delete this banner?">{% csrf_token %}<button class="btn btn-sm btn-light text-danger" aria-label="Delete"><i class="bi bi-trash"></i></button></form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center text-body-secondary py-5"><i class="bi bi-images fs-1 d-block mb-2"></i>No banners yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

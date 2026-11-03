@@ -1,0 +1,45 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Team{% endblock %}
+{% block page_title %}Team{% endblock %}
+{% block page_subtitle %}Who can use this store panel, and what they can do.{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="store-card">
+            <div class="store-card-header"><h2>Members</h2></div>
+            <div class="list-group list-group-flush">
+                {% for member, member_role in members %}
+                    <div class="list-group-item d-flex align-items-center gap-3 p-3">
+                        <span class="store-avatar">{{ member.email|first|upper }}</span>
+                        <span class="me-auto min-w-0"><span class="d-block fw-semibold text-truncate">{{ member.get_full_name|default:member.email }}</span><small class="text-body-secondary">{{ member.email }}</small></span>
+                        <span class="badge {% if member.is_superuser %}text-bg-warning{% else %}text-bg-primary{% endif %}">{{ member_role }}</span>
+                        {% if not member.is_superuser %}
+                            <form method="post" action="{% url 'store:team_remove' member.pk %}" data-confirm="Remove {{ member.email }} from the team?">{% csrf_token %}<button class="btn btn-sm btn-light text-danger" aria-label="Remove {{ member.email }}"><i class="bi bi-person-dash"></i></button></form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <form method="post" class="store-card p-3 p-md-4 mb-4" novalidate>
+            {% csrf_token %}
+            <h2 class="h6 fw-bold mb-3">Add a team member</h2>
+            <div class="row g-3">
+                {% include 'store/_field.html' with field=form.email %}
+                {% include 'store/_field.html' with field=form.role %}
+            </div>
+            <button class="btn btn-primary mt-3" type="submit"><i class="bi bi-person-plus"></i> Add to team</button>
+        </form>
+        <div class="store-card p-3 p-md-4">
+            <h2 class="h6 fw-bold">Roles</h2>
+            <dl class="small mb-0">
+                <dt>Owner</dt><dd class="text-body-secondary">Everything, including the team and advanced settings.</dd>
+                {% for name, role in roles.items %}<dt>{{ name }}</dt><dd class="text-body-secondary">{{ role.description }}</dd>{% endfor %}
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}

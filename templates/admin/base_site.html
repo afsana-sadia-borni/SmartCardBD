@@ -1,0 +1,7 @@
+{% extends "admin/base_site.html" %}
+{# Adds a "Store panel" link next to "View site" so staff can move between the two. #}
+
+{% block userlinks %}
+    <a href="{% url 'store:dashboard' %}">Store panel</a> /
+    {{ block.super }}
+{% endblock %}

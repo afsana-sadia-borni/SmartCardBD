@@ -1,0 +1,39 @@
+{% extends 'store/base.html' %}
+{% load shop_tags %}
+
+{% block title %}Coupons{% endblock %}
+{% block page_title %}Coupons{% endblock %}
+{% block page_subtitle %}Discount codes customers type at checkout.{% endblock %}
+
+{% block content %}
+<div class="store-card">
+    <div class="store-card-header">
+        <ul class="nav store-tabs gap-1">
+            <li class="nav-item"><a class="nav-link {% if show == 'public' %}active{% endif %}" href="?show=public">Shop coupons</a></li>
+            <li class="nav-item"><a class="nav-link {% if show == 'personal' %}active{% endif %}" href="?show=personal">Personal (referral rewards)</a></li>
+        </ul>
+        <a href="{% url 'store:coupon_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New coupon</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover store-table">
+            <thead><tr><th>Code</th><th>Discount</th><th>Min. order</th><th>Valid until</th><th>Used</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                {% for c in page_obj %}
+                    <tr>
+                        <td><span class="font-monospace fw-bold">{{ c.code }}</span>{% if c.user %}<br><small class="text-body-secondary">for {{ c.user.email }}</small>{% endif %}</td>
+                        <td>{% if c.discount_type == 'percent' %}{{ c.value|floatformat:"-2" }}%{% if c.max_discount %} <small class="text-body-secondary">(max {{ c.max_discount|taka }})</small>{% endif %}{% else %}{{ c.value|taka }}{% endif %}</td>
+                        <td>{{ c.min_order_amount|taka }}</td>
+                        <td class="small">{{ c.valid_to|date:"d M Y" }}</td>
+                        <td>{{ c.used_count }}{% if c.usage_limit %} / {{ c.usage_limit }}{% endif %}</td>
+                        <td><span class="badge {% if c.state == 'Active' %}text-bg-success{% elif c.state == 'Scheduled' %}text-bg-info{% else %}text-bg-secondary{% endif %}">{{ c.state }}</span></td>
+                        <td class="text-end"><a href="{% url 'store:coupon_edit' c.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i> Edit</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center text-body-secondary py-5"><i class="bi bi-ticket-perforated fs-1 d-block mb-2"></i>No coupons here.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'store/_pagination.html' %}
+</div>
+{% endblock %}
