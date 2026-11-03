@@ -69,6 +69,9 @@ class CustomerProfile(models.Model):
     referred_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                     related_name='referrals')
     referral_rewarded = models.BooleanField(default=False)
+    # Mobile number for logging in (01XXXXXXXXX). Not verified by SMS yet (no SMS gateway).
+    phone = models.CharField(max_length=11, unique=True, null=True, blank=True)
+    phone_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.referral_code:
@@ -102,6 +105,22 @@ class PointTransaction(models.Model):
 
     def __str__(self):
         return f'{self.points:+d} {self.reason}'
+
+
+class PushSubscription(models.Model):
+    """A browser that agreed to receive push notifications (Web Push API) for this user."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='push_subscriptions')
+    endpoint = models.URLField(max_length=500, unique=True)
+    p256dh = models.CharField(max_length=200)
+    auth = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def as_subscription_info(self):
+        return {'endpoint': self.endpoint, 'keys': {'p256dh': self.p256dh, 'auth': self.auth}}
+
+    def __str__(self):
+        return f'Push for {self.user}'
 
 
 class Notification(models.Model):

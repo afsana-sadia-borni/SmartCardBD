@@ -26,6 +26,17 @@ def _base_url():
     return 'https://sandbox.sslcommerz.com' if settings.SSLCOMMERZ_SANDBOX else 'https://securepay.sslcommerz.com'
 
 
+# Open the SSLCommerz page straight on the method the customer chose at checkout. SSLCommerz has no
+# separate code for Nagad, so it gets the mobile-banking list (which includes Nagad).
+CHANNEL_GATEWAYS = {
+    'bkash': 'bkash',
+    'nagad': 'mobilebank',
+    'rocket': 'dbblmobilebanking',
+    'card': 'visacard,mastercard,amexcard',
+    'internetbank': 'internetbank',
+}
+
+
 def init_payment(order, request):
     """Create a gateway session and return the URL to redirect the customer to."""
     if not is_configured():
@@ -61,15 +72,26 @@ def init_payment(order, request):
         'product_category': 'General',
         'product_profile': 'general',
     }
+    gateway = CHANNEL_GATEWAYS.get(order.payment_channel)
+    data = _create_session({**payload, 'multi_card_name': gateway} if gateway else payload)
+    if gateway and not _session_ok(data):
+        # The method list is optional; if the store doesn't allow that filter, show every method instead.
+        data = _create_session(payload)
+    if not _session_ok(data):
+        raise PaymentError(data.get('failedreason') or 'Payment gateway rejected the request.')
+    return data['GatewayPageURL']
+
+
+def _create_session(payload):
     try:
         response = requests.post(f'{_base_url()}/gwprocess/v4/api.php', data=payload, timeout=TIMEOUT)
-        data = response.json()
+        return response.json()
     except (requests.RequestException, ValueError) as exc:
         raise PaymentError('Could not reach the payment gateway. Please try again.') from exc
 
-    if data.get('status') != 'SUCCESS' or not data.get('GatewayPageURL'):
-        raise PaymentError(data.get('failedreason') or 'Payment gateway rejected the request.')
-    return data['GatewayPageURL']
+
+def _session_ok(data):
+    return data.get('status') == 'SUCCESS' and bool(data.get('GatewayPageURL'))
 
 
 def validate_payment(val_id, order):
