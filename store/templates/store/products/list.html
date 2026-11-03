@@ -1,0 +1,82 @@
+{% extends 'store/base.html' %}
+{% load static shop_tags %}
+
+{% block title %}Products{% endblock %}
+{% block page_title %}Products{% endblock %}
+{% block page_subtitle %}Prices, stock and photos.{% endblock %}
+
+{% block content %}
+<div class="store-card">
+    <div class="store-card-header">
+        <form method="get" class="d-flex flex-wrap gap-2" role="search">
+            <input type="search" name="q" value="{{ q }}" class="form-control form-control-sm" style="width: 200px;" placeholder="Name, brand or SKU" aria-label="Search products">
+            <select name="category" class="form-select form-select-sm" style="width: auto;" aria-label="Category" onchange="this.form.submit()">
+                <option value="">All categories</option>
+                {% for c in categories %}<option value="{{ c.pk }}" {% if category == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+            </select>
+            <select name="stock" class="form-select form-select-sm" style="width: auto;" aria-label="Stock" onchange="this.form.submit()">
+                <option value="">Any stock</option>
+                <option value="low" {% if stock == 'low' %}selected{% endif %}>Low stock (1-{{ low_stock }})</option>
+                <option value="out" {% if stock == 'out' %}selected{% endif %}>Out of stock</option>
+            </select>
+            <select name="status" class="form-select form-select-sm" style="width: auto;" aria-label="Visibility" onchange="this.form.submit()">
+                <option value="">Visible and hidden</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Visible</option>
+                <option value="hidden" {% if status == 'hidden' %}selected{% endif %}>Hidden</option>
+            </select>
+            <button class="btn btn-sm btn-outline-primary" type="submit">Filter</button>
+        </form>
+        <a href="{% url 'store:product_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add product</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover store-table">
+            <thead><tr><th>Product</th><th class="text-end">Price</th><th>Stock</th><th>Shop</th><th></th></tr></thead>
+            <tbody>
+                {% for p in page_obj %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="{% if p.image %}{{ p.image.url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="" class="thumb">
+                                <span class="min-w-0"><a href="{% url 'store:product_edit' p.pk %}" class="fw-semibold">{{ p.title }}</a><br><small class="text-body-secondary">{{ p.category.name }}{% if p.brand %} · {{ p.brand }}{% endif %}{% if p.variant_count %} · {{ p.variant_count }} option{{ p.variant_count|pluralize }}{% endif %}</small></span>
+                            </div>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            {{ p.final_price|taka }}
+                            {% if p.final_price < p.price %}<br><small class="text-body-secondary text-decoration-line-through">{{ p.price|taka }}</small>{% endif %}
+                            {% if p.flash_sale %}<br><span class="badge text-bg-danger"><i class="bi bi-lightning-charge"></i> Flash sale</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if p.variant_count %}
+                                <span class="badge {% if p.stock == 0 %}text-bg-danger{% elif p.stock <= low_stock %}text-bg-warning{% else %}text-bg-success{% endif %}">{{ p.stock }}</span>
+                            {% else %}
+                                <form method="post" action="{% url 'store:product_quick_update' p.pk %}" class="d-flex gap-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <input type="number" name="stock" value="{{ p.stock }}" min="0" class="form-control form-control-sm stock-input {% if p.stock == 0 %}is-invalid{% elif p.stock <= low_stock %}border-warning{% endif %}" aria-label="Stock for {{ p.title }}">
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit" aria-label="Save stock"><i class="bi bi-check-lg"></i></button>
+                                </form>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'store:product_quick_update' p.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                <button name="toggle_active" value="1" class="btn btn-sm {% if p.is_active %}btn-outline-success{% else %}btn-outline-secondary{% endif %}" type="submit">
+                                    {% if p.is_active %}<i class="bi bi-eye"></i> Visible{% else %}<i class="bi bi-eye-slash"></i> Hidden{% endif %}
+                                </button>
+                            </form>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a href="{% url 'store:product_edit' p.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i> Edit</a>
+                            <a href="{{ p.get_absolute_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-light" aria-label="View in shop"><i class="bi bi-box-arrow-up-right"></i></a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-body-secondary py-5"><i class="bi bi-box-seam fs-1 d-block mb-2"></i>No products match.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'store/_pagination.html' %}
+</div>
+{% endblock %}

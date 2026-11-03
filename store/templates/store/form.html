@@ -1,0 +1,26 @@
+{% extends 'store/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<a href="{% url back_url %}" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> Back</a>
+<form method="post" enctype="multipart/form-data" class="store-card p-3 p-md-4 mt-3" style="max-width: 900px;" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    {% if object.image %}<img src="{{ object.image.url }}" alt="Current image" class="img-fluid rounded-3 mb-3" style="max-height: 160px;">{% endif %}
+    <div class="row g-3">
+        {% for field in form %}
+            {% if field.field.widget.input_type == 'checkbox' or field.field.widget.allow_multiple_selected or field.name == 'description' or field.name == 'title' %}
+                {% include 'store/_field.html' with col='col-12' %}
+            {% else %}
+                {% include 'store/_field.html' with col='col-md-6' %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> Save</button>
+        <a href="{% url back_url %}" class="btn btn-light">Cancel</a>
+    </div>
+</form>
+{% endblock %}

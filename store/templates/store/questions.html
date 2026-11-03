@@ -1,0 +1,41 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Questions{% endblock %}
+{% block page_title %}Customer questions{% endblock %}
+{% block page_subtitle %}Answers appear on the product page, and the customer gets a notification.{% endblock %}
+
+{% block content %}
+<div class="store-card">
+    <div class="store-card-header">
+        <ul class="nav store-tabs gap-1">
+            <li class="nav-item"><a class="nav-link {% if tab == 'unanswered' %}active{% endif %}" href="?show=unanswered">To answer</a></li>
+            <li class="nav-item"><a class="nav-link {% if tab == 'answered' %}active{% endif %}" href="?show=answered">Answered</a></li>
+            <li class="nav-item"><a class="nav-link {% if tab == 'all' %}active{% endif %}" href="?show=all">All</a></li>
+        </ul>
+    </div>
+    <div class="list-group list-group-flush">
+        {% for q in page_obj %}
+            <div class="list-group-item p-3">
+                <div class="d-flex flex-wrap justify-content-between gap-2 mb-1">
+                    <a href="{{ q.product.get_absolute_url }}#questions" target="_blank" rel="noopener" class="small fw-semibold">{{ q.product.title }}</a>
+                    <small class="text-body-secondary">{{ q.user.first_name|default:q.user.email }} · {{ q.created_at|date:"d M Y" }}{% if not q.is_published %} · <span class="text-danger">hidden</span>{% endif %}</small>
+                </div>
+                <p class="mb-2"><i class="bi bi-question-circle text-info"></i> {{ q.question }}</p>
+                <form method="post" action="{% url 'store:question_answer' q.pk %}" class="d-flex flex-column flex-md-row gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <textarea name="answer" rows="2" class="form-control form-control-sm" placeholder="Write your answer..." aria-label="Answer">{{ q.answer }}</textarea>
+                    <div class="d-flex flex-md-column gap-2">
+                        <button class="btn btn-sm btn-primary text-nowrap" type="submit">{% if q.answered_at %}Update{% else %}Post answer{% endif %}</button>
+                        <button class="btn btn-sm btn-light text-nowrap" name="toggle_publish" value="1" type="submit">{% if q.is_published %}Hide{% else %}Show{% endif %}</button>
+                    </div>
+                </form>
+                {% if q.answered_by %}<small class="text-body-secondary">Answered by {{ q.answered_by.first_name|default:q.answered_by.email }}, {{ q.answered_at|date:"d M Y" }}</small>{% endif %}
+            </div>
+        {% empty %}
+            <div class="text-center text-body-secondary py-5"><i class="bi bi-chat-left-dots fs-1 d-block mb-2"></i>No questions here.</div>
+        {% endfor %}
+    </div>
+    {% include 'store/_pagination.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,2 @@
+{# A form field inside a table cell: the column header is its label. #}
+{{ field }}{% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}

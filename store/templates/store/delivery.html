@@ -1,0 +1,30 @@
+{% extends 'store/base.html' %}
+{% load shop_tags %}
+
+{% block title %}Delivery charges{% endblock %}
+{% block page_title %}Delivery charges{% endblock %}
+{% block page_subtitle %}Charge and delivery time for each area. Checkout uses these straight away.{% endblock %}
+
+{% block content %}
+<div class="store-card">
+    <div class="store-card-header"><h2>Zones</h2><a href="{% url 'store:delivery_add' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New zone</a></div>
+    <div class="table-responsive">
+        <table class="table table-hover store-table">
+            <thead><tr><th>Zone</th><th>Charge</th><th>Delivery time</th><th>Districts</th><th></th></tr></thead>
+            <tbody>
+                {% for z in zones %}
+                    <tr>
+                        <td class="fw-semibold">{{ z.name }}{% if z.is_default %} <span class="badge text-bg-info">Default</span>{% endif %}</td>
+                        <td>{{ z.charge|taka }}</td>
+                        <td>{{ z.delivery_time }}</td>
+                        <td class="small">{% if z.districts %}{{ z.districts|join:", "|truncatechars:90 }}{% else %}All other districts{% endif %}</td>
+                        <td class="text-end"><a href="{% url 'store:delivery_edit' z.pk %}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i> Edit</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="text-center text-body-secondary py-5">No zones: the default charges from settings are used.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

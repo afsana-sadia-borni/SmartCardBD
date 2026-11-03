@@ -1,0 +1,111 @@
+{% extends 'store/base.html' %}
+{% load static shop_tags %}
+
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block page_title %}Order {{ order.order_number }}{% endblock %}
+{% block page_subtitle %}Placed {{ order.created_at|date:"d M Y, h:i A" }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'store:orders' %}" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> All orders</a>
+
+{# ---------- What to do next ---------- #}
+<div class="store-card p-3 p-md-4 my-3 d-flex flex-wrap align-items-center gap-3">
+    <div class="me-auto">
+        <div class="small text-body-secondary">Status</div>
+        <div class="fs-5 fw-bold">{% include 'orders/_status_badge.html' %}</div>
+        {% if order.status == 'pending' %}<small class="text-body-secondary">Call the customer to check the order, then confirm it.</small>
+        {% elif order.status == 'confirmed' %}<small class="text-body-secondary">Pack it, hand it to the courier, then mark it shipped.</small>
+        {% elif order.status == 'shipped' %}<small class="text-body-secondary">Mark it delivered when the customer has it{% if order.payment_method == 'cod' %} and the courier has collected {{ order.total|taka }}{% endif %}.</small>
+        {% endif %}
+    </div>
+    <form method="post" action="{% url 'store:order_action' order.order_number %}" class="d-flex flex-wrap gap-2">
+        {% csrf_token %}
+        {% if 'confirm' in actions %}<button name="action" value="confirm" class="btn btn-primary action-btn"><i class="bi bi-check2-circle"></i> Confirm order</button>{% endif %}
+        {% if 'ship' in actions %}<button name="action" value="ship" class="btn {% if order.status == 'confirmed' %}btn-primary{% else %}btn-outline-primary{% endif %} action-btn"><i class="bi bi-truck"></i> Mark shipped</button>{% endif %}
+        {% if 'deliver' in actions %}<button name="action" value="deliver" class="btn btn-success action-btn"><i class="bi bi-box-seam"></i> Mark delivered</button>{% endif %}
+    </form>
+    <a href="{% url 'order_invoice' order.order_number %}" class="btn btn-outline-secondary action-btn"><i class="bi bi-printer"></i> Invoice</a>
+    {% if can_cancel %}
+        <form method="post" action="{% url 'store:order_action' order.order_number %}" data-confirm="Cancel this order? Its items go back in stock and the customer is told.">
+            {% csrf_token %}
+            <button name="action" value="cancel" class="btn btn-outline-danger action-btn"><i class="bi bi-x-circle"></i> Cancel</button>
+        </form>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="store-card mb-4">
+            <div class="store-card-header"><h2>Items</h2></div>
+            <div class="table-responsive">
+                <table class="table store-table">
+                    <thead><tr><th>Product</th><th class="text-end">Price</th><th class="text-end">Qty</th><th class="text-end">Amount</th></tr></thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td class="d-flex align-items-center gap-2">
+                                    <img src="{% if item.product.image %}{{ item.product.image.url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="" class="thumb">
+                                    <span>{% if item.product %}<a href="{% url 'store:product_edit' item.product.pk %}">{{ item.product_title }}</a>{% else %}{{ item.product_title }}{% endif %}{% if item.variant_label %}<br><small class="text-body-secondary">{{ item.variant_label }}</small>{% endif %}</span>
+                                </td>
+                                <td class="text-end">{{ item.price|taka }}</td>
+                                <td class="text-end">{{ item.quantity }}</td>
+                                <td class="text-end fw-semibold">{{ item.subtotal|taka }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="small">
+                        <tr><td colspan="3" class="text-end">Subtotal</td><td class="text-end">{{ order.subtotal|taka }}</td></tr>
+                        {% if order.discount %}<tr><td colspan="3" class="text-end">Coupon {% if order.coupon %}({{ order.coupon.code }}){% endif %}</td><td class="text-end text-success">-{{ order.discount|taka }}</td></tr>{% endif %}
+                        {% if order.bundle_discount %}<tr><td colspan="3" class="text-end">Bundle discount</td><td class="text-end text-success">-{{ order.bundle_discount|taka }}</td></tr>{% endif %}
+                        {% if order.points_discount %}<tr><td colspan="3" class="text-end">Reward points ({{ order.points_used }})</td><td class="text-end text-success">-{{ order.points_discount|taka }}</td></tr>{% endif %}
+                        {% if order.gift_wrap_cost %}<tr><td colspan="3" class="text-end">Gift wrap</td><td class="text-end">{{ order.gift_wrap_cost|taka }}</td></tr>{% endif %}
+                        <tr><td colspan="3" class="text-end">Delivery</td><td class="text-end">{{ order.shipping_cost|taka }}</td></tr>
+                        <tr class="fs-6"><td colspan="3" class="text-end fw-bold">Total</td><td class="text-end fw-bold">{{ order.total|taka }}</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        {% if return_request %}
+            <div class="store-card p-3 mb-4">
+                <h2 class="h6 fw-bold"><i class="bi bi-arrow-return-left text-danger"></i> Return request: {{ return_request.get_status_display }}</h2>
+                <p class="small mb-1"><strong>{{ return_request.get_reason_display }}</strong>: {{ return_request.details }}</p>
+                <a href="{% url 'store:returns' %}?status={{ return_request.status }}" class="small">Handle it in Returns</a>
+            </div>
+        {% endif %}
+
+        <div class="store-card p-3 p-md-4">
+            <h2 class="h6 fw-bold mb-3">History</h2>
+            <ul class="timeline small">
+                {% for when, status, who in timeline %}
+                    <li><strong>{{ status }}</strong> <span class="text-body-secondary">· {{ when|date:"d M Y, h:i A" }}{% if who %} · by {{ who }}{% endif %}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="store-card p-3 p-md-4 mb-4">
+            <h2 class="h6 fw-bold">Customer</h2>
+            <p class="mb-1 fw-semibold">{{ order.full_name }}</p>
+            <p class="small mb-2 text-body-secondary">{{ order.email }}<br>{% if order.user %}Registered customer{% else %}Guest checkout{% endif %}</p>
+            <div class="d-flex gap-2 mb-3">
+                <a href="tel:{{ order.phone }}" class="btn btn-sm btn-outline-primary flex-fill"><i class="bi bi-telephone"></i> {{ order.phone }}</a>
+                <a href="https://wa.me/{{ whatsapp }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            </div>
+            {% if order.user %}<a href="{% url 'store:orders' %}?customer={{ order.user_id }}" class="small">All orders from this customer</a>{% endif %}
+        </div>
+        <div class="store-card p-3 p-md-4 mb-4">
+            <h2 class="h6 fw-bold">Delivery address</h2>
+            <p class="small mb-2">{{ order.address_line }}<br>{{ order.area }}, {{ order.upazila }}<br>{{ order.district }}</p>
+            {% if order.delivery_estimate %}<p class="small text-body-secondary mb-0"><i class="bi bi-truck"></i> {{ order.delivery_estimate }}</p>{% endif %}
+            {% if order.gift_wrap %}<p class="small mb-0 mt-2"><i class="bi bi-gift text-danger"></i> <strong>Gift wrap this order</strong></p>{% endif %}
+            {% if order.note %}<div class="alert alert-warning small mt-3 mb-0"><strong>Customer note:</strong> {{ order.note }}</div>{% endif %}
+        </div>
+        <div class="store-card p-3 p-md-4">
+            <h2 class="h6 fw-bold">Payment</h2>
+            <p class="small mb-0">{{ order.payment_label }}<br>Status: <strong>{{ order.get_payment_status_display }}</strong>{% if order.transaction_id %}<br>Transaction: <span class="font-monospace">{{ order.transaction_id }}</span>{% endif %}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

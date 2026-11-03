@@ -1,0 +1,118 @@
+{% extends 'store/base.html' %}
+{% load shop_tags %}
+
+{% block title %}{% if product %}Edit {{ product.title }}{% else %}Add product{% endif %}{% endblock %}
+{% block page_title %}{% if product %}{{ product.title }}{% else %}Add a product{% endif %}{% endblock %}
+{% block page_subtitle %}{% if product %}Change details, photos, options and stock.{% else %}Fill in the details; you can add photos and options now or later.{% endif %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{% url 'store:products' %}" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> All products</a>
+    {% if product %}<a href="{{ product.get_absolute_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-light"><i class="bi bi-box-arrow-up-right"></i> View in shop</a>{% endif %}
+</div>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% if form.errors or variants.total_error_count or gallery.total_error_count %}
+        <div class="alert alert-danger">Please fix the highlighted fields below.</div>
+    {% endif %}
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <section class="store-card p-3 p-md-4 mb-4">
+                <h2 class="h6 fw-bold mb-3">Details</h2>
+                <div class="row g-3">
+                    {% include 'store/_field.html' with field=form.title %}
+                    {% include 'store/_field.html' with field=form.category col='col-md-6' %}
+                    {% include 'store/_field.html' with field=form.brand col='col-md-6' %}
+                    {% include 'store/_field.html' with field=form.description %}
+                </div>
+            </section>
+
+            <section class="store-card p-3 p-md-4 mb-4">
+                <h2 class="h6 fw-bold mb-1">Options <small class="text-body-secondary fw-normal">(size, colour, storage)</small></h2>
+                <p class="small text-body-secondary">Each option has its own stock and, if you like, its own price. Leave the empty row empty if you don't need it.</p>
+                {{ variants.management_form }}
+                {% if variants.non_form_errors %}<div class="text-danger small mb-2">{{ variants.non_form_errors }}</div>{% endif %}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle formset-table">
+                        <thead><tr><th>Colour</th><th>Size</th><th>Storage</th><th>SKU</th><th>Price (৳)</th><th>Sale price</th><th>Stock</th><th class="text-center">On</th><th class="text-center">Delete</th></tr></thead>
+                        <tbody>
+                            {% for vf in variants %}
+                                <tr>
+                                    <td>{{ vf.id }}{% include 'store/_cell.html' with field=vf.color %}</td>
+                                    <td>{% include 'store/_cell.html' with field=vf.size %}</td>
+                                    <td>{% include 'store/_cell.html' with field=vf.storage %}</td>
+                                    <td>{% include 'store/_cell.html' with field=vf.sku %}</td>
+                                    <td>{% include 'store/_cell.html' with field=vf.price %}</td>
+                                    <td>{% include 'store/_cell.html' with field=vf.discount_price %}</td>
+                                    <td>{% include 'store/_cell.html' with field=vf.stock %}</td>
+                                    <td class="text-center">{{ vf.is_active }}</td>
+                                    <td class="text-center">{% if vf.instance.pk %}{{ vf.DELETE }}{% endif %}</td>
+                                </tr>
+                                {% if vf.non_field_errors %}<tr><td colspan="9" class="text-danger small">{{ vf.non_field_errors }}</td></tr>{% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="small text-body-secondary mb-0">Price empty = same as the product. Save to get another empty row.</p>
+            </section>
+
+            <section class="store-card p-3 p-md-4 mb-4">
+                <h2 class="h6 fw-bold mb-1">More photos</h2>
+                <p class="small text-body-secondary">Shown in the gallery on the product page. Give a photo a colour to show it when the customer picks that colour.</p>
+                {{ gallery.management_form }}
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle formset-table">
+                        <thead><tr><th>Photo</th><th>Colour</th><th>Description</th><th>Order</th><th class="text-center">Delete</th></tr></thead>
+                        <tbody>
+                            {% for gf in gallery %}
+                                <tr>
+                                    <td>
+                                        {{ gf.id }}
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if gf.instance.pk and gf.instance.image %}<img src="{{ gf.instance.image.url|webp:400 }}" alt="" class="thumb">{% endif %}
+                                            {% include 'store/_cell.html' with field=gf.image %}
+                                        </div>
+                                    </td>
+                                    <td style="width: 18%;">{% include 'store/_cell.html' with field=gf.color %}</td>
+                                    <td>{% include 'store/_cell.html' with field=gf.alt %}</td>
+                                    <td style="width: 80px;">{% include 'store/_cell.html' with field=gf.sort_order %}</td>
+                                    <td class="text-center">{% if gf.instance.pk %}{{ gf.DELETE }}{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-xl-4">
+            <section class="store-card p-3 p-md-4 mb-4">
+                <h2 class="h6 fw-bold mb-3">Price &amp; stock</h2>
+                <div class="row g-3">
+                    {% include 'store/_field.html' with field=form.price col='col-6' %}
+                    {% include 'store/_field.html' with field=form.discount_price col='col-6' %}
+                    {% include 'store/_field.html' with field=form.stock %}
+                </div>
+                {% if product.flash_sale %}<div class="alert alert-danger small mt-3 mb-0"><i class="bi bi-lightning-charge"></i> In a flash sale now: customers pay {{ product.final_price|taka }}.</div>{% endif %}
+            </section>
+            <section class="store-card p-3 p-md-4 mb-4">
+                <h2 class="h6 fw-bold mb-3">Main photo</h2>
+                {% if product.image %}<img src="{{ product.image.url|webp:400 }}" alt="" class="img-fluid rounded-3 mb-2"><p class="small text-body-secondary mb-2">Choose a file to replace it.</p>{% endif %}
+                <div class="row g-3">{% include 'store/_field.html' with field=form.image %}</div>
+            </section>
+            <section class="store-card p-3 p-md-4 mb-4">
+                <h2 class="h6 fw-bold mb-2">Visibility</h2>
+                <div class="row g-1">
+                    {% include 'store/_field.html' with field=form.is_active %}
+                    {% include 'store/_field.html' with field=form.is_featured %}
+                </div>
+            </section>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-check-lg"></i> Save product</button>
+                <button type="submit" name="add_another" value="1" class="btn btn-outline-primary">Save and add another</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

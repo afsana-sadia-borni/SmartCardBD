@@ -1,0 +1,46 @@
+{% extends 'store/base.html' %}
+{% load shop_tags %}
+
+{% block title %}Orders{% endblock %}
+{% block page_title %}Orders{% endblock %}
+{% block page_subtitle %}Confirm, ship and deliver customer orders.{% endblock %}
+
+{% block content %}
+<div class="store-card">
+    <div class="store-card-header">
+        <ul class="nav store-tabs gap-1">
+            {% for key, label, count in tabs %}
+                <li class="nav-item"><a class="nav-link {% if key == tab %}active{% endif %}" href="?{% query_transform status=key page=None %}">{{ label }} <span class="badge rounded-pill {% if key == tab %}text-bg-light{% else %}text-bg-secondary{% endif %}">{{ count }}</span></a></li>
+            {% endfor %}
+        </ul>
+        <form method="get" class="d-flex gap-2" role="search">
+            <input type="hidden" name="status" value="{{ tab }}">
+            {% if customer %}<input type="hidden" name="customer" value="{{ customer }}">{% endif %}
+            <input type="search" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="Order no., name, phone, email" aria-label="Search orders">
+            <button class="btn btn-sm btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+    {% if customer %}<div class="px-3 pt-3"><span class="badge text-bg-info">Showing one customer's orders</span> <a href="?status={{ tab }}" class="small">Show everyone</a></div>{% endif %}
+    <div class="table-responsive">
+        <table class="table table-hover store-table">
+            <thead><tr><th>Order</th><th>Customer</th><th class="d-none d-md-table-cell">Delivery to</th><th class="text-end">Total</th><th>Payment</th><th>Status</th><th class="d-none d-lg-table-cell">Placed</th></tr></thead>
+            <tbody>
+                {% for order in page_obj %}
+                    <tr class="row-link" onclick="window.location='{% url 'store:order_detail' order.order_number %}'">
+                        <td><a href="{% url 'store:order_detail' order.order_number %}" class="font-monospace fw-semibold">{{ order.order_number }}</a><br><small class="text-body-secondary">{{ order.items_count|default:0 }} item{{ order.items_count|pluralize }}</small></td>
+                        <td>{{ order.full_name }}<br><small class="text-body-secondary">{{ order.phone }}</small></td>
+                        <td class="d-none d-md-table-cell">{{ order.district }}<br><small class="text-body-secondary">{{ order.upazila }}</small></td>
+                        <td class="text-end fw-semibold">{{ order.total|taka }}</td>
+                        <td><small>{{ order.payment_label }}</small><br>{% if order.payment_status == 'paid' %}<span class="badge text-bg-success">Paid</span>{% else %}<span class="badge text-bg-light border">Unpaid</span>{% endif %}</td>
+                        <td>{% include 'orders/_status_badge.html' with order=order %}</td>
+                        <td class="d-none d-lg-table-cell small text-body-secondary">{{ order.created_at|date:"d M, h:i A" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center text-body-secondary py-5"><i class="bi bi-inbox fs-1 d-block mb-2"></i>No orders here.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'store/_pagination.html' %}
+</div>
+{% endblock %}
