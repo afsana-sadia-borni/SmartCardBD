@@ -17,3 +17,12 @@ class ReviewForm(forms.ModelForm):
             'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3,
                                              'placeholder': 'How did you like this product?'}),
         }
+
+
+class QuestionForm(forms.Form):
+    question = forms.CharField(
+        min_length=10, max_length=500,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2,
+                                     'placeholder': 'e.g. Does this come with a warranty?'}),
+        error_messages={'min_length': 'Please write a little more (at least 10 characters).'},
+    )

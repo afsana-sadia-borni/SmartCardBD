@@ -1,20 +1,71 @@
+import json
 from decimal import Decimal, InvalidOperation
 
 from django import template
-from django.contrib.humanize.templatetags.humanize import intcomma
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+
+from core.numerals import localize_digits, use_bn_digits
 
 register = template.Library()
 
 
+def lakh_group(digits):
+    """'1250000' -> '12,50,000' (Bangladeshi/Indian grouping)."""
+    if len(digits) <= 3:
+        return digits
+    head, tail = digits[:-3], digits[-3:]
+    groups = []
+    while len(head) > 2:
+        groups.insert(0, head[-2:])
+        head = head[:-2]
+    if head:
+        groups.insert(0, head)
+    return ','.join(groups) + ',' + tail
+
+
 @register.filter
 def taka(value):
-    """12500.00 -> '৳12,500', 99.50 -> '৳99.50'."""
+    """1250000 -> '৳12,50,000', 99.50 -> '৳99.50'; Bangla digits when the visitor chose them."""
     try:
         amount = Decimal(value)
     except (TypeError, ValueError, InvalidOperation):
         return value
-    text = f'{amount:.0f}' if amount == amount.to_integral_value() else f'{amount:.2f}'
-    return f'৳{intcomma(text)}'
+    negative = amount < 0
+    amount = abs(amount)
+    whole = amount.to_integral_value()
+    text = lakh_group(f'{whole:.0f}') if amount == whole else f'{lakh_group(f"{int(amount)}")}.{f"{amount:.2f}"[-2:]}'
+    return localize_digits(f'{"-" if negative else ""}৳{text}')
+
+
+@register.filter
+def num(value):
+    """Format a whole number with lakh grouping (and Bangla digits when chosen)."""
+    try:
+        return localize_digits(lakh_group(str(int(value))))
+    except (TypeError, ValueError):
+        return value
+
+
+@register.filter
+def sold_label(count):
+    """Real units sold: '7 sold', '120+ sold' / '১২০+ বিক্রি হয়েছে'."""
+    try:
+        count = int(count)
+    except (TypeError, ValueError):
+        return ''
+    if count <= 0:
+        return ''
+    shown = f'{count}' if count < 10 else f'{count // 10 * 10}+'
+    if use_bn_digits.get():
+        return f'{localize_digits(shown)} বিক্রি হয়েছে'
+    return f'{shown} sold'
+
+
+@register.filter
+def json_attr(value):
+    """JSON for an HTML data- attribute."""
+    return mark_safe(escape(json.dumps(value)))
 
 
 @register.inclusion_tag('partials/stars.html')

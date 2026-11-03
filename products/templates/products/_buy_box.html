@@ -1,0 +1,54 @@
+{% load shop_tags %}
+{# Price, stock, variant options and add-to-cart. `prefix` keeps ids unique when the quick view is open on a product page. #}
+<div class="js-product-buy">
+    <div class="d-flex flex-wrap align-items-baseline gap-2 mb-2">
+        <span class="{% if compact %}fs-3{% else %}display-6{% endif %} fw-bold text-warning-emphasis js-price">{{ product.final_price|taka }}</span>
+        <span class="price-old fs-5 js-regular {% if not product.has_discount %}d-none{% endif %}">{{ product.price|taka }}</span>
+        {% if product.has_discount %}<span class="badge text-bg-danger js-save">Save {{ product.discount_percent|num }}%</span>{% endif %}
+    </div>
+
+    {% if product.flash_sale %}
+        <div class="flash-strip mb-3">
+            <i class="bi bi-lightning-charge-fill"></i> Flash sale
+            {% include 'partials/countdown.html' with ends_at=product.flash_sale.1 %}
+        </div>
+    {% endif %}
+
+    <p class="mb-3 d-flex flex-wrap align-items-center gap-2 js-stock-msg">
+        {% if not product.in_stock %}
+            <span class="badge text-bg-secondary"><i class="bi bi-x-circle"></i> Out of stock</span>
+        {% elif product.low_stock and not variants %}
+            <span class="badge text-bg-warning"><i class="bi bi-exclamation-triangle"></i> Only {{ product.stock|num }} left - order soon</span>
+        {% else %}
+            <span class="badge text-bg-success"><i class="bi bi-check-circle"></i> In stock</span>
+        {% endif %}
+        {% if product.sold %}<span class="small text-body-secondary"><i class="bi bi-fire text-danger"></i> {{ product.sold|sold_label }}</span>{% endif %}
+    </p>
+
+    <form class="js-add-to-cart" action="{% url 'cart_add' %}" method="post" {% if variants %}data-variants="{{ variants|json_attr }}"{% endif %}>
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% if variants %}
+            <input type="hidden" name="variant_id" class="js-variant-id" value="">
+            {% for attr, values in variant_options.items %}
+                <fieldset class="mb-3">
+                    <legend class="small fw-semibold mb-1">{{ attr|capfirst }}: <span class="fw-normal text-body-secondary js-opt-label" data-attr="{{ attr }}">Choose</span></legend>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for value in values %}
+                            <input type="radio" class="btn-check js-option" name="opt_{{ attr }}" id="{{ prefix }}-{{ attr }}-{{ forloop.counter }}" value="{{ value }}" data-attr="{{ attr }}" autocomplete="off">
+                            <label class="btn btn-outline-dark btn-sm option-btn" for="{{ prefix }}-{{ attr }}-{{ forloop.counter }}">{{ value }}</label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+            {% endfor %}
+        {% endif %}
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <label for="{{ prefix }}-qty" class="visually-hidden">Quantity</label>
+            <input type="number" id="{{ prefix }}-qty" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control text-center js-qty" style="width: 90px;" {% if not product.in_stock %}disabled{% endif %}>
+            <button type="submit" class="btn btn-warning {% if not compact %}btn-lg{% endif %} fw-semibold flex-grow-1 js-add-btn" {% if not product.in_stock or variants %}disabled{% endif %}>
+                <i class="bi bi-cart-plus"></i> <span class="js-add-label">{% if variants %}Choose an option{% else %}Add to cart{% endif %}</span>
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,34 @@
+from django.db import transaction
+from django.db.models import Sum
+from django.db.models.signals import m2m_changed, post_delete, post_save
+from django.dispatch import receiver
+
+from .models import FlashSale, Product, ProductVariant
+from .services import check_price_alerts, clear_flash_sale_cache
+
+
+@receiver([post_save, post_delete], sender=FlashSale)
+def flash_sale_changed(sender, instance, **kwargs):
+    clear_flash_sale_cache()
+
+
+@receiver(m2m_changed, sender=FlashSale.products.through)
+def flash_sale_products_changed(sender, instance, action, **kwargs):
+    if action.startswith('post_'):
+        clear_flash_sale_cache()
+        if isinstance(instance, FlashSale) and instance.is_active:
+            products = list(instance.products.all())
+            transaction.on_commit(lambda: check_price_alerts(products))
+
+
+@receiver(post_save, sender=Product)
+def product_saved(sender, instance, **kwargs):
+    transaction.on_commit(lambda: check_price_alerts([instance]))
+
+
+@receiver([post_save, post_delete], sender=ProductVariant)
+def sync_product_stock(sender, instance, **kwargs):
+    """A product with variants shows the total stock of its active variants."""
+    total = ProductVariant.objects.filter(product_id=instance.product_id, is_active=True).aggregate(s=Sum('stock'))['s']
+    if total is not None:
+        Product.objects.filter(pk=instance.product_id).update(stock=total)

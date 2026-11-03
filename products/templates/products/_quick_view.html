@@ -1,0 +1,16 @@
+{% load static shop_tags %}
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="img-skeleton rounded-3 overflow-hidden">
+            <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="w-100 product-thumb js-gallery-main" alt="{{ product.title }}">
+        </div>
+    </div>
+    <div class="col-md-6">
+        <small class="text-body-secondary">{{ product.brand|default:product.category.name }}</small>
+        <h2 class="h4 fw-bold mt-1">{{ product.title }}</h2>
+        {% if product.review_count %}<div class="mb-2">{% stars product.avg_rating product.review_count %}</div>{% endif %}
+        <p class="small text-body-secondary">{{ product.description|truncatewords:30 }}</p>
+        {% include 'products/_buy_box.html' with prefix='qv' compact=True %}
+        <a href="{{ product.get_absolute_url }}" class="btn btn-link px-0 mt-2">See full details <i class="bi bi-arrow-right"></i></a>
+    </div>
+</div>

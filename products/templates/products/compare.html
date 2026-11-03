@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static shop_tags %}
+
+{% block title %}Compare products | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <h1 class="h3 fw-bold mb-0"><i class="bi bi-arrow-left-right"></i> Compare products</h1>
+        {% if products %}
+            <form method="post" action="{% url 'compare_clear' %}">{% csrf_token %}<button class="btn btn-outline-secondary btn-sm" type="submit"><i class="bi bi-x"></i> Clear all</button></form>
+        {% endif %}
+    </div>
+
+    {% if products %}
+        <div class="bg-body rounded-4 shadow-sm p-2 p-md-3">
+            <div class="table-responsive">
+                <table class="table compare-table align-middle mb-0">
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="text-body-secondary small">Product</th>
+                            {% for product in products %}
+                                <td>
+                                    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body">
+                                        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="" class="compare-img mb-2">
+                                        <div class="fw-semibold">{{ product.title }}</div>
+                                    </a>
+                                    <button type="button" class="btn btn-link btn-sm text-danger px-0 js-compare-toggle active" data-url="{% url 'compare_toggle' product.id %}" data-remove-col="1">Remove</button>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr><th scope="row" class="text-body-secondary small">Price</th>{% for product in products %}<td><span class="fw-bold text-warning-emphasis">{{ product.final_price|taka }}</span>{% if product.has_discount %} <span class="price-old">{{ product.price|taka }}</span>{% endif %}</td>{% endfor %}</tr>
+                        <tr><th scope="row" class="text-body-secondary small">Brand</th>{% for product in products %}<td>{{ product.brand|default:'-' }}</td>{% endfor %}</tr>
+                        <tr><th scope="row" class="text-body-secondary small">Category</th>{% for product in products %}<td>{{ product.category.name }}</td>{% endfor %}</tr>
+                        <tr><th scope="row" class="text-body-secondary small">Rating</th>{% for product in products %}<td>{% if product.review_count %}{% stars product.avg_rating product.review_count %}{% else %}<span class="text-body-secondary small">No reviews</span>{% endif %}</td>{% endfor %}</tr>
+                        <tr><th scope="row" class="text-body-secondary small">Sold</th>{% for product in products %}<td>{{ product.sold|sold_label|default:'-' }}</td>{% endfor %}</tr>
+                        <tr><th scope="row" class="text-body-secondary small">Availability</th>{% for product in products %}<td>{% if product.in_stock %}<span class="text-success">In stock</span>{% else %}<span class="text-danger">Out of stock</span>{% endif %}</td>{% endfor %}</tr>
+                        <tr><th scope="row" class="text-body-secondary small">Options</th>{% for product in products %}<td class="small">{% for v in product.active_variants %}{{ v.label }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td>{% endfor %}</tr>
+                        <tr><th scope="row" class="text-body-secondary small">Details</th>{% for product in products %}<td class="small">{{ product.description|truncatewords:30 }}</td>{% endfor %}</tr>
+                        <tr><th scope="row"></th>{% for product in products %}<td><a href="{{ product.get_absolute_url }}" class="btn btn-warning btn-sm fw-semibold">View &amp; buy</a></td>{% endfor %}</tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="bg-body rounded-4 shadow-sm">
+            {% url 'product_list' as shop_url %}
+            {% include 'partials/empty_state.html' with image='search' heading='Nothing to compare yet' message='Tap the ⇄ button on up to 4 products to see them side by side.' button_url=shop_url button_text='Browse products' %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
