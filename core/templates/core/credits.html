@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Image credits | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 960px;">
+    <h1 class="h3 fw-bold mb-2">Image credits</h1>
+    <p class="text-body-secondary">The demo product and banner photos come from Wikimedia Commons and are used under the licences below.</p>
+    <div class="bg-body rounded-4 shadow-sm p-3">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0 small">
+                <thead><tr><th>Image</th><th>Author</th><th>Licence</th><th>Source</th></tr></thead>
+                <tbody>
+                    {% for file, info in credits %}
+                        <tr>
+                            <td class="font-monospace">{{ file }}</td>
+                            <td>{{ info.author|default:"Unknown" }}{% if info.note %} <span class="text-body-secondary">({{ info.note }})</span>{% endif %}</td>
+                            <td>{% if info.license_url %}<a href="{{ info.license_url }}" rel="noopener" target="_blank">{{ info.license }}</a>{% else %}{{ info.license }}{% endif %}</td>
+                            <td><a href="{{ info.source }}" rel="noopener" target="_blank">Wikimedia Commons</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="text-body-secondary">No credits recorded.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

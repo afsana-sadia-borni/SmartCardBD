@@ -54,9 +54,9 @@ class LayoutTests(TestCase):
         self.assertContains(response, f'sidebar-link active" href="{self.category.get_absolute_url()}"')
 
     def test_sidebar_shows_account_links_only_when_logged_in(self):
-        self.assertNotContains(self.client.get('/'), 'Profile &amp; addresses')
+        self.assertNotContains(self.client.get('/'), 'Profile &amp; rewards')
         self.client.force_login(self.user)
-        self.assertContains(self.client.get('/'), 'Profile &amp; addresses')
+        self.assertContains(self.client.get('/'), 'Profile &amp; rewards')
 
 
 @override_settings(DEBUG=False)

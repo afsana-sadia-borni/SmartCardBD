@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}You're offline | SmartCart BD{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="bg-body rounded-4 shadow-sm text-center py-5 px-3 mx-auto" style="max-width: 560px;">
+        <i class="bi bi-wifi-off text-warning" style="font-size: 4rem;"></i>
+        <h1 class="h4 fw-bold mt-2">You're offline</h1>
+        <p class="text-body-secondary">Check your internet connection. Your cart is saved and will be here when you're back.</p>
+        <button type="button" class="btn btn-warning fw-semibold" onclick="location.reload()"><i class="bi bi-arrow-clockwise"></i> Try again</button>
+    </div>
+</div>
+{% endblock %}

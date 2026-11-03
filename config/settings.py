@@ -8,6 +8,7 @@ variables (loaded from `.env` in development). See `.env.example`.
 import os
 import sys
 import warnings
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -56,7 +57,10 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'axes',
+    'simple_history',
 
+    'core',
     'accounts',
     'products',
     'cart',
@@ -85,6 +89,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
+    'core.middleware.ShopPreferencesMiddleware',
+    # Must be last: turns django-axes lockouts into a response.
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -103,6 +111,8 @@ TEMPLATES = [
                 'cart.context_processors.cart',
                 'products.context_processors.categories',
                 'accounts.context_processors.wishlist',
+                'accounts.context_processors.notifications',
+                'core.context_processors.shop',
             ],
         },
     },
@@ -146,6 +156,8 @@ if 'test' in sys.argv:
     PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
 
 AUTHENTICATION_BACKENDS = [
+    # django-axes must come first so locked-out users are refused before any other check.
+    'axes.backends.AxesStandaloneBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
@@ -218,6 +230,24 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = None
+ACCOUNT_FORMS = {'signup': 'accounts.forms.SignupForm'}
+
+# Lock an account/IP pair for 30 minutes after 5 failed logins.
+AXES_FAILURE_LIMIT = int(os.getenv('AXES_FAILURE_LIMIT', 5))
+AXES_COOLOFF_TIME = timedelta(minutes=int(os.getenv('AXES_COOLOFF_MINUTES', 30)))
+AXES_LOCKOUT_PARAMETERS = [['username', 'ip_address']]
+AXES_USERNAME_CALLABLE = 'core.axes.get_login_username'
+AXES_RESET_ON_SUCCESS = True
+AXES_LOCKOUT_TEMPLATE = 'account/lockout.html'
+# allauth has its own failed-login throttle (5 per 5 min by default). Keep it as a second line of
+# defence but looser than django-axes, so axes' 30-minute lockout is what customers normally see.
+ACCOUNT_RATE_LIMITS = {'login_failed': '10/m/ip,10/5m/key'}
+
+# The admin lives at a non-obvious URL to cut down on bots probing /admin/.
+ADMIN_URL = os.getenv('ADMIN_URL', 'manage-scb/').strip('/') + '/'
+
+# Caching (used for flash-sale prices and rate limits). Local memory is fine for one server.
+CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'smartcart'}}
 SOCIALACCOUNT_LOGIN_ON_GET = False
 
 
@@ -242,6 +272,19 @@ SHIPPING_INSIDE_DHAKA = int(os.getenv('SHIPPING_INSIDE_DHAKA', 60))
 SHIPPING_OUTSIDE_DHAKA = int(os.getenv('SHIPPING_OUTSIDE_DHAKA', 120))
 FREE_SHIPPING_MIN = int(os.getenv('FREE_SHIPPING_MIN', 2000))
 LOW_STOCK_THRESHOLD = 5
+GIFT_WRAP_PRICE = int(os.getenv('GIFT_WRAP_PRICE', 50))
+RETURN_WINDOW_DAYS = int(os.getenv('RETURN_WINDOW_DAYS', 7))
+
+# Reward points: 1 point per ৳100 spent (credited on delivery); 100 points = ৳50 off.
+POINTS_PER_TAKA = 100
+POINTS_REDEEM_BLOCK = 100
+POINTS_REDEEM_VALUE = 50
+# Referral: both people get a ৳100 coupon when the new customer's first order is delivered.
+REFERRAL_REWARD = int(os.getenv('REFERRAL_REWARD', 100))
+
+# Customer support links (optional). WhatsApp number in international format, e.g. 8801712345678.
+WHATSAPP_NUMBER = os.getenv('WHATSAPP_NUMBER', '').lstrip('+')
+MESSENGER_URL = os.getenv('MESSENGER_URL', '')
 # Unpaid online-payment orders are cancelled (and restocked) after this many minutes.
 UNPAID_ORDER_TIMEOUT_MINUTES = int(os.getenv('UNPAID_ORDER_TIMEOUT_MINUTES', 60))
 
