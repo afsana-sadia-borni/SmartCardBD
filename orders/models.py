@@ -118,6 +118,14 @@ class Order(models.Model):
         COD = 'cod', 'Cash on Delivery'
         SSLCOMMERZ = 'sslcommerz', 'Online Payment (bKash, Nagad, Card)'
 
+    class PaymentChannel(models.TextChoices):
+        """Which method the customer picked for an online payment (all go through SSLCommerz)."""
+        BKASH = 'bkash', 'bKash'
+        NAGAD = 'nagad', 'Nagad'
+        ROCKET = 'rocket', 'Rocket'
+        CARD = 'card', 'Card'
+        INTERNET_BANKING = 'internetbank', 'Internet banking'
+
     class PaymentStatus(models.TextChoices):
         UNPAID = 'unpaid', 'Unpaid'
         PAID = 'paid', 'Paid'
@@ -153,6 +161,7 @@ class Order(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
     payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices, default=PaymentMethod.COD)
+    payment_channel = models.CharField(max_length=20, choices=PaymentChannel.choices, blank=True)
     payment_status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.UNPAID)
     transaction_id = models.CharField(max_length=100, blank=True, help_text='Gateway validation / bank transaction id')
 
@@ -181,6 +190,13 @@ class Order(models.Model):
 
     def get_absolute_url(self):
         return reverse('order_detail', args=[self.order_number])
+
+    @property
+    def payment_label(self):
+        """'Cash on Delivery', 'Online: bKash', ..."""
+        if self.payment_method == self.PaymentMethod.COD:
+            return self.get_payment_method_display()
+        return f'Online: {self.get_payment_channel_display()}' if self.payment_channel else 'Online payment'
 
     @property
     def can_cancel(self):
