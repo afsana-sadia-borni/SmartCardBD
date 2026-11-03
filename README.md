@@ -9,6 +9,11 @@ Staff manage the store from the Django admin and a sales dashboard.
 
 **Shopping**
 - Product catalogue with categories, brands, sale prices and stock levels
+- Product variants (size, colour, storage) with their own price, stock and SKU; picking a colour shows its photo
+- Image gallery with hover zoom, quick-view popup, live search suggestions (debounced, keyboard friendly)
+- Slide-out mini cart (AJAX add to cart), infinite scroll with skeleton loading, compare up to 4 products
+- Flash sales with a live countdown (prices return to normal automatically), bundle offers, real "sold" counts
+- Product Q&A (staff answer from the admin), review photos, "notify me if the price drops" alerts
 - Search, filters (category, price range, brand, in stock) and sorting, with pagination
 - SEO-friendly slug URLs (`/product/samsung-galaxy-a15/`); old `/product/<id>/` links redirect permanently
 - AJAX cart: add, change quantity, remove, no page reloads; quantities are capped at available stock
@@ -17,7 +22,9 @@ Staff manage the store from the Django admin and a sales dashboard.
 
 **Checkout & orders**
 - Guest checkout, or logged-in checkout with saved addresses
-- Bangladesh-specific: all 64 districts, phone validation (`01XXXXXXXXX`), shipping charged by zone (inside/outside Dhaka) with free delivery over a threshold
+- Bangladesh-specific: Division → District → Upazila/Thana dropdowns (all 64 districts, Dhaka city thanas), phone validation (`01XXXXXXXXX`), delivery charge and delivery time per zone (editable in the admin), free delivery over a threshold
+- Order tracking without an account (`/track/`: order number + phone), gift wrap, order notes
+- Return / refund requests within 7 days of delivery (with a photo); staff approve or reject in the admin
 - Cash on Delivery and SSLCommerz online payment (server-side validation and IPN)
 - Order confirmation and status-update emails
 - Order tracking timeline, order history, customer cancellation (restocks items)
@@ -28,14 +35,29 @@ Staff manage the store from the Django admin and a sales dashboard.
 - Address book with a default address
 - Wishlist
 - Verified-purchase reviews and ratings (only for delivered orders)
+- Reward points (1 point per ৳100, 100 points = ৳50 off) and referral codes (both people get a ৳100 coupon)
+- In-app notifications (bell icon) for order updates, answers, price drops and rewards
+- Newsletter sign-up with one-click unsubscribe
 
-**Layout**
+**Layout & UX**
 - Every page (including 404/500) shares a top bar (search, cart, account) and a sidebar
   (shop links, categories, account). On phones the sidebar becomes a slide-out menu.
+- Admin-managed hero banner slider, dark mode (remembered per device), Bangla digits mode (১২৩),
+  taka in lakh format (৳12,50,000), scroll animations, empty-state illustrations, back-to-top button,
+  floating WhatsApp/Messenger chat buttons
+- Installable PWA: app icon, splash colours, offline page
+- Accessibility: skip link, labelled buttons, keyboard-friendly search and option pickers, reduced-motion support
 
 **Store management**
-- Django admin for products, orders, coupons, reviews and addresses, with bulk order status actions
-- Sales dashboard (`/dashboard/`): revenue and orders for the last 30 days, orders by status, top products, low-stock alerts
+- Django admin (at `/manage-scb/`, configurable) for products (with gallery and variants), orders, banners,
+  flash sales, bundles, delivery zones, questions, returns, coupons, subscribers and loyalty points
+- Change history for products, variants, orders, coupons and returns (who changed what, django-simple-history)
+- Sales dashboard (`/dashboard/`) and CSV sales reports (dashboard button and admin action)
+
+**Security**
+- Login lockout after 5 failed attempts for 30 minutes (django-axes), plus allauth's own throttle
+- Honeypot fields against bots on sign-up and newsletter forms; rate limits on order tracking and questions
+- Admin URL moved off `/admin/`; HTTPS, HSTS and secure cookies when `DEBUG=False`; no secrets in the code
 
 ## Engineering notes
 
@@ -51,13 +73,13 @@ Staff manage the store from the Django admin and a sales dashboard.
 |---|---|
 | Backend | Python 3.12, Django 6.1 |
 | Auth | django-allauth |
-| Database | SQLite locally, PostgreSQL (e.g. Neon) via `DATABASE_URL` |
-| Frontend | Django templates, Bootstrap 5.3, Bootstrap Icons, vanilla JS (fetch) |
+| Database | PostgreSQL via `DATABASE_URL` (SQLite works too for quick tries) |
+| Frontend | Django templates, Bootstrap 5.3, Bootstrap Icons, vanilla JS (fetch), AOS |
 | Production | gunicorn, WhiteNoise (static files), django-storages (S3/R2 for uploads) |
 | Charts | Chart.js |
 | Payments | SSLCommerz v4 API |
 | ML | scikit-learn (TF-IDF + cosine similarity) |
-| Tests | Django test framework (72 tests) |
+| Tests | Django test framework (119 tests) |
 
 ## Getting started
 
@@ -66,16 +88,33 @@ git clone <repo-url> && cd SmartcardBD
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-cp .env.example .env          # then set SECRET_KEY (DEBUG=True is fine locally)
+createdb smartcart_db         # PostgreSQL (Postgres.app or Homebrew)
+cp .env.example .env          # set SECRET_KEY, and DATABASE_URL=postgresql://<you>@localhost:5432/smartcart_db
+                              # with DATABASE_SSL_REQUIRE=False for a local database
 python manage.py migrate
-python manage.py seed_demo    # demo categories, 17 products and coupon WELCOME10
+python manage.py seed_demo    # 17 products with photos and variants, banners, a flash sale, bundles, WELCOME10
 python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000. The admin is at `/admin/` and the sales dashboard at `/dashboard/`.
+Open http://127.0.0.1:8000. The admin is at `/manage-scb/` (set `ADMIN_URL` to change it) and the sales dashboard at `/dashboard/`.
 
 Without `EMAIL_HOST`, emails (order confirmations, password resets) are printed to the terminal.
+
+### With Docker
+
+Needs only Docker; PostgreSQL runs in its own container.
+
+```bash
+docker compose up --build                          # Django on http://localhost:8000 + PostgreSQL
+docker compose exec web python manage.py seed_demo
+docker compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py test
+docker compose down                                # stop (add -v to also delete the database)
+```
+
+The project folder is mounted into the container, so code changes reload the dev server.
+A `.env` file is optional here; compose sets `DEBUG` and the database URL itself.
 
 ### Online payments (optional)
 
@@ -92,6 +131,19 @@ run `python manage.py release_unpaid_orders` from a cron job (for example every 
 
 Create an OAuth client in Google Cloud Console with the redirect URI
 `http://localhost:8000/accounts/google/login/callback/`, then set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+
+### Scheduled jobs (cron)
+
+```bash
+python manage.py release_unpaid_orders        # every 15 min: free stock held by unpaid online orders
+python manage.py send_price_alerts            # every 15 min: price-drop alerts (catches scheduled flash sales)
+python manage.py send_abandoned_cart_emails   # hourly: remind logged-in customers about carts left 24h+
+```
+
+### Demo images
+
+The demo photos in `products/demo_media/` come from Wikimedia Commons under free licences;
+see `products/demo_media/CREDITS.md` or the **Image credits** page linked in the footer.
 
 ## Running tests
 
@@ -125,6 +177,10 @@ config/           Settings, root URLs, layout/error-page/settings tests
    `DEBUG=False`, a new `SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` and `DATABASE_URL`.
 2. Build: `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
 3. Start: `gunicorn config.wsgi` (already in the `Procfile`).
+
+Or deploy the Docker image instead (Render, Railway, Fly.io or any VPS). The `Dockerfile` builds a
+production image: dependencies, hashed static files, a non-root user, and gunicorn on `$PORT`.
+Migrations run when the container starts. Pass the same environment variables to the container.
 
 Static files (CSS/JS) are served by WhiteNoise, so no separate web server is needed.
 HTTPS redirect and HSTS are on by default when `DEBUG=False`; `SECURE_HSTS_SECONDS` starts at

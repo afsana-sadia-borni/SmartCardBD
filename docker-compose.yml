@@ -1,0 +1,41 @@
+# Local development: Django + PostgreSQL.
+#   docker compose up --build
+#   docker compose exec web python manage.py seed_demo
+# Then open http://localhost:8000
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: smartcart_db
+      POSTGRES_USER: smartcart
+      # Local-only password; the database port is not published to the host.
+      POSTGRES_PASSWORD: smartcart
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartcart -d smartcart_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    # Django's dev server reloads when you edit code (the project folder is mounted).
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DEBUG: "True"
+      DATABASE_URL: postgresql://smartcart:smartcart@db:5432/smartcart_db
+      DATABASE_SSL_REQUIRE: "False"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
