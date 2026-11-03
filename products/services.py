@@ -27,3 +27,14 @@ def check_price_alerts(products):
             alert.save(update_fields=['notified_at'])
             sent += 1
     return sent
+
+
+def send_due_price_alerts():
+    """Check every product someone is watching (catches flash sales that start on schedule)."""
+    from .models import Product
+
+    clear_flash_sale_cache()
+    products = Product.objects.filter(
+        id__in=PriceAlert.objects.filter(notified_at__isnull=True).values('product_id'),
+    )
+    return check_price_alerts(products)
