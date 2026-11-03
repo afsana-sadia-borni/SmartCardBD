@@ -5,7 +5,7 @@
             {% with product=item.product %}
                 <div class="d-flex gap-3 py-3 border-bottom js-mini-row" data-product-id="{{ product.id }}" data-variant-id="{{ item.variant.id|default:'' }}">
                     <a href="{{ product.get_absolute_url }}" class="flex-shrink-0">
-                        <img src="{% if item.image_url %}{{ item.image_url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="cart-thumb" alt="{{ product.title }}">
+                        <img src="{% if item.image_url %}{{ item.image_url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="cart-thumb" alt="{{ product.title }}">
                     </a>
                     <div class="flex-grow-1 small">
                         <a href="{{ product.get_absolute_url }}" class="fw-semibold text-body text-decoration-none d-block">{{ product.title }}</a>

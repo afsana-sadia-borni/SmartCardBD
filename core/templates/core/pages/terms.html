@@ -1,0 +1,38 @@
+{% extends 'core/pages/_page.html' %}
+{% load shop_tags %}
+
+{% block page %}
+<p>By using SmartCart BD and placing an order, you agree to these terms.</p>
+
+<h2 class="h5 fw-bold mt-4">Orders and prices</h2>
+<ul>
+    <li>All prices are in Bangladeshi Taka (BDT) and include VAT where applicable.</li>
+    <li>An order is accepted when we confirm it. We may cancel an order if a product is out of stock, the price was clearly wrong, or the order looks fraudulent; any payment is then refunded in full.</li>
+    <li>Flash sale prices apply only while the countdown is running and stock lasts.</li>
+</ul>
+
+<h2 class="h5 fw-bold mt-4">Payment</h2>
+<ul>
+    <li>Cash on Delivery: pay the courier the order total in cash.</li>
+    <li>Online payment: processed by SSLCommerz. An order left unpaid for {{ unpaid_minutes }} minutes is cancelled and its items released.</li>
+</ul>
+
+<h2 class="h5 fw-bold mt-4">Coupons, points and referrals</h2>
+<ul>
+    <li>One coupon per order. Coupons can have a minimum order, an expiry date and a usage limit, and some are for one customer only.</li>
+    <li>Reward points have no cash value and cannot be transferred. Points from a cancelled or returned order are removed.</li>
+    <li>Referral rewards are given once per new customer, after their first delivered order. Self-referrals are not allowed.</li>
+</ul>
+
+<h2 class="h5 fw-bold mt-4">Your account</h2>
+<ul>
+    <li>Keep your password private. After {{ lockout_attempts }} failed logins, the account is locked for a short time to protect it.</li>
+    <li>Reviews, photos and questions must be about the product and must not be abusive, false or someone else's work. We may remove them.</li>
+</ul>
+
+<h2 class="h5 fw-bold mt-4">Delivery and returns</h2>
+<p>See the <a href="{% url 'policy_page' 'shipping' %}">delivery policy</a> and the <a href="{% url 'policy_page' 'returns' %}">return and refund policy</a>.</p>
+
+<h2 class="h5 fw-bold mt-4">Law</h2>
+<p>These terms are governed by the laws of Bangladesh, including the Consumer Rights Protection Act 2009 and the Digital Commerce Operation Guidelines 2021.</p>
+{% endblock %}

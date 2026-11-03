@@ -1,11 +1,10 @@
-from django.db import transaction
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from accounts.services import award_order_points, notify, reward_referral
 
 from .models import Order, ReturnRequest
-from .services import send_order_email
+from .services import queue_order_email
 
 STATUS_MESSAGES = {
     Order.Status.CONFIRMED: ('Your order {n} is confirmed.', 'check2-circle'),
@@ -27,11 +26,15 @@ def on_status_change(sender, instance, created, **kwargs):
     previous = getattr(instance, '_previous_status', None)
     if created or not previous or previous == instance.status:
         return
-    transaction.on_commit(lambda: send_order_email(instance, 'status'))
+    queue_order_email(instance, 'status')
     if instance.status in STATUS_MESSAGES:
         text, icon = STATUS_MESSAGES[instance.status]
         notify(instance.user, text.format(n=instance.order_number), url=instance.get_absolute_url(), icon=icon)
     if instance.status == Order.Status.DELIVERED:
+        if instance.payment_method == Order.PaymentMethod.COD and instance.payment_status != Order.PaymentStatus.PAID:
+            # The courier collected the cash. Done here so it holds however the order was marked delivered.
+            Order.objects.filter(pk=instance.pk).update(payment_status=Order.PaymentStatus.PAID)
+            instance.payment_status = Order.PaymentStatus.PAID
         award_order_points(instance)
         reward_referral(instance)
 

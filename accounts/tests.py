@@ -15,7 +15,8 @@ ADDRESS = {'full_name': 'Karim', 'phone': '01812345678', 'district': 'Sylhet', '
 class AuthTests(TestCase):
     def test_signup_with_email(self):
         response = self.client.post(reverse('account_signup'), {
-            'email': 'new@example.com', 'password1': 'Str0ng-pass!', 'password2': 'Str0ng-pass!',
+            'full_name': 'Nusrat Jahan', 'phone': '01712345678', 'email': 'new@example.com',
+            'password1': 'Str0ng-pass!', 'password2': 'Str0ng-pass!',
         })
         self.assertEqual(response.status_code, 302)
         self.assertTrue(get_user_model().objects.filter(email='new@example.com').exists())

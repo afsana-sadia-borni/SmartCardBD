@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -6,10 +7,11 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from core.numerals import localize_digits
+from core.ratelimit import hit_limit
 from orders.models import Coupon
 from products.models import Product, ProductVariant
 
-from .cart import Cart, make_key
+from .cart import CART_EMAIL_KEY, Cart, make_key
 
 
 def _is_ajax(request):
@@ -146,3 +148,18 @@ def coupon_remove(request):
     Cart(request).remove_coupon()
     messages.info(request, 'Coupon removed.')
     return _redirect_back(request)
+
+
+@require_POST
+def remember_email(request):
+    """A guest typed their email at checkout: keep it with the cart so we can send one reminder
+    if they don't finish the order."""
+    field = forms.EmailField()
+    try:
+        email = field.clean(request.POST.get('email', '').strip())
+    except forms.ValidationError:
+        return JsonResponse({'ok': False}, status=400)
+    if request.user.is_authenticated or hit_limit(request, 'cart-email', limit=20, window_seconds=600):
+        return JsonResponse({'ok': False}, status=400)
+    request.session[CART_EMAIL_KEY] = email.lower()
+    return JsonResponse({'ok': True})

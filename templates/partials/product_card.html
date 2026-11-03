@@ -22,7 +22,7 @@
         </button>
     </div>
     <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body img-skeleton">
-        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
+        <img src="{% if product.image %}{{ product.image.url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
              class="card-img-top" alt="{{ product.title }}" loading="lazy">
     </a>
     <div class="card-body d-flex flex-column p-3">

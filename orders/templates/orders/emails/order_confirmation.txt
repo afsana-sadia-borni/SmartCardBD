@@ -3,13 +3,16 @@
 Thank you for shopping with {{ site_name }}! We have received your order.
 
 Order number: {{ order.order_number }}
-Payment: {{ order.get_payment_method_display }} ({{ order.get_payment_status_display }})
+Payment: {{ order.payment_label }} ({{ order.get_payment_status_display }})
 
 Items:
 {% for item in order.items.all %}  - {{ item.product_title }} x {{ item.quantity }} = BDT {{ item.subtotal|floatformat:2|intcomma }}
 {% endfor %}
 Subtotal: BDT {{ order.subtotal|floatformat:2|intcomma }}{% if order.discount %}
-Discount: -BDT {{ order.discount|floatformat:2|intcomma }}{% endif %}
+Discount: -BDT {{ order.discount|floatformat:2|intcomma }}{% endif %}{% if order.bundle_discount %}
+Bundle discount: -BDT {{ order.bundle_discount|floatformat:2|intcomma }}{% endif %}{% if order.points_discount %}
+Reward points: -BDT {{ order.points_discount|floatformat:2|intcomma }}{% endif %}{% if order.gift_wrap_cost %}
+Gift wrap: BDT {{ order.gift_wrap_cost|floatformat:2|intcomma }}{% endif %}
 Shipping: BDT {{ order.shipping_cost|floatformat:2|intcomma }}
 Total:    BDT {{ order.total|floatformat:2|intcomma }}
 
@@ -17,6 +20,10 @@ Delivery to:
 {{ order.full_name }}, {{ order.phone }}
 {{ order.address_line }}, {{ order.area }}, {{ order.district }}
 
+Your invoice is attached as a PDF.
+{% if order.user_id %}See your order: {{ site_url }}{{ order.get_absolute_url }}
+{% else %}Track your order: {{ site_url }}{% url 'track_order' %}
+{% endif %}
 We will let you know when your order ships.
 
 - {{ site_name }}

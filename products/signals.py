@@ -3,8 +3,9 @@ from django.db.models import Sum
 from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
-from .models import FlashSale, Product, ProductVariant
+from .models import Banner, FlashSale, Product, ProductImage, ProductVariant, ReviewImage
 from .services import check_price_alerts, clear_flash_sale_cache
+from .tasks import make_webp_images
 
 
 @receiver([post_save, post_delete], sender=FlashSale)
@@ -32,3 +33,14 @@ def sync_product_stock(sender, instance, **kwargs):
     total = ProductVariant.objects.filter(product_id=instance.product_id, is_active=True).aggregate(s=Sum('stock'))['s']
     if total is not None:
         Product.objects.filter(pk=instance.product_id).update(stock=total)
+
+
+@receiver(post_save, sender=Product)
+@receiver(post_save, sender=ProductImage)
+@receiver(post_save, sender=Banner)
+@receiver(post_save, sender=ReviewImage)
+def make_webp_copies(sender, instance, **kwargs):
+    """Make the small WebP copies of a new or changed image in the background."""
+    name = instance.image.name if instance.image else ''
+    if name:
+        transaction.on_commit(lambda: make_webp_images.delay(name))

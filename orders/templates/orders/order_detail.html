@@ -48,13 +48,14 @@
             </div>
             <div class="bg-body rounded-4 shadow-sm p-4">
                 <h6 class="fw-bold">Payment</h6>
-                <p class="small mb-3">{{ order.get_payment_method_display }}<br>Status: <strong>{{ order.get_payment_status_display }}</strong></p>
+                <p class="small mb-3">{{ order.payment_label }}<br>Status: <strong>{{ order.get_payment_status_display }}</strong></p>
                 {% if order.can_pay_online %}
                     <form method="post" action="{% url 'order_pay' order.order_number %}" class="mb-2">
                         {% csrf_token %}
                         <button class="btn btn-warning w-100 fw-semibold" type="submit"><i class="bi bi-credit-card"></i> Pay {{ order.total|taka }} now</button>
                     </form>
                 {% endif %}
+                <a href="{% url 'order_invoice' order.order_number %}" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-file-earmark-pdf"></i> Download invoice (PDF)</a>
                 {% if order.points_earned %}<p class="small text-success"><i class="bi bi-star-fill"></i> You earned {{ order.points_earned|num }} reward points.</p>{% endif %}
                 {% if order.return_request %}
                     <div class="border rounded-3 p-2 small mb-2">

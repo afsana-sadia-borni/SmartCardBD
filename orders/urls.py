@@ -1,6 +1,8 @@
 from django.urls import path
 
-from . import dashboard, reports, views
+from django.views.generic import RedirectView
+
+from . import reports, views
 
 urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
@@ -9,6 +11,7 @@ urlpatterns = [
     path('orders/<str:order_number>/', views.order_detail, name='order_detail'),
     path('orders/<str:order_number>/success/', views.order_success, name='order_success'),
     path('orders/<str:order_number>/cancel/', views.order_cancel, name='order_cancel'),
+    path('orders/<str:order_number>/invoice.pdf', views.order_invoice, name='order_invoice'),
     path('orders/<str:order_number>/pay/', views.order_pay, name='order_pay'),
     path('orders/<str:order_number>/return/', views.return_request, name='return_request'),
     path('orders/<str:order_number>/payment/<str:result>/', views.payment_result, name='payment_result'),
@@ -18,6 +21,7 @@ urlpatterns = [
     path('payment/cancel/', views.payment_cancel, name='payment_cancel'),
     path('payment/ipn/', views.payment_ipn, name='payment_ipn'),
 
-    path('dashboard/', dashboard.dashboard, name='dashboard'),
+    # The dashboard moved into the store panel.
+    path('dashboard/', RedirectView.as_view(pattern_name='store:dashboard'), name='old_dashboard'),
     path('dashboard/sales.csv', reports.sales_report_csv, name='sales_report_csv'),
 ]

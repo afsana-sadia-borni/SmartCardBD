@@ -59,6 +59,17 @@ class DeliveryZoneTests(OrderTestCase):
         self.assertFalse(Order.objects.exists())
 
 
+class CashOnDeliveryTests(OrderTestCase):
+    def test_delivered_cod_order_is_paid_whoever_marks_it(self):
+        order = self.deliver(self.buy())  # plain save(), like the Django admin
+        self.assertEqual(order.payment_status, Order.PaymentStatus.PAID)
+        other = self.buy()
+        other.status = Order.Status.DELIVERED
+        other.save(update_fields=['status', 'updated_at'])  # like the admin's bulk action
+        other.refresh_from_db()
+        self.assertEqual(other.payment_status, Order.PaymentStatus.PAID)
+
+
 class GiftWrapAndPointsTests(OrderTestCase):
     def test_gift_wrap_adds_charge(self):
         order = self.buy(gift_wrap='on')

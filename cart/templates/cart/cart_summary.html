@@ -19,7 +19,7 @@
                              data-update-url="{% url 'cart_update' %}"
                              data-remove-url="{% url 'cart_remove' %}">
                             <a href="{{ product.get_absolute_url }}">
-                                <img src="{% if item.image_url %}{{ item.image_url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="cart-thumb" alt="{{ product.title }}">
+                                <img src="{% if item.image_url %}{{ item.image_url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="cart-thumb" alt="{{ product.title }}">
                             </a>
                             <div class="flex-grow-1" style="min-width: 160px;">
                                 <a href="{{ product.get_absolute_url }}" class="fw-semibold text-body text-decoration-none">{{ product.title }}</a>
