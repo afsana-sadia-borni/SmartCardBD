@@ -1,0 +1,7 @@
+{% load static %}
+<div class="empty-state text-center py-5 px-3">
+    <img src="{% static 'img/empty/'|add:image|add:'.svg' %}" alt="" width="200" height="150" class="mb-3">
+    <h5 class="fw-bold">{{ heading }}</h5>
+    {% if message %}<p class="text-body-secondary">{{ message }}</p>{% endif %}
+    {% if button_url %}<a href="{{ button_url }}" class="btn btn-warning fw-semibold">{{ button_text|default:'Start shopping' }}</a>{% endif %}
+</div>

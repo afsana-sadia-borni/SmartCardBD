@@ -1,41 +1,57 @@
 {% load static shop_tags %}
-<div class="card product-card h-100 shadow-sm position-relative">
-    {% if product.has_discount %}
-        <span class="badge text-bg-danger badge-corner">-{{ product.discount_percent }}%</span>
-    {% elif not product.in_stock %}
-        <span class="badge text-bg-secondary badge-corner">Out of stock</span>
-    {% endif %}
-    {% if user.is_authenticated %}
-        <div class="wishlist-corner">
-            <button type="button" class="btn-wishlist js-wishlist-toggle" data-url="{% url 'wishlist_toggle' product.id %}" aria-label="Toggle wishlist">
+<div class="card product-card h-100 shadow-sm position-relative" data-aos="fade-up">
+    <div class="badge-corner d-flex flex-column gap-1 align-items-start">
+        {% if product.flash_sale %}
+            <span class="badge text-bg-danger"><i class="bi bi-lightning-charge-fill"></i> -{{ product.discount_percent|num }}%</span>
+        {% elif product.has_discount %}
+            <span class="badge text-bg-danger">-{{ product.discount_percent|num }}%</span>
+        {% endif %}
+        {% if not product.in_stock %}<span class="badge text-bg-secondary">Out of stock</span>{% endif %}
+    </div>
+    <div class="card-actions">
+        {% if user.is_authenticated %}
+            <button type="button" class="btn-wishlist js-wishlist-toggle" data-url="{% url 'wishlist_toggle' product.id %}" aria-label="Save {{ product.title }} to wishlist">
                 <i class="bi bi-heart{% if product.id in wishlist_ids %}-fill{% endif %}"></i>
             </button>
-        </div>
-    {% endif %}
-    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body">
+        {% endif %}
+        <button type="button" class="btn-wishlist text-body js-quick-view" data-url="{% url 'quick_view' product.slug %}" aria-label="Quick view of {{ product.title }}">
+            <i class="bi bi-eye"></i>
+        </button>
+        <button type="button" class="btn-wishlist text-body js-compare-toggle {% if product.id in compare_ids %}active{% endif %}" data-url="{% url 'compare_toggle' product.id %}" aria-pressed="{% if product.id in compare_ids %}true{% else %}false{% endif %}" aria-label="Compare {{ product.title }}">
+            <i class="bi bi-arrow-left-right"></i>
+        </button>
+    </div>
+    <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body img-skeleton">
         <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
              class="card-img-top" alt="{{ product.title }}" loading="lazy">
     </a>
     <div class="card-body d-flex flex-column p-3">
         <small class="text-body-secondary">{{ product.brand|default:product.category.name }}</small>
         <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body">
-            <h6 class="card-title fw-semibold mt-1 mb-2">{{ product.title }}</h6>
+            <h3 class="h6 card-title fw-semibold mt-1 mb-2">{{ product.title }}</h3>
         </a>
-        {% if product.review_count %}
-            <div class="mb-2">{% stars product.avg_rating product.review_count %}</div>
-        {% endif %}
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2 small">
+            {% if product.review_count %}{% stars product.avg_rating product.review_count %}{% endif %}
+            {% if product.sold %}<span class="text-body-secondary">{{ product.sold|sold_label }}</span>{% endif %}
+        </div>
         <div class="mt-auto">
             <span class="fw-bold fs-5 text-warning-emphasis">{{ product.final_price|taka }}</span>
             {% if product.has_discount %}<span class="price-old ms-1">{{ product.price|taka }}</span>{% endif %}
         </div>
-        <form class="js-add-to-cart mt-2" action="{% url 'cart_add' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="product_id" value="{{ product.id }}">
-            <input type="hidden" name="quantity" value="1">
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <button type="submit" class="btn btn-sm btn-dark w-100" {% if not product.in_stock %}disabled{% endif %}>
-                <i class="bi bi-cart-plus"></i> {% if product.in_stock %}Add to cart{% else %}Out of stock{% endif %}
-            </button>
-        </form>
+        {% if product.has_variants %}
+            <a href="{{ product.get_absolute_url }}" class="btn btn-sm btn-outline-dark w-100 mt-2 {% if not product.in_stock %}disabled{% endif %}">
+                <i class="bi bi-sliders"></i> Choose options
+            </a>
+        {% else %}
+            <form class="js-add-to-cart mt-2" action="{% url 'cart_add' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="btn btn-sm btn-dark w-100" {% if not product.in_stock %}disabled{% endif %}>
+                    <i class="bi bi-cart-plus"></i> {% if product.in_stock %}Add to cart{% else %}Out of stock{% endif %}
+                </button>
+            </form>
+        {% endif %}
     </div>
 </div>

@@ -1,52 +1,100 @@
 {% load static shop_tags %}<!DOCTYPE html>
-<html lang="en">
+<html lang="{% if bn_digits %}bn{% else %}en{% endif %}" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SmartCart BD - Smart Online Shopping{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Shop electronics, fashion and more at the best prices in Bangladesh. Cash on Delivery all over the country.{% endblock %}">
+    {# Apply the saved theme before anything paints, so dark mode doesn't flash white. #}
+    <script>
+        (function () {
+            var theme = null;
+            try { theme = localStorage.getItem('theme'); } catch (e) {}
+            if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{% static 'img/icons/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% url 'pwa_manifest' %}">
+    <meta name="theme-color" content="#212529">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="SmartCart">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100 bg-body-tertiary">
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 {% url 'home' as home_url %}
 {% url 'product_list' as shop_url %}
 {% url 'cart_summary' as cart_url %}
-{% url 'checkout' as checkout_url %}
 {% url 'order_list' as orders_url %}
 {% url 'wishlist' as wishlist_url %}
 {% url 'profile' as profile_url %}
 {% url 'dashboard' as dashboard_url %}
+{% url 'compare' as compare_url %}
+{% url 'track_order' as track_url %}
+{% url 'notifications' as notifications_url %}
 
 {# ---------- Top bar ---------- #}
 <header class="app-topbar sticky-top shadow-sm">
-    <nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark" aria-label="Top">
         <div class="container-fluid px-3 px-lg-4 flex-nowrap gap-2">
             <button class="btn btn-link text-white d-lg-none px-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar" aria-label="Open menu">
                 <i class="bi bi-list fs-3"></i>
             </button>
             <a class="navbar-brand fw-bold me-0 me-md-3" href="{{ home_url }}"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</a>
 
-            <form class="d-none d-md-flex flex-grow-1 mx-lg-3" action="{{ shop_url }}" method="get" role="search">
+            <form class="d-none d-md-flex flex-grow-1 mx-lg-3 position-relative js-search-form" action="{{ shop_url }}" method="get" role="search">
                 <div class="input-group">
-                    <input class="form-control" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search products, brands, categories..." aria-label="Search">
+                    <input class="form-control js-search-input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search products, brands, categories..." aria-label="Search" autocomplete="off" aria-autocomplete="list" aria-controls="search-suggest-desktop">
                     <button class="btn btn-warning" type="submit" aria-label="Search"><i class="bi bi-search"></i></button>
                 </div>
+                <div class="search-suggest shadow js-search-suggest" id="search-suggest-desktop" role="listbox" hidden></div>
             </form>
 
-            <div class="d-flex align-items-center gap-1 gap-sm-2 ms-auto">
+            <div class="d-flex align-items-center gap-1 ms-auto">
+                <button type="button" class="btn btn-link text-white px-2 js-digits-toggle d-none d-sm-inline-block" aria-label="{% if bn_digits %}Show English numbers{% else %}Show Bangla numbers{% endif %}" title="{% if bn_digits %}English numbers{% else %}বাংলা সংখ্যা{% endif %}">
+                    <span class="small fw-semibold">{% if bn_digits %}123{% else %}১২৩{% endif %}</span>
+                </button>
+                <button type="button" class="btn btn-link text-white px-2 js-theme-toggle" aria-label="Toggle dark mode" title="Dark mode">
+                    <i class="bi bi-moon-stars js-theme-icon"></i>
+                </button>
                 {% if user.is_authenticated %}
-                    <a href="{{ wishlist_url }}" class="btn btn-link text-white px-2" aria-label="Wishlist">
+                    <div class="dropdown">
+                        <button class="btn btn-link text-white px-2 position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications{% if unread_notifications %}, {{ unread_notifications }} unread{% endif %}">
+                            <i class="bi bi-bell fs-5"></i>
+                            {% if unread_notifications %}<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notif-badge js-notif-badge">{{ unread_notifications|num }}</span>{% endif %}
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end notif-menu p-0">
+                            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                <strong>Notifications</strong>
+                                {% if unread_notifications %}
+                                    <form method="post" action="{% url 'notifications_mark_read' %}" class="js-mark-read">{% csrf_token %}<button class="btn btn-link btn-sm p-0" type="submit">Mark all read</button></form>
+                                {% endif %}
+                            </div>
+                            {% for note in latest_notifications %}
+                                <a class="dropdown-item d-flex gap-2 py-2 {% if not note.is_read %}notif-unread{% endif %}" href="{% url 'notification_open' note.pk %}">
+                                    <i class="bi bi-{{ note.icon }} text-warning mt-1"></i>
+                                    <span class="small text-wrap">{{ note.message }}<br><span class="text-body-secondary">{{ note.created_at|timesince }} ago</span></span>
+                                </a>
+                            {% empty %}
+                                <div class="text-center text-body-secondary small py-4"><i class="bi bi-bell-slash fs-4 d-block mb-1"></i>No notifications yet</div>
+                            {% endfor %}
+                            <a class="d-block text-center small py-2 border-top" href="{{ notifications_url }}">See all</a>
+                        </div>
+                    </div>
+                    <a href="{{ wishlist_url }}" class="btn btn-link text-white px-2 d-none d-sm-inline-block" aria-label="Wishlist">
                         <i class="bi bi-heart fs-5"></i>
                     </a>
                 {% endif %}
-                <a href="{{ cart_url }}" class="btn btn-warning btn-sm fw-semibold" aria-label="Cart">
+                <a href="{{ cart_url }}" class="btn btn-warning btn-sm fw-semibold" data-bs-toggle="offcanvas" data-bs-target="#miniCart" aria-controls="miniCart" aria-label="Cart">
                     <i class="bi bi-cart3"></i> <span class="d-none d-sm-inline">Cart</span>
-                    <span class="badge rounded-pill bg-danger js-cart-count">{{ cart|length }}</span>
+                    <span class="badge rounded-pill bg-danger js-cart-count">{{ cart|length|num }}</span>
                 </a>
                 {% if user.is_authenticated %}
                     <div class="dropdown">
@@ -71,11 +119,12 @@
                 {% endif %}
             </div>
         </div>
-        <form class="d-md-none w-100 px-3 pb-2" action="{{ shop_url }}" method="get" role="search">
+        <form class="d-md-none w-100 px-3 pb-2 position-relative js-search-form" action="{{ shop_url }}" method="get" role="search">
             <div class="input-group input-group-sm">
-                <input class="form-control" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search products..." aria-label="Search">
+                <input class="form-control js-search-input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search products..." aria-label="Search" autocomplete="off" aria-autocomplete="list" aria-controls="search-suggest-mobile">
                 <button class="btn btn-warning" type="submit" aria-label="Search"><i class="bi bi-search"></i></button>
             </div>
+            <div class="search-suggest shadow js-search-suggest" id="search-suggest-mobile" role="listbox" hidden></div>
         </form>
     </nav>
 </header>
@@ -100,11 +149,15 @@
                 <div class="sidebar-heading">Shop</div>
                 <a class="sidebar-link {% nav_active home_url exact=True %}" href="{{ home_url }}"><i class="bi bi-house"></i> Home</a>
                 <a class="sidebar-link {% nav_active shop_url exact=True %}" href="{{ shop_url }}"><i class="bi bi-grid"></i> All products</a>
+                <a class="sidebar-link" href="{{ home_url }}#flash-sale"><i class="bi bi-lightning-charge"></i> Flash sale</a>
                 <a class="sidebar-link" href="{{ shop_url }}?sort=rating"><i class="bi bi-star"></i> Top rated</a>
-                <a class="sidebar-link" href="{{ shop_url }}?sort=price_asc"><i class="bi bi-lightning-charge"></i> Best prices</a>
+                <a class="sidebar-link {% nav_active compare_url %}" href="{{ compare_url }}">
+                    <i class="bi bi-arrow-left-right"></i> Compare
+                    <span class="badge rounded-pill text-bg-secondary ms-auto js-compare-count {% if not compare_ids %}d-none{% endif %}">{{ compare_ids|length|num }}</span>
+                </a>
                 <a class="sidebar-link {% nav_active cart_url %}" href="{{ cart_url }}">
                     <i class="bi bi-cart3"></i> Cart
-                    <span class="badge rounded-pill text-bg-warning ms-auto js-cart-count">{{ cart|length }}</span>
+                    <span class="badge rounded-pill text-bg-warning ms-auto js-cart-count">{{ cart|length|num }}</span>
                 </a>
 
                 {% if nav_categories %}
@@ -118,9 +171,13 @@
 
                 <div class="sidebar-heading">My account</div>
                 {% if user.is_authenticated %}
-                    <a class="sidebar-link {% nav_active profile_url %}" href="{{ profile_url }}"><i class="bi bi-person"></i> Profile &amp; addresses</a>
+                    <a class="sidebar-link {% nav_active profile_url exact=True %}" href="{{ profile_url }}"><i class="bi bi-person"></i> Profile &amp; rewards</a>
                     <a class="sidebar-link {% nav_active orders_url %}" href="{{ orders_url }}"><i class="bi bi-box-seam"></i> My orders</a>
-                    <a class="sidebar-link" href="{{ wishlist_url }}"><i class="bi bi-heart"></i> Wishlist</a>
+                    <a class="sidebar-link {% nav_active notifications_url %}" href="{{ notifications_url }}">
+                        <i class="bi bi-bell"></i> Notifications
+                        {% if unread_notifications %}<span class="badge rounded-pill text-bg-danger ms-auto">{{ unread_notifications|num }}</span>{% endif %}
+                    </a>
+                    <a class="sidebar-link {% nav_active wishlist_url %}" href="{{ wishlist_url }}"><i class="bi bi-heart"></i> Wishlist</a>
                     {% if user.is_staff %}
                         <div class="sidebar-heading">Store</div>
                         <a class="sidebar-link {% nav_active dashboard_url %}" href="{{ dashboard_url }}"><i class="bi bi-graph-up"></i> Sales dashboard</a>
@@ -135,17 +192,19 @@
                     <a class="sidebar-link" href="{% url 'account_login' %}"><i class="bi bi-box-arrow-in-right"></i> Log in</a>
                     <a class="sidebar-link" href="{% url 'account_signup' %}"><i class="bi bi-person-plus"></i> Sign up</a>
                 {% endif %}
+                <a class="sidebar-link {% nav_active track_url %}" href="{{ track_url }}"><i class="bi bi-geo"></i> Track an order</a>
             </nav>
 
             <div class="sidebar-note small text-body-secondary mt-4 pt-3 border-top">
                 <div><i class="bi bi-cash-coin text-warning"></i> Cash on Delivery</div>
                 <div><i class="bi bi-truck text-warning"></i> All 64 districts</div>
+                <button type="button" class="btn btn-link btn-sm px-0 mt-2 js-digits-toggle d-sm-none">{% if bn_digits %}Show English numbers{% else %}বাংলা সংখ্যা দেখান{% endif %}</button>
             </div>
         </div>
     </aside>
 
     <div class="app-content d-flex flex-column flex-grow-1">
-        <main class="flex-grow-1 py-4">
+        <main class="flex-grow-1 py-4" id="main-content" tabindex="-1">
             {% block before_content %}{% endblock %}
             {% block content %}{% endblock %}
             {% block after_content %}{% endblock %}
@@ -154,21 +213,35 @@
         <footer class="bg-dark text-white-50 pt-4 pb-3">
             <div class="container">
                 <div class="row g-4">
-                    <div class="col-md-5">
+                    <div class="col-lg-4">
                         <h6 class="text-white fw-bold"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</h6>
                         <p class="small mb-0">Smart online shopping for Bangladesh. Genuine products, fair prices and Cash on Delivery across all 64 districts.</p>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-lg-2">
                         <h6 class="text-white">Help</h6>
                         <ul class="list-unstyled small mb-0">
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ orders_url }}">Track my order</a></li>
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ cart_url }}">Cart</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ track_url }}">Track my order</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ compare_url }}">Compare products</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'image_credits' %}">Image credits</a></li>
                         </ul>
                     </div>
-                    <div class="col-6 col-md-4">
+                    <div class="col-6 col-lg-2">
                         <h6 class="text-white">We accept</h6>
                         <p class="small mb-1"><i class="bi bi-cash-coin"></i> Cash on Delivery</p>
-                        <p class="small mb-0"><i class="bi bi-phone"></i> bKash · Nagad · Card (SSLCommerz)</p>
+                        <p class="small mb-0"><i class="bi bi-phone"></i> bKash · Nagad · Card</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <h6 class="text-white">Get deals in your inbox</h6>
+                        <form method="post" action="{% url 'newsletter_subscribe' %}" class="js-newsletter" novalidate>
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <div class="hp-wrap" aria-hidden="true"><label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+                            <div class="input-group input-group-sm">
+                                <input type="email" name="email" class="form-control" placeholder="your@email.com" aria-label="Email address" required>
+                                <button class="btn btn-warning fw-semibold" type="submit">Subscribe</button>
+                            </div>
+                            <div class="small mt-1 js-newsletter-msg" role="status"></div>
+                        </form>
                     </div>
                 </div>
                 <hr class="border-secondary">
@@ -178,7 +251,41 @@
     </div>
 </div>
 
-<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container">
+{# ---------- Slide-out mini cart ---------- #}
+<div class="offcanvas offcanvas-end mini-cart" tabindex="-1" id="miniCart" aria-labelledby="miniCartLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold" id="miniCartLabel"><i class="bi bi-cart3"></i> Your cart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column p-0 js-mini-cart-body" data-url="{% url 'mini_cart' %}">
+        {% include 'cart/_mini_cart.html' %}
+    </div>
+</div>
+
+{# ---------- Quick view ---------- #}
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-label="Quick view" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0 js-quick-view-body"></div>
+        </div>
+    </div>
+</div>
+
+{# ---------- Floating buttons ---------- #}
+<div class="floating-actions">
+    {% if messenger_url %}
+        <a href="{{ messenger_url }}" class="fab fab-messenger" target="_blank" rel="noopener" aria-label="Chat on Messenger"><i class="bi bi-messenger"></i></a>
+    {% endif %}
+    {% if whatsapp_number %}
+        <a href="https://wa.me/{{ whatsapp_number }}?text={{ 'Hi SmartCart BD, I have a question.'|urlencode }}" class="fab fab-whatsapp" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><i class="bi bi-whatsapp"></i></a>
+    {% endif %}
+    <button type="button" class="fab fab-top js-back-to-top" aria-label="Back to top" hidden><i class="bi bi-arrow-up"></i></button>
+</div>
+
+<div class="toast-container position-fixed bottom-0 start-0 p-3" id="toast-container">
     {% for message in messages %}
         <div class="toast align-items-center border-0 text-bg-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}secondary{% endif %}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
             <div class="d-flex">
@@ -190,7 +297,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'js/script.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script src="{% static 'js/script.js' %}" data-suggest-url="{% url 'search_suggest' %}" data-geo-url="{% static 'data/bd-geo.json' %}" data-sw-url="{% url 'service_worker' %}" id="app-script"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
