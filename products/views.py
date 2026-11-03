@@ -2,8 +2,7 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import F, Prefetch, Q
-from django.db.models.functions import Coalesce
+from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -15,6 +14,7 @@ from core.ratelimit import hit_limit
 from orders.models import Order, OrderItem
 from recommendations.engine import bought_together, similar_products
 
+from .filters import SORT_OPTIONS, filter_products
 from .forms import QuestionForm, ReviewForm
 from .models import Banner, Bundle, Category, FlashSale, PriceAlert, Product, Question, ReviewImage
 from .templatetags.shop_tags import taka
@@ -37,14 +37,6 @@ def shop_products():
 
 PRODUCTS_PER_PAGE = 12
 
-SORT_OPTIONS = {
-    'newest': ('Newest', ['-created_at']),
-    'price_asc': ('Price: Low to High', ['effective_price', '-created_at']),
-    'price_desc': ('Price: High to Low', ['-effective_price', '-created_at']),
-    'rating': ('Top Rated', [F('avg_rating').desc(nulls_last=True), '-review_count', '-created_at']),
-}
-
-
 def home(request):
     base = shop_products()
     featured = list(base.filter(is_featured=True)[:8])
@@ -61,39 +53,12 @@ def home(request):
 
 def product_list(request, category_slug=None):
     category = get_object_or_404(Category, slug=category_slug) if category_slug else None
-    products = shop_products().annotate(effective_price=Coalesce('discount_price', 'price'))
+    products = shop_products()
     if category:
         products = products.filter(category=category)
-
+    products, sort = filter_products(products, request.GET)
     q = request.GET.get('q', '').strip()
-    if q:
-        products = products.filter(
-            Q(title__icontains=q) | Q(description__icontains=q)
-            | Q(brand__icontains=q) | Q(category__name__icontains=q)
-        )
-
-    def price_param(name):
-        try:
-            return max(float(request.GET[name]), 0)
-        except (KeyError, ValueError):
-            return None
-
-    min_price, max_price = price_param('min_price'), price_param('max_price')
-    if min_price is not None:
-        products = products.filter(effective_price__gte=min_price)
-    if max_price is not None:
-        products = products.filter(effective_price__lte=max_price)
-
     brand = request.GET.get('brand', '').strip()
-    if brand:
-        products = products.filter(brand__iexact=brand)
-    if request.GET.get('in_stock'):
-        products = products.filter(stock__gt=0)
-
-    sort = request.GET.get('sort', 'newest')
-    if sort not in SORT_OPTIONS:
-        sort = 'newest'
-    products = products.order_by(*SORT_OPTIONS[sort][1])
 
     page = Paginator(products, PRODUCTS_PER_PAGE).get_page(request.GET.get('page'))
 

@@ -1,10 +1,8 @@
-from django import forms
 from django.contrib import admin, messages
 from django.utils import timezone
 from simple_history.admin import SimpleHistoryAdmin
 
-from accounts.constants import DISTRICT_CHOICES
-
+from .forms import DeliveryZoneForm
 from .models import Coupon, DeliveryZone, Order, OrderItem, ReturnRequest
 from .reports import orders_csv_response
 from .services import CheckoutError, cancel_order
@@ -38,7 +36,7 @@ def _set_status(status):
 class OrderAdmin(SimpleHistoryAdmin):
     list_display = ['order_number', 'full_name', 'phone', 'district', 'total', 'payment_method',
                     'payment_status', 'status', 'created_at']
-    list_filter = ['status', 'payment_status', 'payment_method', 'created_at']
+    list_filter = ['status', 'payment_status', 'payment_method', 'payment_channel', 'created_at']
     search_fields = ['order_number', 'full_name', 'phone', 'email']
     readonly_fields = ['order_number', 'user', 'subtotal', 'discount', 'bundle_discount', 'points_used',
                        'points_discount', 'gift_wrap_cost', 'shipping_cost', 'total', 'coupon', 'transaction_id',
@@ -52,7 +50,7 @@ class OrderAdmin(SimpleHistoryAdmin):
         ('Order', {'fields': ['order_number', 'user', 'status', 'created_at', 'updated_at']}),
         ('Customer & shipping', {'fields': ['full_name', 'email', 'phone', 'district', 'upazila', 'area',
                                             'address_line', 'note', 'gift_wrap', 'delivery_estimate']}),
-        ('Payment', {'fields': ['payment_method', 'payment_status', 'transaction_id', 'coupon',
+        ('Payment', {'fields': ['payment_method', 'payment_channel', 'payment_status', 'transaction_id', 'coupon',
                                 'subtotal', 'discount', 'bundle_discount', 'points_used', 'points_discount',
                                 'gift_wrap_cost', 'shipping_cost', 'total', 'points_earned']}),
     ]
@@ -96,17 +94,6 @@ class CouponAdmin(SimpleHistoryAdmin):
     list_editable = ['is_active']
     search_fields = ['code']
     readonly_fields = ['used_count']
-
-
-class DeliveryZoneForm(forms.ModelForm):
-    districts = forms.MultipleChoiceField(
-        choices=DISTRICT_CHOICES, required=False, widget=forms.CheckboxSelectMultiple,
-        help_text='Leave empty for the default zone.',
-    )
-
-    class Meta:
-        model = DeliveryZone
-        fields = '__all__'
 
 
 @admin.register(DeliveryZone)

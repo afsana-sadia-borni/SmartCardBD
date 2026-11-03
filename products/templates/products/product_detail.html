@@ -20,14 +20,14 @@
                 {% with images=product.gallery %}
                     <div class="js-gallery">
                         <div class="zoom-frame img-skeleton rounded-3 js-zoom" aria-label="Product image. Hover to zoom.">
-                            <img src="{% if images %}{{ images.0.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
+                            <img src="{% if images %}{{ images.0.url|webp:1600 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
                                  class="w-100 product-thumb js-gallery-main" alt="{% if images %}{{ images.0.alt }}{% else %}{{ product.title }}{% endif %}">
                         </div>
                         {% if images|length > 1 %}
                             <div class="gallery-thumbs d-flex gap-2 mt-2" role="list">
                                 {% for img in images %}
-                                    <button type="button" class="gallery-thumb js-gallery-thumb {% if forloop.first %}active{% endif %}" data-src="{{ img.url }}" data-alt="{{ img.alt }}" data-color="{{ img.color }}" aria-label="Show image {{ forloop.counter }}" role="listitem">
-                                        <img src="{{ img.url }}" alt="" loading="lazy">
+                                    <button type="button" class="gallery-thumb js-gallery-thumb {% if forloop.first %}active{% endif %}" data-src="{{ img.url|webp:1600 }}" data-alt="{{ img.alt }}" data-color="{{ img.color }}" aria-label="Show image {{ forloop.counter }}" role="listitem">
+                                        <img src="{{ img.url|webp:400 }}" alt="" loading="lazy">
                                     </button>
                                 {% endfor %}
                             </div>
@@ -98,7 +98,7 @@
                 {% for item in bundle.products.all %}
                     {% if not forloop.first %}<i class="bi bi-plus-lg text-body-secondary"></i>{% endif %}
                     <a href="{{ item.get_absolute_url }}" class="bundle-item text-decoration-none text-body">
-                        <img src="{% if item.image %}{{ item.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="" class="cart-thumb">
+                        <img src="{% if item.image %}{{ item.image.url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="" class="cart-thumb">
                         <span class="small d-block mt-1">{{ item.title|truncatechars:28 }}</span>
                         <span class="small fw-semibold">{{ item.final_price|taka }}</span>
                     </a>
@@ -182,7 +182,7 @@
                 {% if review.images.all %}
                     <div class="d-flex gap-2 mt-2">
                         {% for photo in review.images.all %}
-                            <a href="{{ photo.image.url }}" target="_blank" rel="noopener"><img src="{{ photo.image.url }}" class="review-photo" alt="Customer photo {{ forloop.counter }}" loading="lazy"></a>
+                            <a href="{{ photo.image.url }}" target="_blank" rel="noopener"><img src="{{ photo.image.url|webp:400 }}" class="review-photo" alt="Customer photo {{ forloop.counter }}" loading="lazy"></a>
                         {% endfor %}
                     </div>
                 {% endif %}

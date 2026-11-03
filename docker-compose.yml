@@ -1,4 +1,4 @@
-# Local development: Django + PostgreSQL.
+# Local development: Django + PostgreSQL + Redis + Celery (worker and scheduler).
 #   docker compose up --build
 #   docker compose exec web python manage.py seed_demo
 # Then open http://localhost:8000
@@ -25,10 +25,11 @@ services:
     env_file:
       - path: .env
         required: false
-    environment:
+    environment: &app-env
       DEBUG: "True"
       DATABASE_URL: postgresql://smartcart:smartcart@db:5432/smartcart_db
       DATABASE_SSL_REQUIRE: "False"
+      REDIS_URL: redis://redis:6379/0
     ports:
       - "8000:8000"
     volumes:
@@ -36,6 +37,48 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Background jobs: emails, push notifications, WebP image copies.
+  worker:
+    build: .
+    command: celery -A config worker --loglevel=info --concurrency=2
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      <<: *app-env
+      RUN_MIGRATIONS: "0"
+    volumes:
+      - .:/app
+    depends_on:
+      web:
+        condition: service_started
+
+  # Scheduled jobs (see CELERY_BEAT_SCHEDULE): unpaid orders, price alerts, abandoned carts.
+  beat:
+    build: .
+    command: celery -A config beat --loglevel=info --schedule=/tmp/celerybeat-schedule
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      <<: *app-env
+      RUN_MIGRATIONS: "0"
+    volumes:
+      - .:/app
+    depends_on:
+      web:
+        condition: service_started
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   postgres_data:

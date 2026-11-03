@@ -1,5 +1,4 @@
 from django import forms
-
 from django.conf import settings
 
 from accounts.constants import DISTRICT_CHOICES
@@ -7,7 +6,7 @@ from accounts.forms import UpazilaMixin
 from accounts.models import get_profile, phone_validator
 
 from . import payments
-from .models import Order, ReturnRequest
+from .models import DeliveryZone, Order, ReturnRequest
 
 
 class CheckoutForm(UpazilaMixin, forms.Form):
@@ -40,11 +39,20 @@ class CheckoutForm(UpazilaMixin, forms.Form):
     gift_wrap = forms.BooleanField(required=False, label='Gift wrap this order')
     use_points = forms.BooleanField(required=False, label='Use my reward points')
     payment_method = forms.ChoiceField(
-        choices=Order.PaymentMethod.choices, initial=Order.PaymentMethod.COD, widget=forms.RadioSelect,
+        choices=[(Order.PaymentMethod.COD, 'Cash on Delivery')] + Order.PaymentChannel.choices
+        + [(Order.PaymentMethod.SSLCOMMERZ, 'Other online methods')],
+        initial=Order.PaymentMethod.COD, widget=forms.RadioSelect, label='Payment',
     )
     save_address = forms.BooleanField(required=False, initial=True, label='Save this address to my account')
 
     SHIPPING_FIELDS = ['full_name', 'email', 'phone', 'district', 'upazila', 'area', 'address_line', 'note']
+
+    def payment(self):
+        """The chosen option as (payment_method, payment_channel), e.g. ('sslcommerz', 'bkash')."""
+        choice = self.cleaned_data['payment_method']
+        if choice in Order.PaymentChannel.values:
+            return Order.PaymentMethod.SSLCOMMERZ, choice
+        return choice, ''
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -57,9 +65,7 @@ class CheckoutForm(UpazilaMixin, forms.Form):
         if not (user and user.is_authenticated):
             del self.fields['save_address']
         if not payments.is_configured():
-            self.fields['payment_method'].choices = [
-                c for c in Order.PaymentMethod.choices if c[0] != Order.PaymentMethod.SSLCOMMERZ
-            ]
+            self.fields['payment_method'].choices = [(Order.PaymentMethod.COD, 'Cash on Delivery')]
 
     def shipping_data(self):
         return {name: self.cleaned_data[name] for name in self.SHIPPING_FIELDS}
@@ -90,3 +96,14 @@ class ReturnRequestForm(forms.ModelForm):
         if photo and photo.size > self.MAX_PHOTO_MB * 1024 * 1024:
             raise forms.ValidationError(f'Photo must be smaller than {self.MAX_PHOTO_MB} MB.')
         return photo
+
+
+class DeliveryZoneForm(forms.ModelForm):
+    districts = forms.MultipleChoiceField(
+        choices=DISTRICT_CHOICES, required=False, widget=forms.CheckboxSelectMultiple,
+        help_text='Leave empty for the default zone.',
+    )
+
+    class Meta:
+        model = DeliveryZone
+        fields = '__all__'

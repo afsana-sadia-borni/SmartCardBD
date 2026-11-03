@@ -2,7 +2,7 @@
 <div class="row g-4">
     <div class="col-md-6">
         <div class="img-skeleton rounded-3 overflow-hidden">
-            <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="w-100 product-thumb js-gallery-main" alt="{{ product.title }}">
+            <img src="{% if product.image %}{{ product.image.url|webp:800 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" class="w-100 product-thumb js-gallery-main" alt="{{ product.title }}">
         </div>
     </div>
     <div class="col-md-6">

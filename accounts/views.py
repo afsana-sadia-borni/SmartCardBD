@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -9,7 +10,8 @@ from core.ratelimit import hit_limit
 from products.models import Product
 
 from .forms import AddressForm, NewsletterForm
-from .models import Address, Notification, Subscriber, Wishlist, get_profile
+from .models import Address, Notification, PushSubscription, Subscriber, Wishlist, get_profile
+from .push import push_enabled
 
 
 @login_required
@@ -32,7 +34,9 @@ def profile(request):
 def notifications(request):
     items = list(request.user.notifications.all()[:50])
     request.user.notifications.filter(is_read=False).update(is_read=True)
-    return render(request, 'accounts/notifications.html', {'items': items})
+    return render(request, 'accounts/notifications.html', {
+        'items': items, 'vapid_public_key': settings.VAPID_PUBLIC_KEY if push_enabled() else '',
+    })
 
 
 @login_required
@@ -52,6 +56,27 @@ def notifications_mark_read(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'ok': True})
     return redirect('notifications')
+
+
+@login_required
+@require_POST
+def push_subscribe(request):
+    """Save this browser's push subscription (sent by the 'Turn on' button on the notifications page)."""
+    endpoint = request.POST.get('endpoint', '')
+    p256dh, auth = request.POST.get('p256dh', ''), request.POST.get('auth', '')
+    if not (endpoint.startswith('https://') and len(endpoint) <= 500 and p256dh and auth):
+        return JsonResponse({'ok': False}, status=400)
+    PushSubscription.objects.update_or_create(
+        endpoint=endpoint, defaults={'user': request.user, 'p256dh': p256dh[:200], 'auth': auth[:100]},
+    )
+    return JsonResponse({'ok': True})
+
+
+@login_required
+@require_POST
+def push_unsubscribe(request):
+    PushSubscription.objects.filter(user=request.user, endpoint=request.POST.get('endpoint', '')).delete()
+    return JsonResponse({'ok': True})
 
 
 @require_POST

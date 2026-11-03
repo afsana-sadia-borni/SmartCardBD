@@ -2,22 +2,28 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 
+from core.tasks import queue_email
+
 from .models import CustomerProfile, Notification, PointTransaction, get_profile
+from .push import push_enabled
+from .tasks import send_push
 
 
 def notify(user, message, url='', icon='bell', email_subject=None):
-    """In-app notification (the bell), optionally also emailed."""
+    """In-app notification (the bell), a push notification if they turned those on, and optionally an email."""
     if user is None:
         return None
     note = Notification.objects.create(user=user, message=message[:255], url=url, icon=icon)
+    link = settings.SITE_URL + url if url.startswith('/') else url
     if email_subject and user.email:
-        body = message + (f'\n\n{url}' if url else '') + f'\n\n- {settings.SITE_NAME}'
-        transaction.on_commit(lambda: send_mail(email_subject, body, None, [user.email], fail_silently=True))
+        body = message + (f'\n\n{link}' if link else '') + f'\n\n- {settings.SITE_NAME}'
+        queue_email(email_subject, body, [user.email])
+    if push_enabled():
+        transaction.on_commit(lambda: send_push.delay(user.pk, settings.SITE_NAME, message, url))
     return note
 
 

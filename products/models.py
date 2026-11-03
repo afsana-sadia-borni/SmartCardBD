@@ -4,8 +4,9 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Avg, Count, OuterRef, Q, Subquery, Sum
-from django.db.models.functions import Coalesce
+from django.db.models import (Avg, Case, Count, DecimalField, ExpressionWrapper, F, OuterRef, Q, Subquery, Sum,
+                              When)
+from django.db.models.functions import Coalesce, Least, Round
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -69,6 +70,22 @@ class ProductQuerySet(models.QuerySet):
             .values('total')
         )
         return self.annotate(sold=Coalesce(Subquery(sold), 0))
+
+    def with_effective_price(self):
+        """Annotate `effective_price`: what the customer pays right now, i.e. the lowest of the
+        regular price, the sale price and the running flash-sale price. The database version of
+        Product.final_price, so sorting and price filters match the price on the card."""
+        money_field = DecimalField(max_digits=10, decimal_places=2)
+        sale = Case(When(discount_price__lt=F('price'), then=F('discount_price')), default=F('price'),
+                    output_field=money_field)
+        now = timezone.now()
+        flash_percent = Subquery(
+            FlashSale.objects.filter(products=OuterRef('pk'), is_active=True, starts_at__lte=now, ends_at__gt=now)
+            .order_by('-discount_percent').values('discount_percent')[:1]
+        )
+        flash = Round(ExpressionWrapper(F('price') * (100 - flash_percent) / 100, output_field=money_field), 2)
+        # Coalesce: no flash sale gives NULL, and SQLite's LEAST returns NULL if any argument is NULL.
+        return self.annotate(effective_price=Least(sale, Coalesce(flash, sale), output_field=money_field))
 
 
 def money(value):

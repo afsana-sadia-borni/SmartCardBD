@@ -15,6 +15,7 @@ from core.ratelimit import hit_limit
 
 from . import payments
 from .forms import CheckoutForm, ReturnRequestForm, TrackOrderForm
+from .invoice import render_invoice
 from .models import Order, ReturnRequest
 from .services import (CheckoutError, cancel_order, create_order, delivery_zone_table, mark_order_paid,
                        release_unpaid_orders)
@@ -60,10 +61,11 @@ def checkout(request):
         release_unpaid_orders()
         form = CheckoutForm(request.POST, user=user)
         if form.is_valid():
+            payment_method, payment_channel = form.payment()
             try:
                 order = create_order(
                     cart, form.shipping_data(), user=user,
-                    payment_method=form.cleaned_data['payment_method'],
+                    payment_method=payment_method, payment_channel=payment_channel,
                     gift_wrap=form.cleaned_data.get('gift_wrap', False),
                     use_points=form.cleaned_data.get('use_points', False),
                 )
@@ -121,6 +123,13 @@ def order_list(request):
 def order_detail(request, order_number):
     order = _get_viewable_order(request, order_number)
     return render(request, 'orders/order_detail.html', {'order': order})
+
+
+def order_invoice(request, order_number):
+    order = _get_viewable_order(request, order_number)
+    response = HttpResponse(render_invoice(order), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice-{order.order_number}.pdf"'
+    return response
 
 
 @require_POST

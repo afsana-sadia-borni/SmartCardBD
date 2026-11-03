@@ -2,7 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.db import transaction
 from django.db.models import F
 from django.template.loader import render_to_string
@@ -52,7 +52,7 @@ def delivery_zone_table():
 
 @transaction.atomic
 def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.COD, gift_wrap=False,
-                 use_points=False):
+                 use_points=False, payment_channel=''):
     """Turn the cart into an Order.
 
     Product and variant rows are locked with SELECT ... FOR UPDATE so two customers buying
@@ -136,6 +136,7 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
         delivery_estimate=delivery_info(shipping['district'])[1],
         total=goods_total + shipping_cost + gift_wrap_cost,
         payment_method=payment_method,
+        payment_channel=payment_channel if payment_method == Order.PaymentMethod.SSLCOMMERZ else '',
         **shipping,
     )
     OrderItem.objects.bulk_create([
@@ -153,7 +154,7 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
     if points_used:
         change_points(user, -points_used, f'Used on order {order.order_number}', order)
 
-    transaction.on_commit(lambda: send_order_email(order, 'confirmation'))
+    queue_order_email(order, 'confirmation')
     return order
 
 
@@ -257,7 +258,22 @@ EMAIL_SUBJECTS = {
 }
 
 
-def send_order_email(order, kind):
+def order_email(order, kind):
+    """The confirmation or status-update email for an order. The confirmation has the PDF invoice attached."""
+    from .invoice import render_invoice
+
     subject = EMAIL_SUBJECTS[kind].format(number=order.order_number, status=order.get_status_display())
-    body = render_to_string(f'orders/emails/order_{kind}.txt', {'order': order, 'site_name': settings.SITE_NAME})
-    send_mail(subject, body, None, [order.email], fail_silently=True)
+    body = render_to_string(f'orders/emails/order_{kind}.txt', {
+        'order': order, 'site_name': settings.SITE_NAME, 'site_url': settings.SITE_URL,
+    })
+    message = EmailMessage(subject, body, None, [order.email])
+    if kind == 'confirmation':
+        message.attach(f'invoice-{order.order_number}.pdf', render_invoice(order), 'application/pdf')
+    return message
+
+
+def queue_order_email(order, kind):
+    """Send the order email from the background worker once the order is saved."""
+    from .tasks import send_order_email
+
+    transaction.on_commit(lambda: send_order_email.delay(order.pk, kind))

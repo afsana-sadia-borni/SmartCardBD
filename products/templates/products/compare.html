@@ -22,7 +22,7 @@
                             {% for product in products %}
                                 <td>
                                     <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-body">
-                                        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="" class="compare-img mb-2">
+                                        <img src="{% if product.image %}{{ product.image.url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="" class="compare-img mb-2">
                                         <div class="fw-semibold">{{ product.title }}</div>
                                     </a>
                                     <button type="button" class="btn btn-link btn-sm text-danger px-0 js-compare-toggle active" data-url="{% url 'compare_toggle' product.id %}" data-remove-col="1">Remove</button>

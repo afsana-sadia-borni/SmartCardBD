@@ -630,6 +630,14 @@
         };
         [district, gift, points].forEach((el) => el && el.addEventListener('change', recalc));
         recalc();
+
+        // Guests: remember the email with the cart, for one reminder if the order isn't finished.
+        const email = document.getElementById('id_email');
+        if (cfg.rememberEmailUrl && email) {
+            email.addEventListener('change', () => {
+                if (email.value && email.checkValidity()) postData(cfg.rememberEmailUrl, { email: email.value }).catch(() => {});
+            });
+        }
     }
 
     // ---------- Notifications: mark all read without leaving the page ----------
@@ -679,6 +687,69 @@
     }
 
     // ---------- PWA ----------
+    // ---------- Show / hide password ----------
+    document.querySelectorAll('.js-toggle-password').forEach((btn) => btn.addEventListener('click', () => {
+        const input = btn.parentElement.querySelector('input');
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        btn.querySelector('i').className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+    }));
+
+    // ---------- Demo account: fill the login form ----------
+    document.querySelectorAll('.js-demo-login').forEach((btn) => btn.addEventListener('click', () => {
+        const login = document.querySelector('input[name="login"]');
+        const password = document.querySelector('input[name="password"]');
+        if (!login || !password) return;
+        login.value = btn.dataset.email;
+        password.value = btn.dataset.password;
+        password.form.requestSubmit();
+    }));
+
+    // ---------- Push notifications (notifications page) ----------
+    const pushBox = document.querySelector('.js-push-box');
+    if (pushBox && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+        const btn = pushBox.querySelector('.js-push-toggle');
+        const text = pushBox.querySelector('.js-push-text');
+        const keyBytes = () => {
+            const b64 = pushBox.dataset.key.replace(/-/g, '+').replace(/_/g, '/');
+            const raw = atob(b64 + '='.repeat((4 - b64.length % 4) % 4));
+            return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+        };
+        const show = (sub) => {
+            btn.textContent = sub ? 'Turn off' : 'Turn on';
+            btn.className = 'btn btn-sm js-push-toggle ' + (sub ? 'btn-outline-secondary' : 'btn-dark');
+            if (sub) text.textContent = 'Notifications are on for this device.';
+            else if (Notification.permission === 'denied') text.textContent = 'Notifications are blocked in your browser settings for this site.';
+            else text.textContent = 'Get order updates and price drops on this device, even when the site is closed.';
+            btn.disabled = !sub && Notification.permission === 'denied';
+        };
+        navigator.serviceWorker.ready.then(async (reg) => {
+            pushBox.hidden = false;
+            show(await reg.pushManager.getSubscription());
+            btn.addEventListener('click', async () => {
+                btn.disabled = true;
+                try {
+                    const current = await reg.pushManager.getSubscription();
+                    if (current) {
+                        await postData(pushBox.dataset.unsubscribeUrl, { endpoint: current.endpoint });
+                        await current.unsubscribe();
+                        show(null);
+                    } else {
+                        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes() });
+                        const keys = sub.toJSON().keys;
+                        await postData(pushBox.dataset.subscribeUrl, { endpoint: sub.endpoint, p256dh: keys.p256dh, auth: keys.auth });
+                        show(sub);
+                        showToast('Notifications turned on.', 'success');
+                    }
+                } catch (err) {
+                    show(await reg.pushManager.getSubscription().catch(() => null));
+                    if (Notification.permission !== 'denied') showToast('Could not change notification settings.', 'error');
+                }
+            });
+        });
+    }
+
     if ('serviceWorker' in navigator && config.swUrl) {
         window.addEventListener('load', () => navigator.serviceWorker.register(config.swUrl, { scope: '/' }).catch(() => {}));
     }

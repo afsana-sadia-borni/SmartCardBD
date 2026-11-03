@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Address, CustomerProfile, Notification, PointTransaction, Subscriber, Wishlist
+from .models import Address, CustomerProfile, Notification, PointTransaction, PushSubscription, Subscriber, Wishlist
 
 
 @admin.register(Address)
@@ -38,6 +38,14 @@ class NotificationAdmin(admin.ModelAdmin):
     list_filter = ['is_read', 'created_at']
     search_fields = ['user__email', 'message']
     list_select_related = ['user']
+
+
+@admin.register(PushSubscription)
+class PushSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'created_at']
+    search_fields = ['user__email']
+    list_select_related = ['user']
+    readonly_fields = ['user', 'endpoint', 'p256dh', 'auth', 'created_at']
 
 
 @admin.register(Subscriber)

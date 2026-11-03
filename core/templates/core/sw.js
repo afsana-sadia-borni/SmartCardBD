@@ -1,5 +1,5 @@
-// SmartCart BD service worker: fast repeat visits and an offline page.
-const VERSION = 'scb-v1';
+// SmartCart BD service worker: fast repeat visits, an offline page and push notifications.
+const VERSION = 'scb-v2';
 const OFFLINE_URL = '{% url "offline" %}';
 const PRECACHE = [OFFLINE_URL{% for url in precache %}, '{{ url }}'{% endfor %}];
 
@@ -38,4 +38,27 @@ self.addEventListener('fetch', (event) => {
             }))
         );
     }
+});
+
+// Push notifications sent by the server (accounts/push.py): {title, body, url}.
+self.addEventListener('push', (event) => {
+    let data = {};
+    try { data = event.data ? event.data.json() : {}; } catch (err) { data = { body: event.data.text() }; }
+    event.waitUntil(self.registration.showNotification(data.title || 'SmartCart BD', {
+        body: data.body || '',
+        icon: '{{ icon_url }}',
+        badge: '{{ icon_url }}',
+        data: { url: data.url || '/' },
+    }));
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const url = new URL(event.notification.data.url || '/', self.location.origin).href;
+    event.waitUntil(
+        self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+            const open = windows.find((w) => w.url === url);
+            return open ? open.focus() : self.clients.openWindow(url);
+        })
+    );
 });

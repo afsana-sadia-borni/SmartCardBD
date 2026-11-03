@@ -1,0 +1,34 @@
+{% extends 'core/pages/_page.html' %}
+
+{% block page %}
+<p>This page explains what personal information SmartCart BD collects, why, and the choices you have.</p>
+
+<h2 class="h5 fw-bold mt-4">What we collect</h2>
+<ul>
+    <li><strong>Account:</strong> your email address and password (stored only as a secure hash), or your Google profile if you log in with Google.</li>
+    <li><strong>Orders:</strong> name, phone number, email, delivery address, the products you buy and how you pay. Card and mobile-wallet details are entered on the SSLCommerz payment page; we never see or store them.</li>
+    <li><strong>Your cart:</strong> what is in it and when it last changed. If you type your email at checkout but don't finish the order, we may send you one reminder.</li>
+    <li><strong>Optional:</strong> saved addresses, wishlist, reviews and photos, questions, price alerts, newsletter subscription and push notifications.</li>
+    <li><strong>Technical:</strong> cookies needed for login, the cart and security (to block repeated failed logins), plus your theme and digit preferences.</li>
+</ul>
+
+<h2 class="h5 fw-bold mt-4">How we use it</h2>
+<ul>
+    <li>To deliver your orders and keep you updated by email, in-site notifications and, if you turn them on, push notifications.</li>
+    <li>To run reward points and referrals, and to show recommendations based on what is in the shop.</li>
+    <li>To protect accounts and stop fraud.</li>
+    <li>To send offers, only if you subscribe to the newsletter. Every email has an unsubscribe link.</li>
+</ul>
+
+<h2 class="h5 fw-bold mt-4">Who we share it with</h2>
+<p>Only with the services needed to complete your order: the courier (name, phone and address), the payment gateway (order amount and contact details) and our email provider. We do not sell your information.</p>
+
+<h2 class="h5 fw-bold mt-4">Your choices</h2>
+<ul>
+    <li>Edit or delete saved addresses from your profile, and turn push notifications off on the notifications page.</li>
+    <li>Unsubscribe from the newsletter with the link in any newsletter email.</li>
+    <li>Ask us to delete your account. Order records are kept as long as the law requires for accounting.</li>
+</ul>
+
+{% include 'core/pages/_contact.html' %}
+{% endblock %}

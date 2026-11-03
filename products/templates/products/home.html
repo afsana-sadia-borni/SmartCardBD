@@ -15,7 +15,7 @@
             <div class="carousel-inner">
                 {% for banner in banners %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        <img src="{{ banner.image.url }}" class="d-block w-100 hero-img" alt="" {% if not forloop.first %}loading="lazy"{% endif %}>
+                        <img src="{{ banner.image.url|webp:1600 }}" srcset="{{ banner.image.url|webp:800 }} 800w, {{ banner.image.url|webp:1600 }} 1600w" sizes="100vw" class="d-block w-100 hero-img" alt="" {% if not forloop.first %}loading="lazy"{% endif %}>
                         <div class="hero-overlay">
                             <div class="p-4 p-md-5">
                                 <h2 class="display-6 fw-bold text-white mb-2">{{ banner.title }}</h2>

@@ -13,6 +13,8 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('notifications/<int:pk>/', views.notification_open, name='notification_open'),
     path('notifications/read/', views.notifications_mark_read, name='notifications_mark_read'),
+    path('push/subscribe/', views.push_subscribe, name='push_subscribe'),
+    path('push/unsubscribe/', views.push_unsubscribe, name='push_unsubscribe'),
 ]
 
 newsletter_urlpatterns = [

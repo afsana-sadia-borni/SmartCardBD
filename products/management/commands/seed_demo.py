@@ -2,15 +2,21 @@ from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from allauth.account.models import EmailAddress
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
-from orders.models import Coupon
+from accounts.models import Address, CustomerProfile, Wishlist
+from accounts.services import change_points
+from orders.models import Coupon, Order, OrderItem
 from products.models import Banner, Bundle, Category, FlashSale, Product, ProductImage, ProductVariant
 
 MEDIA_DIR = Path(__file__).resolve().parents[2] / 'demo_media'
+DEMO_PHONE = '01700000000'
 
 DEMO_CATALOG = {
     'Mobile Phones': [
@@ -165,6 +171,42 @@ class Command(BaseCommand):
             bundle = Bundle.objects.create(title=title, bundle_price=regular - saving)
             bundle.products.set(products)
 
+    def add_demo_account(self):
+        """A shopper account visitors can log in with: a saved address, reward points, a wishlist
+        and one delivered order (so reviews and returns can be tried)."""
+        User = get_user_model()
+        user = User.objects.filter(email__iexact=settings.DEMO_EMAIL).first()
+        if user is None:
+            username = 'demo' if not User.objects.filter(username='demo').exists() else 'demo-shopper'
+            user = User.objects.create_user(username=username, email=settings.DEMO_EMAIL, first_name='Demo',
+                                            last_name='Customer')
+        user.set_password(settings.DEMO_PASSWORD)  # reset it every time, so the demo login always works
+        user.save()
+        if not CustomerProfile.objects.filter(phone=DEMO_PHONE).exists():
+            CustomerProfile.objects.filter(user=user, phone__isnull=True).update(phone=DEMO_PHONE)
+        EmailAddress.objects.update_or_create(user=user, email=settings.DEMO_EMAIL,
+                                              defaults={'verified': True, 'primary': True})
+        address = dict(full_name='Demo Customer', phone='01712345678', district='Dhaka',
+                       upazila='Mirpur (Dhaka City)', area='Mirpur 10', address_line='House 12, Road 3')
+        if not user.addresses.exists():
+            Address.objects.create(user=user, is_default=True, **address)
+        products = list(Product.objects.active().filter(variants__isnull=True).order_by('id')[:3])
+        for product in products[1:]:
+            Wishlist.objects.get_or_create(user=user, product=product)
+        if products and not user.orders.exists():
+            product = products[0]
+            price = product.final_price
+            order = Order.objects.create(user=user, email=user.email, subtotal=price, shipping_cost=Decimal('60'),
+                                         total=price + 60, delivery_estimate='1-2 days', **address)
+            OrderItem.objects.create(order=order, product=product, product_title=product.title, price=price,
+                                     quantity=1)
+            for status in (Order.Status.CONFIRMED, Order.Status.SHIPPED, Order.Status.DELIVERED):
+                order.status = status
+                order.save()  # signals add notifications and reward points, like a real order
+        if user.profile.points < 200:
+            change_points(user, 200, 'Welcome bonus (demo account)')
+        return user
+
     @transaction.atomic
     def handle(self, *args, **options):
         # Older demo data used a colour in the panjabi's title; it now has colour options instead.
@@ -203,7 +245,8 @@ class Command(BaseCommand):
                 'valid_to': timezone.now() + timedelta(days=365),
             },
         )
+        demo = self.add_demo_account()
         self.stdout.write(self.style.SUCCESS(
             f'Demo data ready: {created} new products, with photos, variants, banners, a flash sale and bundles. '
-            'Try coupon WELCOME10 on orders over ৳1,000.'
+            f'Try coupon WELCOME10 on orders over ৳1,000. Demo login: {demo.email} / {settings.DEMO_PASSWORD}'
         ))

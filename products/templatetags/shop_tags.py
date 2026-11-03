@@ -6,6 +6,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from core.numerals import localize_digits, use_bn_digits
+from products import images
 
 register = template.Library()
 
@@ -102,3 +103,8 @@ def nav_active(context, url, exact=False):
         return ''
     matches = request.path == url if exact else request.path.startswith(url)
     return 'active' if matches else ''
+
+@register.filter
+def webp(url, width=400):
+    """{{ product.image.url|webp:400 }}: the small WebP copy of an uploaded image (or the original)."""
+    return images.webp_url(url, int(width))

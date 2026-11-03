@@ -178,6 +178,31 @@ class OnlinePaymentTests(CheckoutTestCase):
         order = Order.objects.get()
         self.assertEqual((sent['tran_id'], sent['total_amount']), (order.order_number, str(order.total)))
 
+    @mock.patch('orders.payments.requests.post')
+    def test_bkash_opens_the_gateway_on_bkash(self, post):
+        post.return_value.json.return_value = {'status': 'SUCCESS', 'GatewayPageURL': 'https://sandbox.example/pay'}
+        self.checkout(payment_method='bkash')
+        order = Order.objects.get()
+        self.assertEqual((order.payment_method, order.payment_channel), ('sslcommerz', 'bkash'))
+        self.assertEqual(order.payment_label, 'Online: bKash')
+        self.assertEqual(post.call_args.kwargs['data']['multi_card_name'], 'bkash')
+
+    @mock.patch('orders.payments.requests.post')
+    def test_falls_back_to_all_methods_if_the_filter_is_refused(self, post):
+        refused = {'status': 'FAILED', 'failedreason': 'Invalid multi_card_name'}
+        ok = {'status': 'SUCCESS', 'GatewayPageURL': 'https://sandbox.example/pay'}
+        post.return_value.json.side_effect = [refused, ok]
+        response = self.checkout(payment_method='nagad')
+        self.assertRedirects(response, 'https://sandbox.example/pay', fetch_redirect_response=False)
+        first, second = (c.kwargs['data'] for c in post.call_args_list)
+        self.assertEqual(first['multi_card_name'], 'mobilebank')
+        self.assertNotIn('multi_card_name', second)
+
+    def test_checkout_lists_bkash_nagad_rocket_and_card(self):
+        page = self.client.get(reverse('checkout'))
+        for label in ('bKash', 'Nagad', 'Rocket', 'Visa, Mastercard, Amex', 'Cash on Delivery'):
+            self.assertContains(page, label)
+
     def _place_online_order(self):
         with mock.patch('orders.payments.requests.post') as post:
             post.return_value.json.return_value = {'status': 'SUCCESS', 'GatewayPageURL': 'https://x'}
@@ -298,10 +323,21 @@ class UnpaidOrderReleaseTests(CheckoutTestCase):
         self.assertIn('Released 1', out.getvalue())
 
 
+@override_settings(SSLCOMMERZ_STORE_ID='', SSLCOMMERZ_STORE_PASSWORD='')
+class PaymentOptionsWithoutGatewayTests(CheckoutTestCase):
+    def test_only_cash_on_delivery_without_sslcommerz_keys(self):
+        self.add(self.phone, 1)
+        page = self.client.get(reverse('checkout'))
+        self.assertContains(page, 'Cash on Delivery')
+        self.assertNotContains(page, 'value="bkash"')
+        self.assertEqual(self.checkout(payment_method='bkash').status_code, 200)  # rejected
+        self.assertFalse(Order.objects.exists())
+
+
 class DashboardTests(TestCase):
     def test_staff_only(self):
-        url = reverse('dashboard')
-        self.assertEqual(self.client.get(url).status_code, 302)
+        url = reverse('store:dashboard')
+        self.assertEqual(self.client.get(url).status_code, 404)
         staff = get_user_model().objects.create_user('s', 's@example.com', 'pass12345!', is_staff=True)
         self.client.force_login(staff)
         self.assertEqual(self.client.get(url).status_code, 200)

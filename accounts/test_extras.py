@@ -10,9 +10,10 @@ AJAX = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
 
 
 class SignupTests(TestCase):
-    def signup(self, email='new@example.com', **extra):
+    def signup(self, email='new@example.com', phone='01712345678', **extra):
         return self.client.post(reverse('account_signup'), {
-            'email': email, 'password1': 'Str0ng-pass!', 'password2': 'Str0ng-pass!', **extra,
+            'full_name': 'Nusrat Jahan', 'phone': phone, 'email': email,
+            'password1': 'Str0ng-pass!', 'password2': 'Str0ng-pass!', **extra,
         })
 
     def test_new_user_gets_profile_and_referrer_from_link(self):
@@ -33,6 +34,38 @@ class SignupTests(TestCase):
         self.signup(website='http://spam.example')
         self.assertFalse(User.objects.filter(email='new@example.com').exists())
 
+
+    def test_name_and_mobile_are_saved_and_number_can_log_in(self):
+        self.signup(phone='+8801812-345678')
+        user = User.objects.get(email='new@example.com')
+        self.assertEqual((user.first_name, user.last_name), ('Nusrat', 'Jahan'))
+        self.assertEqual(user.profile.phone, '01812345678')
+        self.client.logout()
+        response = self.client.post(reverse('account_login'), {'login': '01812345678', 'password': 'Str0ng-pass!'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(int(self.client.session['_auth_user_id']), user.pk)
+
+    def test_mobile_is_required_unique_and_bangladeshi(self):
+        self.assertContains(self.signup(phone=''), 'This field is required')
+        self.assertContains(self.signup(phone='12345'), 'Bangladeshi mobile number')
+        self.signup()
+        self.client.logout()
+        response = self.signup(email='second@example.com')  # same number
+        self.assertContains(response, 'already has an account')
+        self.assertContains(response, 'Log in</a> instead')  # a real link, not escaped text
+        self.assertNotContains(response, 'sent a code')
+        self.assertFalse(User.objects.filter(email='second@example.com').exists())
+
+    def test_accounts_without_a_number_can_still_log_in(self):
+        User.objects.create_user('old', 'old@example.com', 'Str0ng-pass!')
+        response = self.client.post(reverse('account_login'), {'login': 'old@example.com', 'password': 'Str0ng-pass!'})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('_auth_user_id', self.client.session)
+
+    def test_honeypot_is_hidden_on_the_page(self):
+        page = self.client.get(reverse('account_signup')).content.decode()
+        self.assertNotIn('Leave this field empty', page.split('<footer')[0])
+        self.assertIn('class="hp-wrap"', page)
 
 class LoginLockoutTests(TestCase):
     def test_account_locked_after_repeated_failures(self):

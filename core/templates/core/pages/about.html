@@ -1,0 +1,19 @@
+{% extends 'core/pages/_page.html' %}
+{% load shop_tags %}
+
+{% block page %}
+<p class="lead">SmartCart BD is an online shop for Bangladesh: phones, gadgets, fashion and home essentials, delivered to all 64 districts.</p>
+
+<h2 class="h5 fw-bold mt-4">What we promise</h2>
+<ul>
+    <li><strong>Genuine products.</strong> Every product page shows the brand, real customer reviews and photos.</li>
+    <li><strong>Fair, clear prices.</strong> The price you see, including any sale or flash sale, is the price you pay. Delivery charges are shown before you order.</li>
+    <li><strong>Pay the way you like.</strong> Cash on Delivery everywhere{% if online_payment %}, or bKash, Nagad and cards through SSLCommerz{% endif %}.</li>
+    <li><strong>Easy returns.</strong> Changed your mind? Request a return within {{ return_days }} days of delivery. <a href="{% url 'policy_page' 'returns' %}">How returns work</a>.</li>
+</ul>
+
+<h2 class="h5 fw-bold mt-4">Rewards</h2>
+<p>You earn 1 reward point for every {{ points_per_taka|taka }} you spend, credited when your order is delivered. Every {{ points_block }} points take {{ points_value|taka }} off a later order. Invite a friend with your referral link and you both get a {{ referral_reward|taka }} coupon after their first delivery.</p>
+
+{% include 'core/pages/_contact.html' %}
+{% endblock %}

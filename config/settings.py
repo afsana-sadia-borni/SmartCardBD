@@ -61,6 +61,10 @@ INSTALLED_APPS = [
     'simple_history',
 
     'core',
+    'api',
+    'store',
+    'rest_framework',
+    'drf_spectacular',
     'accounts',
     'products',
     'cart',
@@ -91,6 +95,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     'core.middleware.ShopPreferencesMiddleware',
+    'core.middleware.DemoAccountGuardMiddleware',
     # Must be last: turns django-axes lockouts into a response.
     'axes.middleware.AxesMiddleware',
 ]
@@ -187,7 +192,7 @@ if not USE_MANIFEST_STATIC:
     # Without collectstatic there is no STATIC_ROOT yet; let WhiteNoise use the
     # app/static directories directly instead of warning about it.
     WHITENOISE_USE_FINDERS = True
-    warnings.filterwarnings('ignore', message='No directory at', module='whitenoise.base')
+    warnings.filterwarnings('ignore', message='No directory at')
 STORAGES = {
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
     'staticfiles': {
@@ -225,12 +230,18 @@ SITE_NAME = 'SmartCart BD'
 LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'home'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+# Customers log in with their email or their mobile number (01XXXXXXXXX).
+ACCOUNT_LOGIN_METHODS = {'email', 'phone'}
+# Phone is optional here so older accounts without a number (and Google sign-ups) can still log in;
+# accounts.forms.SignupForm makes it required for new sign-ups.
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'phone', 'password1*', 'password2*']
+# Verifying the number needs an SMS gateway; until one is set up the number is saved unverified.
+ACCOUNT_PHONE_VERIFICATION_ENABLED = False
 ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = None
-ACCOUNT_FORMS = {'signup': 'accounts.forms.SignupForm'}
+ACCOUNT_FORMS = {'login': 'accounts.forms.LoginForm', 'signup': 'accounts.forms.SignupForm'}
+ACCOUNT_ADAPTER = 'accounts.adapter.AccountAdapter'
 
 # Lock an account/IP pair for 30 minutes after 5 failed logins.
 AXES_FAILURE_LIMIT = int(os.getenv('AXES_FAILURE_LIMIT', 5))
@@ -246,8 +257,13 @@ ACCOUNT_RATE_LIMITS = {'login_failed': '10/m/ip,10/5m/key'}
 # The admin lives at a non-obvious URL to cut down on bots probing /admin/.
 ADMIN_URL = os.getenv('ADMIN_URL', 'manage-scb/').strip('/') + '/'
 
-# Caching (used for flash-sale prices and rate limits). Local memory is fine for one server.
-CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'smartcart'}}
+# Caching (used for flash-sale prices and rate limits). Local memory is fine for one process;
+# with Redis the web server and the Celery worker share one cache.
+REDIS_URL = os.getenv('REDIS_URL', '')
+if REDIS_URL and 'test' not in sys.argv:
+    CACHES = {'default': {'BACKEND': 'django.core.cache.backends.redis.RedisCache', 'LOCATION': REDIS_URL}}
+else:
+    CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'smartcart'}}
 SOCIALACCOUNT_LOGIN_ON_GET = False
 
 
@@ -264,6 +280,61 @@ if EMAIL_HOST:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'SmartCart BD <noreply@smartcartbd.local>')
+# Public address of the site, for links in emails and push notifications.
+SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000').rstrip('/')
+
+
+# REST API (Django REST Framework). Docs at /api/docs/.
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # Lets a logged-in browser try the API in the docs page (CSRF is still enforced).
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 12,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {'anon': '100/min', 'user': '300/min', 'login': '10/min', 'orders': '10/min'},
+}
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'UPDATE_LAST_LOGIN': True,
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SmartCart BD API',
+    'DESCRIPTION': 'Browse products and place Cash on Delivery orders. Log in at /api/auth/token/ with your '
+                   'email and password, then send `Authorization: Bearer <access token>`.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+
+# Web push notifications. Generate keys once with: python manage.py generate_vapid_keys
+# Leave empty to turn push notifications off.
+VAPID_PUBLIC_KEY = os.getenv('VAPID_PUBLIC_KEY', '')
+VAPID_PRIVATE_KEY = os.getenv('VAPID_PRIVATE_KEY', '')
+VAPID_ADMIN_EMAIL = os.getenv('VAPID_ADMIN_EMAIL', 'admin@example.com')
+
+
+# Background jobs (Celery + Redis)
+# Without a broker, tasks run inline (eager), so nothing else needs to be running.
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', REDIS_URL)
+CELERY_TASK_ALWAYS_EAGER = not CELERY_BROKER_URL or 'test' in sys.argv
+CELERY_TIMEZONE = 'Asia/Dhaka'
+CELERY_TASK_IGNORE_RESULT = True
+CELERY_BEAT_SCHEDULE = {
+    'release-unpaid-orders': {'task': 'orders.tasks.release_unpaid_orders', 'schedule': timedelta(minutes=10)},
+    'send-price-alerts': {'task': 'products.tasks.send_price_alerts', 'schedule': timedelta(minutes=15)},
+    'send-abandoned-cart-emails': {'task': 'cart.tasks.send_abandoned_cart_emails', 'schedule': timedelta(hours=1)},
+}
 
 
 # Shop settings (BDT)
@@ -285,6 +356,16 @@ REFERRAL_REWARD = int(os.getenv('REFERRAL_REWARD', 100))
 # Customer support links (optional). WhatsApp number in international format, e.g. 8801712345678.
 WHATSAPP_NUMBER = os.getenv('WHATSAPP_NUMBER', '').lstrip('+')
 MESSENGER_URL = os.getenv('MESSENGER_URL', '')
+# Demo shopper account, created by `seed_demo`. With SHOW_DEMO_LOGIN on, the login page shows
+# the email and password with a one-click fill button (for a public portfolio demo).
+DEMO_EMAIL = os.getenv('DEMO_EMAIL', 'demo@smartcartbd.com')
+DEMO_PASSWORD = os.getenv('DEMO_PASSWORD', 'SmartCart-Demo-2026')
+SHOW_DEMO_LOGIN = env_bool('SHOW_DEMO_LOGIN', DEBUG)
+# Shown on the About / Privacy pages and in the footer (leave empty to hide).
+SUPPORT_EMAIL = os.getenv('SUPPORT_EMAIL', '')
+SUPPORT_PHONE = os.getenv('SUPPORT_PHONE', '')
+BUSINESS_ADDRESS = os.getenv('BUSINESS_ADDRESS', '')
+TRADE_LICENSE = os.getenv('TRADE_LICENSE', '')
 # Unpaid online-payment orders are cancelled (and restocked) after this many minutes.
 UNPAID_ORDER_TIMEOUT_MINUTES = int(os.getenv('UNPAID_ORDER_TIMEOUT_MINUTES', 60))
 

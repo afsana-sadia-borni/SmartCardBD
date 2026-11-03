@@ -35,7 +35,7 @@
 {% url 'order_list' as orders_url %}
 {% url 'wishlist' as wishlist_url %}
 {% url 'profile' as profile_url %}
-{% url 'dashboard' as dashboard_url %}
+{% url 'store:dashboard' as dashboard_url %}
 {% url 'compare' as compare_url %}
 {% url 'track_order' as track_url %}
 {% url 'notifications' as notifications_url %}
@@ -47,7 +47,7 @@
             <button class="btn btn-link text-white d-lg-none px-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar" aria-label="Open menu">
                 <i class="bi bi-list fs-3"></i>
             </button>
-            <a class="navbar-brand fw-bold me-0 me-md-3" href="{{ home_url }}"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</a>
+            <a class="navbar-brand fw-bold me-0 me-md-3 app-brand" href="{{ home_url }}"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</a>
 
             <form class="d-none d-md-flex flex-grow-1 mx-lg-3 position-relative js-search-form" action="{{ shop_url }}" method="get" role="search">
                 <div class="input-group">
@@ -57,11 +57,11 @@
                 <div class="search-suggest shadow js-search-suggest" id="search-suggest-desktop" role="listbox" hidden></div>
             </form>
 
-            <div class="d-flex align-items-center gap-1 ms-auto">
+            <div class="d-flex align-items-center gap-0 gap-sm-1 ms-auto topbar-actions">
                 <button type="button" class="btn btn-link text-white px-2 js-digits-toggle d-none d-sm-inline-block" aria-label="{% if bn_digits %}Show English numbers{% else %}Show Bangla numbers{% endif %}" title="{% if bn_digits %}English numbers{% else %}বাংলা সংখ্যা{% endif %}">
                     <span class="small fw-semibold">{% if bn_digits %}123{% else %}১২৩{% endif %}</span>
                 </button>
-                <button type="button" class="btn btn-link text-white px-2 js-theme-toggle" aria-label="Toggle dark mode" title="Dark mode">
+                <button type="button" class="btn btn-link text-white px-2 js-theme-toggle d-none d-sm-inline-block" aria-label="Toggle dark mode" title="Dark mode">
                     <i class="bi bi-moon-stars js-theme-icon"></i>
                 </button>
                 {% if user.is_authenticated %}
@@ -96,6 +96,9 @@
                     <i class="bi bi-cart3"></i> <span class="d-none d-sm-inline">Cart</span>
                     <span class="badge rounded-pill bg-danger js-cart-count">{{ cart|length|num }}</span>
                 </a>
+                {% if user.is_staff %}
+                    <a href="{{ dashboard_url }}" class="btn btn-warning btn-sm fw-semibold" title="Store panel"><i class="bi bi-shop"></i> <span class="d-none d-lg-inline">Store</span></a>
+                {% endif %}
                 {% if user.is_authenticated %}
                     <div class="dropdown">
                         <button class="btn btn-link text-white px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account">
@@ -105,6 +108,12 @@
                             <li><span class="dropdown-item-text small text-body-secondary">{{ user.email }}</span></li>
                             <li><a class="dropdown-item" href="{{ profile_url }}"><i class="bi bi-person me-2"></i>My account</a></li>
                             <li><a class="dropdown-item" href="{{ orders_url }}"><i class="bi bi-box-seam me-2"></i>My orders</a></li>
+                            {% if user.is_staff %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">Store</h6></li>
+                                <li><a class="dropdown-item" href="{{ dashboard_url }}"><i class="bi bi-shop me-2"></i>Store panel</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>Admin panel</a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="post" action="{% url 'account_logout' %}">
@@ -180,8 +189,8 @@
                     <a class="sidebar-link {% nav_active wishlist_url %}" href="{{ wishlist_url }}"><i class="bi bi-heart"></i> Wishlist</a>
                     {% if user.is_staff %}
                         <div class="sidebar-heading">Store</div>
-                        <a class="sidebar-link {% nav_active dashboard_url %}" href="{{ dashboard_url }}"><i class="bi bi-graph-up"></i> Sales dashboard</a>
-                        <a class="sidebar-link" href="{% url 'admin:index' %}"><i class="bi bi-gear"></i> Admin</a>
+                        <a class="sidebar-link" href="{{ dashboard_url }}"><i class="bi bi-shop"></i> Store panel</a>
+                        <a class="sidebar-link" href="{% url 'admin:index' %}"><i class="bi bi-gear"></i> Admin panel</a>
                     {% endif %}
                     <form method="post" action="{% url 'account_logout' %}">
                         {% csrf_token %}
@@ -198,7 +207,10 @@
             <div class="sidebar-note small text-body-secondary mt-4 pt-3 border-top">
                 <div><i class="bi bi-cash-coin text-warning"></i> Cash on Delivery</div>
                 <div><i class="bi bi-truck text-warning"></i> All 64 districts</div>
-                <button type="button" class="btn btn-link btn-sm px-0 mt-2 js-digits-toggle d-sm-none">{% if bn_digits %}Show English numbers{% else %}বাংলা সংখ্যা দেখান{% endif %}</button>
+                <div class="d-flex flex-column align-items-start d-sm-none mt-2">
+                    <button type="button" class="btn btn-link btn-sm px-0 js-digits-toggle">{% if bn_digits %}Show English numbers{% else %}বাংলা সংখ্যা দেখান{% endif %}</button>
+                    <button type="button" class="btn btn-link btn-sm px-0 js-theme-toggle"><i class="bi bi-moon-stars js-theme-icon"></i> Dark / light mode</button>
+                </div>
             </div>
         </div>
     </aside>
@@ -213,7 +225,7 @@
         <footer class="bg-dark text-white-50 pt-4 pb-3">
             <div class="container">
                 <div class="row g-4">
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <h6 class="text-white fw-bold"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</h6>
                         <p class="small mb-0">Smart online shopping for Bangladesh. Genuine products, fair prices and Cash on Delivery across all 64 districts.</p>
                     </div>
@@ -226,11 +238,21 @@
                         </ul>
                     </div>
                     <div class="col-6 col-lg-2">
+                        <h6 class="text-white">Policies</h6>
+                        <ul class="list-unstyled small mb-0">
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'about' %}">About us</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'shipping' %}">Delivery</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'returns' %}">Returns &amp; refunds</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'privacy' %}">Privacy</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'terms' %}">Terms</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-lg-2">
                         <h6 class="text-white">We accept</h6>
                         <p class="small mb-1"><i class="bi bi-cash-coin"></i> Cash on Delivery</p>
                         <p class="small mb-0"><i class="bi bi-phone"></i> bKash · Nagad · Card</p>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <h6 class="text-white">Get deals in your inbox</h6>
                         <form method="post" action="{% url 'newsletter_subscribe' %}" class="js-newsletter" novalidate>
                             {% csrf_token %}

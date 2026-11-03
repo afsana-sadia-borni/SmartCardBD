@@ -10,6 +10,8 @@ COUPON_SESSION_ID = 'coupon_id'
 # For abandoned-cart reminders: when the cart last changed, and whether we already sent one.
 CART_UPDATED_KEY = 'cart_updated_at'
 CART_REMINDED_KEY = 'cart_reminded'
+# A guest's email from the checkout form, so guests can get a reminder too.
+CART_EMAIL_KEY = 'cart_email'
 
 
 def make_key(product_id, variant_id=None):

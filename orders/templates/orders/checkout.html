@@ -9,7 +9,8 @@
      data-amount="{{ cart.get_total }}"
      data-free-min="{{ free_shipping_min }}"
      data-gift-wrap="{{ gift_wrap_price }}"
-     data-points-discount="{{ points_discount }}">
+     data-points-discount="{{ points_discount }}"{% if not user.is_authenticated %}
+     data-remember-email-url="{% url 'cart_remember_email' %}"{% endif %}>
     <h1 class="h2 fw-bold mb-4">Checkout</h1>
 
     {% if not user.is_authenticated %}
@@ -77,17 +78,31 @@
 
                 <div class="bg-body rounded-4 shadow-sm p-4">
                     <h2 class="h5 fw-bold mb-3"><i class="bi bi-credit-card"></i> Payment method</h2>
-                    {% for radio in form.payment_method %}
-                        <label class="payment-option d-flex align-items-center gap-3 border p-3 mb-2" for="{{ radio.id_for_label }}">
-                            {{ radio.tag }}
-                            <span>
-                                <strong>{{ radio.choice_label }}</strong><br>
-                                <small class="text-body-secondary">
-                                    {% if radio.data.value == 'cod' %}Pay in cash when your order arrives.{% else %}Pay securely with bKash, Nagad, Rocket or card via SSLCommerz.{% endif %}
-                                </small>
-                            </span>
-                        </label>
-                    {% endfor %}
+                    <div class="row g-2">
+                        {% for radio in form.payment_method %}
+                            {% with v=radio.data.value %}
+                            <div class="{% if v == 'cod' %}col-12{% else %}col-sm-6{% endif %}">
+                                <label class="payment-option d-flex align-items-center gap-3 border p-3 h-100" for="{{ radio.id_for_label }}">
+                                    {{ radio.tag }}
+                                    <span class="pay-badge pay-{{ v }}" aria-hidden="true">
+                                        {% if v == 'cod' %}<i class="bi bi-cash-coin"></i>{% elif v == 'bkash' %}b{% elif v == 'nagad' %}N{% elif v == 'rocket' %}R{% elif v == 'card' %}<i class="bi bi-credit-card-2-front"></i>{% elif v == 'internetbank' %}<i class="bi bi-bank"></i>{% else %}<i class="bi bi-three-dots"></i>{% endif %}
+                                    </span>
+                                    <span>
+                                        <strong>{{ radio.choice_label }}</strong><br>
+                                        <small class="text-body-secondary">
+                                            {% if v == 'cod' %}Pay in cash when your order arrives.
+                                            {% elif v == 'card' %}Visa, Mastercard, Amex
+                                            {% elif v == 'internetbank' %}Pay from your bank account
+                                            {% elif v == 'sslcommerz' %}Upay, Tap and more
+                                            {% else %}Pay from your {{ radio.choice_label }} account{% endif %}
+                                        </small>
+                                    </span>
+                                </label>
+                            </div>
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                    {% if form.payment_method|length > 1 %}<p class="small text-body-secondary mt-2 mb-0"><i class="bi bi-shield-lock"></i> Online payments are processed securely by SSLCommerz. We never see your PIN or card number.</p>{% endif %}
                     {% for error in form.payment_method.errors %}<div class="small text-danger">{{ error }}</div>{% endfor %}
                 </div>
             </div>
