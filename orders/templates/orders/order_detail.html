@@ -41,7 +41,9 @@
         <div class="col-md-4">
             <div class="bg-body rounded-4 shadow-sm p-4 mb-4">
                 <h6 class="fw-bold">Delivery address</h6>
-                <p class="small mb-0">{{ order.full_name }}<br>{{ order.phone }}<br>{{ order.address_line }}<br>{{ order.area }}, {{ order.district }}</p>
+                <p class="small mb-0">{{ order.full_name }}<br>{{ order.phone }}<br>{{ order.address_line }}<br>{{ order.area }}{% if order.upazila %}, {{ order.upazila }}{% endif %}, {{ order.district }}</p>
+                {% if order.delivery_estimate and order.status != 'delivered' and order.status != 'cancelled' %}<p class="small text-body-secondary mt-2 mb-0"><i class="bi bi-truck"></i> Delivery in {{ order.delivery_estimate }}</p>{% endif %}
+                {% if order.gift_wrap %}<p class="small mt-2 mb-0"><i class="bi bi-gift text-danger"></i> Gift wrapped</p>{% endif %}
                 {% if order.note %}<hr><h6 class="fw-bold">Note</h6><p class="small mb-0">{{ order.note }}</p>{% endif %}
             </div>
             <div class="bg-body rounded-4 shadow-sm p-4">
@@ -52,6 +54,15 @@
                         {% csrf_token %}
                         <button class="btn btn-warning w-100 fw-semibold" type="submit"><i class="bi bi-credit-card"></i> Pay {{ order.total|taka }} now</button>
                     </form>
+                {% endif %}
+                {% if order.points_earned %}<p class="small text-success"><i class="bi bi-star-fill"></i> You earned {{ order.points_earned|num }} reward points.</p>{% endif %}
+                {% if order.return_request %}
+                    <div class="border rounded-3 p-2 small mb-2">
+                        <strong>Return request:</strong> {{ order.return_request.get_status_display }}
+                        {% if order.return_request.admin_note %}<br><span class="text-body-secondary">{{ order.return_request.admin_note }}</span>{% endif %}
+                    </div>
+                {% elif order.can_request_return and order.user_id == user.id %}
+                    <a href="{% url 'return_request' order.order_number %}" class="btn btn-outline-dark w-100 mb-2"><i class="bi bi-arrow-return-left"></i> Request a return</a>
                 {% endif %}
                 {% if order.can_cancel %}
                     <form method="post" action="{% url 'order_cancel' order.order_number %}" onsubmit="return confirm('Cancel this order?');">

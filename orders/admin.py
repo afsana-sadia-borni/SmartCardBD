@@ -1,6 +1,12 @@
+from django import forms
 from django.contrib import admin, messages
+from django.utils import timezone
+from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Coupon, Order, OrderItem
+from accounts.constants import DISTRICT_CHOICES
+
+from .models import Coupon, DeliveryZone, Order, OrderItem, ReturnRequest
+from .reports import orders_csv_response
 from .services import CheckoutError, cancel_order
 
 
@@ -8,7 +14,7 @@ class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
     can_delete = False
-    readonly_fields = ['product', 'product_title', 'price', 'quantity', 'subtotal']
+    readonly_fields = ['product', 'product_title', 'variant_label', 'price', 'quantity', 'subtotal']
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -29,24 +35,26 @@ def _set_status(status):
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(SimpleHistoryAdmin):
     list_display = ['order_number', 'full_name', 'phone', 'district', 'total', 'payment_method',
                     'payment_status', 'status', 'created_at']
     list_filter = ['status', 'payment_status', 'payment_method', 'created_at']
     search_fields = ['order_number', 'full_name', 'phone', 'email']
-    readonly_fields = ['order_number', 'user', 'subtotal', 'discount', 'shipping_cost', 'total',
-                       'coupon', 'transaction_id', 'created_at', 'updated_at']
+    readonly_fields = ['order_number', 'user', 'subtotal', 'discount', 'bundle_discount', 'points_used',
+                       'points_discount', 'gift_wrap_cost', 'shipping_cost', 'total', 'coupon', 'transaction_id',
+                       'points_earned', 'created_at', 'updated_at']
     list_select_related = ['user']
     inlines = [OrderItemInline]
     date_hierarchy = 'created_at'
     actions = [_set_status(Order.Status.CONFIRMED), _set_status(Order.Status.SHIPPED),
-               _set_status(Order.Status.DELIVERED), 'cancel_orders']
+               _set_status(Order.Status.DELIVERED), 'cancel_orders', 'export_csv']
     fieldsets = [
         ('Order', {'fields': ['order_number', 'user', 'status', 'created_at', 'updated_at']}),
-        ('Customer & shipping', {'fields': ['full_name', 'email', 'phone', 'district', 'area',
-                                            'address_line', 'note']}),
+        ('Customer & shipping', {'fields': ['full_name', 'email', 'phone', 'district', 'upazila', 'area',
+                                            'address_line', 'note', 'gift_wrap', 'delivery_estimate']}),
         ('Payment', {'fields': ['payment_method', 'payment_status', 'transaction_id', 'coupon',
-                                'subtotal', 'discount', 'shipping_cost', 'total']}),
+                                'subtotal', 'discount', 'bundle_discount', 'points_used', 'points_discount',
+                                'gift_wrap_cost', 'shipping_cost', 'total', 'points_earned']}),
     ]
 
     def save_model(self, request, obj, form, change):
@@ -74,11 +82,69 @@ class OrderAdmin(admin.ModelAdmin):
         self.message_user(request, f'{done} order(s) cancelled.', messages.SUCCESS if done else messages.WARNING)
 
 
+    @admin.action(description='Download selected as CSV (sales report)')
+    def export_csv(self, request, queryset):
+        return orders_csv_response(queryset.order_by('created_at'), f'orders-{timezone.localdate():%Y%m%d}.csv')
+
+
 @admin.register(Coupon)
-class CouponAdmin(admin.ModelAdmin):
+class CouponAdmin(SimpleHistoryAdmin):
     list_display = ['code', 'discount_type', 'value', 'min_order_amount', 'valid_from', 'valid_to',
-                    'used_count', 'usage_limit', 'is_active']
+                    'used_count', 'usage_limit', 'user', 'is_active']
+    raw_id_fields = ['user']
     list_filter = ['is_active', 'discount_type']
     list_editable = ['is_active']
     search_fields = ['code']
     readonly_fields = ['used_count']
+
+
+class DeliveryZoneForm(forms.ModelForm):
+    districts = forms.MultipleChoiceField(
+        choices=DISTRICT_CHOICES, required=False, widget=forms.CheckboxSelectMultiple,
+        help_text='Leave empty for the default zone.',
+    )
+
+    class Meta:
+        model = DeliveryZone
+        fields = '__all__'
+
+
+@admin.register(DeliveryZone)
+class DeliveryZoneAdmin(admin.ModelAdmin):
+    form = DeliveryZoneForm
+    list_display = ['name', 'charge', 'min_days', 'max_days', 'district_count', 'is_default', 'sort_order']
+    list_editable = ['charge', 'min_days', 'max_days', 'sort_order']
+
+    @admin.display(description='Districts')
+    def district_count(self, obj):
+        return 'All others' if obj.is_default and not obj.districts else len(obj.districts)
+
+
+@admin.register(ReturnRequest)
+class ReturnRequestAdmin(SimpleHistoryAdmin):
+    list_display = ['order', 'reason', 'status', 'created_at']
+    list_filter = ['status', 'reason', 'created_at']
+    search_fields = ['order__order_number', 'order__phone', 'order__email']
+    readonly_fields = ['order', 'reason', 'details', 'photo', 'created_at', 'updated_at']
+    list_select_related = ['order']
+    actions = ['approve', 'reject', 'mark_refunded']
+
+    def _set(self, request, queryset, status):
+        count = 0
+        for rr in queryset:
+            rr.status = status
+            rr.save(update_fields=['status', 'updated_at'])  # one by one so customers get notified
+            count += 1
+        self.message_user(request, f'{count} return request(s) updated.')
+
+    @admin.action(description='Approve selected returns')
+    def approve(self, request, queryset):
+        self._set(request, queryset, ReturnRequest.Status.APPROVED)
+
+    @admin.action(description='Reject selected returns')
+    def reject(self, request, queryset):
+        self._set(request, queryset, ReturnRequest.Status.REJECTED)
+
+    @admin.action(description='Mark selected as refunded')
+    def mark_refunded(self, request, queryset):
+        self._set(request, queryset, ReturnRequest.Status.REFUNDED)

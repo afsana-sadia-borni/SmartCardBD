@@ -9,6 +9,7 @@
         <h2 class="fw-bold mb-0"><i class="bi bi-graph-up-arrow"></i> Store dashboard</h2>
         <div class="d-flex gap-2">
             <a href="{% url 'admin:orders_order_changelist' %}?status__exact=pending" class="btn btn-warning btn-sm">Pending orders ({{ pending_orders }})</a>
+            <a href="{% url 'sales_report_csv' %}?days=30" class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Sales CSV (30 days)</a>
             <a href="{% url 'admin:index' %}" class="btn btn-outline-dark btn-sm">Admin panel</a>
         </div>
     </div>

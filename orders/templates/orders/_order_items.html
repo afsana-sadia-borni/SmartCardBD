@@ -7,8 +7,9 @@
                 <tr>
                     <td>
                         {% if item.product and item.product.is_active %}<a href="{{ item.product.get_absolute_url }}" class="text-body">{{ item.product_title }}</a>{% else %}{{ item.product_title }}{% endif %}
+                        {% if item.variant_label %}<div class="small text-body-secondary">{{ item.variant_label }}</div>{% endif %}
                     </td>
-                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-center">{{ item.quantity|num }}</td>
                     <td class="text-end">{{ item.price|taka }}</td>
                     <td class="text-end">{{ item.subtotal|taka }}</td>
                 </tr>
@@ -16,7 +17,10 @@
         </tbody>
         <tfoot>
             <tr><td colspan="3" class="text-end text-body-secondary">Subtotal</td><td class="text-end">{{ order.subtotal|taka }}</td></tr>
+            {% if order.bundle_discount %}<tr class="text-success"><td colspan="3" class="text-end">Bundle savings</td><td class="text-end">-{{ order.bundle_discount|taka }}</td></tr>{% endif %}
             {% if order.discount %}<tr class="text-success"><td colspan="3" class="text-end">Discount{% if order.coupon %} ({{ order.coupon.code }}){% endif %}</td><td class="text-end">-{{ order.discount|taka }}</td></tr>{% endif %}
+            {% if order.points_discount %}<tr class="text-success"><td colspan="3" class="text-end">Reward points ({{ order.points_used|num }})</td><td class="text-end">-{{ order.points_discount|taka }}</td></tr>{% endif %}
+            {% if order.gift_wrap_cost %}<tr><td colspan="3" class="text-end text-body-secondary">Gift wrap</td><td class="text-end">{{ order.gift_wrap_cost|taka }}</td></tr>{% endif %}
             <tr><td colspan="3" class="text-end text-body-secondary">Shipping</td><td class="text-end">{% if order.shipping_cost %}{{ order.shipping_cost|taka }}{% else %}Free{% endif %}</td></tr>
             <tr class="fw-bold fs-5"><td colspan="3" class="text-end">Total</td><td class="text-end">{{ order.total|taka }}</td></tr>
         </tfoot>

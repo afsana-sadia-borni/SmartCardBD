@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,12 +9,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from accounts.models import Address
+from accounts.services import redeemable
 from cart.cart import Cart
+from core.ratelimit import hit_limit
 
 from . import payments
-from .forms import CheckoutForm
-from .models import Order
-from .services import CheckoutError, cancel_order, create_order, mark_order_paid, release_unpaid_orders
+from .forms import CheckoutForm, ReturnRequestForm, TrackOrderForm
+from .models import Order, ReturnRequest
+from .services import (CheckoutError, cancel_order, create_order, delivery_zone_table, mark_order_paid,
+                       release_unpaid_orders)
 
 GUEST_ORDERS_SESSION_KEY = 'guest_orders'
 
@@ -59,6 +64,8 @@ def checkout(request):
                 order = create_order(
                     cart, form.shipping_data(), user=user,
                     payment_method=form.cleaned_data['payment_method'],
+                    gift_wrap=form.cleaned_data.get('gift_wrap', False),
+                    use_points=form.cleaned_data.get('use_points', False),
                 )
             except CheckoutError as exc:
                 messages.error(request, str(exc))
@@ -67,7 +74,7 @@ def checkout(request):
             if user.is_authenticated and form.cleaned_data.get('save_address'):
                 data = form.shipping_data()
                 Address.objects.get_or_create(
-                    user=user, phone=data['phone'], district=data['district'],
+                    user=user, phone=data['phone'], district=data['district'], upazila=data['upazila'],
                     area=data['area'], address_line=data['address_line'],
                     defaults={'full_name': data['full_name']},
                 )
@@ -85,14 +92,18 @@ def checkout(request):
             address = user.addresses.first()
             if address:
                 initial.update(full_name=address.full_name, phone=address.phone, district=address.district,
-                               area=address.area, address_line=address.address_line)
+                               upazila=address.upazila, area=address.area, address_line=address.address_line)
         form = CheckoutForm(initial=initial, user=user)
 
+    points_used, points_discount = redeemable(form.points, cart.get_total())
     return render(request, 'orders/checkout.html', {
         'form': form,
-        'shipping_inside_dhaka': settings.SHIPPING_INSIDE_DHAKA,
-        'shipping_outside_dhaka': settings.SHIPPING_OUTSIDE_DHAKA,
+        'zones': delivery_zone_table(),
         'free_shipping_min': settings.FREE_SHIPPING_MIN,
+        'gift_wrap_price': settings.GIFT_WRAP_PRICE,
+        'points_available': form.points,
+        'points_usable': points_used,
+        'points_discount': points_discount,
     })
 
 
@@ -121,6 +132,40 @@ def order_cancel(request, order_number):
     except CheckoutError as exc:
         messages.error(request, str(exc))
     return redirect(order)
+
+
+def track_order(request):
+    """Order status for guests: order number + the phone number used at checkout."""
+    order = None
+    form = TrackOrderForm(request.POST or None)
+    if request.method == 'POST':
+        if hit_limit(request, 'track', limit=10, window_seconds=600):
+            messages.error(request, 'Too many attempts. Please wait a few minutes and try again.')
+        elif form.is_valid():
+            phone = re.sub(r'^(\+?88)', '', form.cleaned_data['phone'])
+            order = (
+                Order.objects.prefetch_related('items')
+                .filter(order_number__iexact=form.cleaned_data['order_number'].strip(), phone__endswith=phone)
+                .first()
+            )
+            if order is None:
+                form.add_error(None, 'No order matches that order number and phone number.')
+    return render(request, 'orders/track.html', {'form': form, 'order': order})
+
+
+@login_required
+def return_request(request, order_number):
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
+    if not order.can_request_return:
+        messages.error(request, 'A return can be requested within '
+                                f'{settings.RETURN_WINDOW_DAYS} days of delivery, once per order.')
+        return redirect(order)
+    form = ReturnRequestForm(request.POST or None, request.FILES or None)
+    if request.method == 'POST' and form.is_valid():
+        ReturnRequest.objects.create(order=order, **form.cleaned_data)
+        messages.success(request, 'Return request sent. We will get back to you within 2 working days.')
+        return redirect(order)
+    return render(request, 'orders/return_request.html', {'order': order, 'form': form})
 
 
 @require_POST

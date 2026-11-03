@@ -18,7 +18,8 @@ from .services import CheckoutError, calculate_shipping, cancel_order, mark_orde
 
 SHIPPING = {
     'full_name': 'Rahim Uddin', 'email': 'rahim@example.com', 'phone': '01712345678',
-    'district': 'Dhaka', 'area': 'Mirpur', 'address_line': 'House 1, Road 2', 'payment_method': 'cod',
+    'district': 'Dhaka', 'upazila': 'Mirpur (Dhaka City)', 'area': 'Mirpur', 'address_line': 'House 1, Road 2',
+    'payment_method': 'cod',
 }
 
 
@@ -100,7 +101,7 @@ class PlaceOrderTests(CheckoutTestCase):
                                        valid_to=timezone.now() + timedelta(days=1))
         self.add(self.phone, 1)
         self.client.post(reverse('coupon_apply'), {'code': 'flat100'})
-        self.checkout(district='Khulna')
+        self.checkout(district='Khulna', upazila='Dumuria')
         order = Order.objects.get()
         self.assertEqual(order.discount, Decimal('100'))
         self.assertEqual(order.total, Decimal('820'))  # 800 - 100 + 120

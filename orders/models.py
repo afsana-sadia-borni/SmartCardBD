@@ -1,4 +1,5 @@
 import secrets
+from datetime import timedelta
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from simple_history.models import HistoricalRecords
 
 from accounts.constants import DISTRICT_CHOICES
 from accounts.models import phone_validator
@@ -29,6 +31,11 @@ class Coupon(models.Model):
     usage_limit = models.PositiveIntegerField(blank=True, null=True, help_text='Empty = unlimited.')
     used_count = models.PositiveIntegerField(default=0, editable=False)
     is_active = models.BooleanField(default=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='coupons',
+        help_text='Optional: only this customer can use the coupon (e.g. referral rewards).',
+    )
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ['-valid_to']
@@ -37,9 +44,11 @@ class Coupon(models.Model):
         self.code = self.code.strip().upper()
         super().save(*args, **kwargs)
 
-    def is_valid_for(self, subtotal):
+    def is_valid_for(self, subtotal, user=None):
         """Return (is_valid, reason)."""
         now = timezone.now()
+        if self.user_id and (user is None or user.id != self.user_id):
+            return False, 'This coupon belongs to another account.'
         if not self.is_active:
             return False, 'This coupon is no longer active.'
         if now < self.valid_from:
@@ -63,6 +72,38 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class DeliveryZone(models.Model):
+    """Delivery charge and time for a group of districts. One zone is the default for the rest."""
+
+    name = models.CharField(max_length=60)
+    charge = models.DecimalField(max_digits=8, decimal_places=2)
+    min_days = models.PositiveSmallIntegerField(default=1)
+    max_days = models.PositiveSmallIntegerField(default=3)
+    districts = models.JSONField(default=list, blank=True)
+    is_default = models.BooleanField(default=False, help_text='Used for districts not listed in any zone.')
+    sort_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['sort_order', 'id']
+
+    @classmethod
+    def for_district(cls, district):
+        zones = list(cls.objects.all())
+        for zone in zones:
+            if district in zone.districts:
+                return zone
+        return next((z for z in zones if z.is_default), None)
+
+    @property
+    def delivery_time(self):
+        if self.min_days == self.max_days:
+            return f'{self.min_days} day{"s" if self.min_days != 1 else ""}'
+        return f'{self.min_days}-{self.max_days} days'
+
+    def __str__(self):
+        return f'{self.name}: ৳{self.charge:,.0f}, {self.delivery_time}'
 
 
 class Order(models.Model):
@@ -94,13 +135,20 @@ class Order(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=15, validators=[phone_validator])
     district = models.CharField(max_length=50, choices=DISTRICT_CHOICES)
+    upazila = models.CharField(max_length=60, blank=True)
     area = models.CharField(max_length=100)
     address_line = models.CharField(max_length=255)
     note = models.TextField(blank=True)
+    gift_wrap = models.BooleanField(default=False)
+    delivery_estimate = models.CharField(max_length=30, blank=True)
 
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    bundle_discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    points_used = models.PositiveIntegerField(default=0)
+    points_discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    gift_wrap_cost = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     shipping_cost = models.DecimalField(max_digits=8, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -109,8 +157,10 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100, blank=True, help_text='Gateway validation / bank transaction id')
 
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    points_earned = models.PositiveIntegerField(default=0, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords(excluded_fields=['updated_at'])
 
     class Meta:
         ordering = ['-created_at']
@@ -156,6 +206,19 @@ class Order(models.Model):
     def item_count(self):
         return sum(item.quantity for item in self.items.all())
 
+    @property
+    def delivered_at(self):
+        """When the order was marked delivered (from its history), or None."""
+        record = self.history.filter(status=self.Status.DELIVERED).order_by('history_date').first()
+        return record.history_date if record else None
+
+    @property
+    def can_request_return(self):
+        if self.status != self.Status.DELIVERED or hasattr(self, 'return_request'):
+            return False
+        delivered = self.delivered_at or self.updated_at
+        return timezone.now() - delivered <= timedelta(days=settings.RETURN_WINDOW_DAYS)
+
     def __str__(self):
         return self.order_number
 
@@ -163,8 +226,11 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey('products.Product', on_delete=models.SET_NULL, null=True, related_name='order_items')
+    variant = models.ForeignKey('products.ProductVariant', on_delete=models.SET_NULL, null=True, blank=True,
+                                related_name='order_items')
     # Snapshot of the product at purchase time.
     product_title = models.CharField(max_length=200)
+    variant_label = models.CharField(max_length=100, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
 
@@ -174,3 +240,34 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.quantity} × {self.product_title}'
+
+
+class ReturnRequest(models.Model):
+    class Reason(models.TextChoices):
+        DAMAGED = 'damaged', 'Item arrived damaged'
+        WRONG = 'wrong', 'Wrong item delivered'
+        NOT_AS_DESCRIBED = 'not_as_described', 'Not as described'
+        SIZE = 'size', 'Size or fit problem'
+        OTHER = 'other', 'Other'
+
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Pending review'
+        APPROVED = 'approved', 'Approved'
+        REJECTED = 'rejected', 'Rejected'
+        REFUNDED = 'refunded', 'Refunded'
+
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='return_request')
+    reason = models.CharField(max_length=20, choices=Reason.choices)
+    details = models.TextField(max_length=1000)
+    photo = models.ImageField(upload_to='returns/', blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    admin_note = models.TextField(blank=True, help_text='Shown to the customer.')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords(excluded_fields=['updated_at'])
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Return for {self.order}'
