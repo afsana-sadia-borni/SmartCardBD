@@ -1,0 +1,61 @@
+{% load shop_tags %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Packing slips | {{ site_name }}</title>
+    <meta name="robots" content="noindex">
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; color: #111; margin: 0; background: #e9ecef; }
+        .toolbar { padding: 12px 20px; background: #212529; color: #fff; display: flex; gap: 12px; align-items: center; }
+        .toolbar button { background: #ffc107; border: 0; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .slip { background: #fff; width: 190mm; min-height: 128mm; margin: 16px auto; padding: 12mm; box-sizing: border-box; }
+        .head { display: flex; justify-content: space-between; border-bottom: 2px solid #111; padding-bottom: 8px; }
+        .shop { font-size: 20px; font-weight: bold; }
+        .number { font-family: monospace; font-size: 22px; font-weight: bold; letter-spacing: 1px; text-align: right; }
+        .grid { display: flex; gap: 24px; margin: 14px 0; }
+        .grid > div { flex: 1; }
+        .label { font-size: 11px; text-transform: uppercase; color: #555; letter-spacing: .05em; }
+        .to { font-size: 16px; line-height: 1.45; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #ccc; }
+        th.qty, td.qty { text-align: center; width: 60px; }
+        .cod { margin-top: 14px; border: 2px dashed #111; padding: 10px; font-size: 18px; font-weight: bold; text-align: center; }
+        .note { margin-top: 10px; padding: 8px; background: #fff3cd; font-size: 13px; }
+        @media print {
+            body { background: #fff; }
+            .toolbar { display: none; }
+            .slip { margin: 0; width: auto; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+<div class="toolbar"><button type="button" onclick="window.print()">Print {{ orders|length }} slip{{ orders|length|pluralize }}</button> <span>One slip per page. Check the items before packing.</span></div>
+{% for order, cod in orders %}
+    <section class="slip">
+        <div class="head">
+            <div><div class="shop">{{ site_name }}</div><div>{{ order.created_at|date:"d M Y" }}</div></div>
+            <div><div class="label">Order</div><div class="number">{{ order.order_number }}</div>
+                {% if order.courier_tracking_code %}<div style="text-align:right">{{ order.courier_name }}: {{ order.courier_tracking_code }}</div>{% endif %}</div>
+        </div>
+        <div class="grid">
+            <div><div class="label">Deliver to</div>
+                <div class="to"><strong>{{ order.full_name }}</strong><br>{{ order.phone }}<br>{{ order.address_line }}<br>{{ order.area }}, {{ order.upazila }}<br><strong>{{ order.district }}</strong></div></div>
+            <div><div class="label">Payment</div><div>{{ order.payment_label }}<br>{{ order.get_payment_status_display }}</div>
+                {% if order.gift_wrap %}<p><strong>&#127873; GIFT WRAP</strong></p>{% endif %}</div>
+        </div>
+        <table>
+            <thead><tr><th>Item</th><th class="qty">Qty</th><th class="qty">&#10003;</th></tr></thead>
+            <tbody>
+                {% for item in order.items.all %}
+                    <tr><td>{{ item.product_title }}{% if item.variant_label %} &mdash; {{ item.variant_label }}{% endif %}</td><td class="qty"><strong>{{ item.quantity }}</strong></td><td class="qty">&#9744;</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if order.note %}<div class="note"><strong>Customer note:</strong> {{ order.note }}</div>{% endif %}
+        <div class="cod">{% if cod %}COLLECT: {{ cod|taka }}{% else %}PAID &mdash; collect nothing{% endif %}</div>
+    </section>
+{% empty %}
+    <p style="padding:20px">No orders selected.</p>
+{% endfor %}
+</body>
+</html>

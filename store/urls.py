@@ -1,12 +1,15 @@
 from django.urls import path
 
-from . import catalog, support, views
+from . import catalog, reports, support, views
 
 app_name = 'store'
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
+    path('reports/', reports.reports, name='reports'),
     path('orders/', views.order_list, name='orders'),
+    path('orders/bulk/', views.orders_bulk, name='orders_bulk'),
+    path('orders/slips/', views.packing_slips, name='packing_slips'),
     path('orders/<str:order_number>/', views.order_detail, name='order_detail'),
     path('orders/<str:order_number>/action/', views.order_action, name='order_action'),
     path('returns/', support.return_list, name='returns'),
@@ -16,6 +19,8 @@ urlpatterns = [
     path('customers/', views.customer_list, name='customers'),
     path('products/', catalog.product_list, name='products'),
     path('products/new/', catalog.product_form, name='product_add'),
+    path('products/export.csv', catalog.products_export, name='products_export'),
+    path('products/import/', catalog.products_import, name='products_import'),
     path('products/<int:pk>/', catalog.product_form, name='product_edit'),
     path('products/<int:pk>/quick/', catalog.product_quick_update, name='product_quick_update'),
     path('flash-sales/', catalog.flash_sale_list, name='flash_sales'),
@@ -32,5 +37,6 @@ urlpatterns = [
     path('delivery/new/', catalog.delivery_form, name='delivery_add'),
     path('delivery/<int:pk>/', catalog.delivery_form, name='delivery_edit'),
     path('team/', views.team, name='team'),
+    path('integrations/', views.integrations, name='integrations'),
     path('team/<int:user_id>/remove/', views.team_remove, name='team_remove'),
 ]

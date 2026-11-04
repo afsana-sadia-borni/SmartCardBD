@@ -8,6 +8,12 @@
 {% block content %}
 <a href="{% url 'store:orders' %}" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> All orders</a>
 
+{% if order.risk_flags %}
+    <div class="alert {% if order.risk_flags|length == 1 and 'Phone confirmed' in order.risk_flags.0 %}alert-info{% else %}alert-danger{% endif %} mt-3 mb-0">
+        <strong><i class="bi bi-shield-exclamation"></i> Check before confirming:</strong>
+        <ul class="mb-0 small">{% for flag in order.risk_flags %}<li>{{ flag }}</li>{% endfor %}</ul>
+    </div>
+{% endif %}
 {# ---------- What to do next ---------- #}
 <div class="store-card p-3 p-md-4 my-3 d-flex flex-wrap align-items-center gap-3">
     <div class="me-auto">
@@ -24,7 +30,8 @@
         {% if 'ship' in actions %}<button name="action" value="ship" class="btn {% if order.status == 'confirmed' %}btn-primary{% else %}btn-outline-primary{% endif %} action-btn"><i class="bi bi-truck"></i> Mark shipped</button>{% endif %}
         {% if 'deliver' in actions %}<button name="action" value="deliver" class="btn btn-success action-btn"><i class="bi bi-box-seam"></i> Mark delivered</button>{% endif %}
     </form>
-    <a href="{% url 'order_invoice' order.order_number %}" class="btn btn-outline-secondary action-btn"><i class="bi bi-printer"></i> Invoice</a>
+    <a href="{% url 'order_invoice' order.order_number %}" class="btn btn-outline-secondary action-btn"><i class="bi bi-file-earmark-pdf"></i> Invoice</a>
+    <a href="{% url 'store:packing_slips' %}?o={{ order.order_number }}" target="_blank" class="btn btn-outline-secondary action-btn"><i class="bi bi-printer"></i> Packing slip</a>
     {% if can_cancel %}
         <form method="post" action="{% url 'store:order_action' order.order_number %}" data-confirm="Cancel this order? Its items go back in stock and the customer is told.">
             {% csrf_token %}
@@ -93,7 +100,17 @@
                 <a href="tel:{{ order.phone }}" class="btn btn-sm btn-outline-primary flex-fill"><i class="bi bi-telephone"></i> {{ order.phone }}</a>
                 <a href="https://wa.me/{{ whatsapp }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
             </div>
-            {% if order.user %}<a href="{% url 'store:orders' %}?customer={{ order.user_id }}" class="small">All orders from this customer</a>{% endif %}
+            {% if phone_history %}<p class="small mb-2">Earlier orders from this number: {% for row in phone_history %}<span class="badge text-bg-light border">{{ row.n }} {{ row.status }}</span> {% endfor %}</p>{% endif %}
+            <a href="{% url 'store:orders' %}?q={{ order.phone }}" class="small d-block mb-2">All orders from {{ order.phone }}</a>
+            <form method="post" action="{% url 'store:order_action' order.order_number %}" {% if not phone_blocked %}data-confirm="Stop {{ order.phone }} from using Cash on Delivery?"{% endif %}>
+                {% csrf_token %}
+                {% if phone_blocked %}
+                    <span class="badge text-bg-danger mb-1">COD blocked</span>
+                    <button name="action" value="unblock_phone" class="btn btn-sm btn-link p-0 ms-1">Unblock</button>
+                {% else %}
+                    <button name="action" value="block_phone" class="btn btn-sm btn-outline-danger"><i class="bi bi-slash-circle"></i> Block COD for this number</button>
+                {% endif %}
+            </form>
         </div>
         <div class="store-card p-3 p-md-4 mb-4">
             <h2 class="h6 fw-bold">Delivery address</h2>
@@ -101,6 +118,37 @@
             {% if order.delivery_estimate %}<p class="small text-body-secondary mb-0"><i class="bi bi-truck"></i> {{ order.delivery_estimate }}</p>{% endif %}
             {% if order.gift_wrap %}<p class="small mb-0 mt-2"><i class="bi bi-gift text-danger"></i> <strong>Gift wrap this order</strong></p>{% endif %}
             {% if order.note %}<div class="alert alert-warning small mt-3 mb-0"><strong>Customer note:</strong> {{ order.note }}</div>{% endif %}
+        </div>
+        <div class="store-card p-3 p-md-4 mb-4">
+            <h2 class="h6 fw-bold"><i class="bi bi-truck"></i> Courier</h2>
+            {% if order.courier_name %}
+                <p class="small mb-2"><strong>{{ order.courier_name }}</strong>{% if order.courier_tracking_code %} · <span class="font-monospace">{{ order.courier_tracking_code }}</span>{% endif %}
+                    {% if order.courier_status %}<br>Courier status: <span class="badge text-bg-light border">{{ order.courier_status|cut:"_"|capfirst }}</span>{% endif %}</p>
+                {% if order.courier_tracking_url %}<a href="{{ order.courier_tracking_url }}" target="_blank" rel="noopener" class="small">Open tracking page <i class="bi bi-box-arrow-up-right"></i></a>{% endif %}
+            {% elif order.status == 'pending' or order.status == 'confirmed' %}
+                {% if steadfast %}
+                    <form method="post" action="{% url 'store:order_action' order.order_number %}" class="mb-3" data-confirm="Book this parcel with Steadfast? The courier will collect {{ cod_amount|taka }}.">
+                        {% csrf_token %}
+                        <button name="action" value="book_steadfast" class="btn btn-success w-100"><i class="bi bi-send"></i> Book with Steadfast</button>
+                        <div class="form-text">Collects {{ cod_amount|taka }} on delivery. The order becomes Shipped.</div>
+                    </form>
+                {% else %}
+                    <p class="small text-body-secondary">Add STEADFAST_API_KEY and STEADFAST_SECRET_KEY to book parcels from here.</p>
+                {% endif %}
+            {% endif %}
+            {% if order.status != 'cancelled' %}
+                <details {% if not order.courier_name and not steadfast %}open{% endif %}>
+                    <summary class="small">{% if order.courier_name %}Change tracking{% else %}Another courier? Add tracking by hand{% endif %}</summary>
+                    <form method="post" action="{% url 'store:order_action' order.order_number %}" class="row g-2 mt-1" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="set_tracking">
+                        <div class="col-6">{{ tracking_form.courier_name }}</div>
+                        <div class="col-6">{{ tracking_form.tracking_code }}</div>
+                        <div class="col-12">{{ tracking_form.tracking_link }}</div>
+                        <div class="col-12"><button class="btn btn-sm btn-outline-primary">Save tracking</button></div>
+                    </form>
+                </details>
+            {% endif %}
         </div>
         <div class="store-card p-3 p-md-4">
             <h2 class="h6 fw-bold">Payment</h2>
