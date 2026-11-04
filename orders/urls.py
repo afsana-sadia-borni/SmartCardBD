@@ -6,6 +6,7 @@ from . import reports, views
 
 urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
+    path('checkout/verify/', views.checkout_verify, name='checkout_verify'),
     path('track/', views.track_order, name='track_order'),
     path('orders/', views.order_list, name='order_list'),
     path('orders/<str:order_number>/', views.order_detail, name='order_detail'),

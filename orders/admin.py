@@ -3,7 +3,7 @@ from django.utils import timezone
 from simple_history.admin import SimpleHistoryAdmin
 
 from .forms import DeliveryZoneForm
-from .models import Coupon, DeliveryZone, Order, OrderItem, ReturnRequest
+from .models import BlockedPhone, Coupon, DeliveryZone, Order, OrderItem, ReturnRequest
 from .reports import orders_csv_response
 from .services import CheckoutError, cancel_order
 
@@ -50,6 +50,8 @@ class OrderAdmin(SimpleHistoryAdmin):
         ('Order', {'fields': ['order_number', 'user', 'status', 'created_at', 'updated_at']}),
         ('Customer & shipping', {'fields': ['full_name', 'email', 'phone', 'district', 'upazila', 'area',
                                             'address_line', 'note', 'gift_wrap', 'delivery_estimate']}),
+        ('Courier & checks', {'fields': ['courier_name', 'courier_consignment_id', 'courier_tracking_code',
+                                         'courier_tracking_link', 'courier_status', 'risk_flags']}),
         ('Payment', {'fields': ['payment_method', 'payment_channel', 'payment_status', 'transaction_id', 'coupon',
                                 'subtotal', 'discount', 'bundle_discount', 'points_used', 'points_discount',
                                 'gift_wrap_cost', 'shipping_cost', 'total', 'points_earned']}),
@@ -135,3 +137,10 @@ class ReturnRequestAdmin(SimpleHistoryAdmin):
     @admin.action(description='Mark selected as refunded')
     def mark_refunded(self, request, queryset):
         self._set(request, queryset, ReturnRequest.Status.REFUNDED)
+
+
+@admin.register(BlockedPhone)
+class BlockedPhoneAdmin(admin.ModelAdmin):
+    list_display = ['phone', 'reason', 'created_by', 'created_at']
+    search_fields = ['phone', 'reason']
+    readonly_fields = ['created_by', 'created_at']
