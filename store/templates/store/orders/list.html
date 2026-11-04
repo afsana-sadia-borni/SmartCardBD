@@ -20,14 +20,27 @@
             <button class="btn btn-sm btn-primary" type="submit">Search</button>
         </form>
     </div>
+    <form method="post" action="{% url 'store:orders_bulk' %}" id="bulkForm">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <div class="bulk-bar px-3 py-2 d-flex flex-wrap align-items-center gap-2 border-bottom" hidden>
+            <strong class="small me-2"><span class="js-bulk-count">0</span> selected</strong>
+            <button name="action" value="confirm" class="btn btn-sm btn-primary"><i class="bi bi-check2-circle"></i> Confirm</button>
+            <button name="action" value="ship" class="btn btn-sm btn-outline-primary"><i class="bi bi-truck"></i> Mark shipped</button>
+            {% if steadfast %}<button name="action" value="book_steadfast" class="btn btn-sm btn-success" data-confirm-bulk="Book the selected orders with Steadfast?"><i class="bi bi-send"></i> Book with Steadfast</button>{% endif %}
+            <button name="action" value="deliver" class="btn btn-sm btn-outline-success"><i class="bi bi-box-seam"></i> Mark delivered</button>
+            <button name="action" value="slips" class="btn btn-sm btn-outline-secondary" formtarget="_blank"><i class="bi bi-printer"></i> Packing slips</button>
+        </div>
+    </form>
     {% if customer %}<div class="px-3 pt-3"><span class="badge text-bg-info">Showing one customer's orders</span> <a href="?status={{ tab }}" class="small">Show everyone</a></div>{% endif %}
     <div class="table-responsive">
         <table class="table table-hover store-table">
-            <thead><tr><th>Order</th><th>Customer</th><th class="d-none d-md-table-cell">Delivery to</th><th class="text-end">Total</th><th>Payment</th><th>Status</th><th class="d-none d-lg-table-cell">Placed</th></tr></thead>
+            <thead><tr><th class="ps-3" style="width: 1%;"><input type="checkbox" class="form-check-input js-select-all" aria-label="Select all orders on this page"></th><th>Order</th><th>Customer</th><th class="d-none d-md-table-cell">Delivery to</th><th class="text-end">Total</th><th>Payment</th><th>Status</th><th class="d-none d-lg-table-cell">Placed</th></tr></thead>
             <tbody>
                 {% for order in page_obj %}
-                    <tr class="row-link" onclick="window.location='{% url 'store:order_detail' order.order_number %}'">
-                        <td><a href="{% url 'store:order_detail' order.order_number %}" class="font-monospace fw-semibold">{{ order.order_number }}</a><br><small class="text-body-secondary">{{ order.items_count|default:0 }} item{{ order.items_count|pluralize }}</small></td>
+                    <tr class="row-link" onclick="if (!event.target.closest('input, a')) window.location='{% url 'store:order_detail' order.order_number %}'">
+                        <td class="ps-3"><input type="checkbox" class="form-check-input js-select" name="orders" value="{{ order.order_number }}" form="bulkForm" aria-label="Select {{ order.order_number }}"></td>
+                        <td><a href="{% url 'store:order_detail' order.order_number %}" class="font-monospace fw-semibold">{{ order.order_number }}</a>{% if order.risk_flags and order.status == 'pending' %} <span class="badge text-bg-danger" title="{{ order.risk_flags|join:'; ' }}">⚠ Check</span>{% endif %}<br><small class="text-body-secondary">{{ order.items_count|default:0 }} item{{ order.items_count|pluralize }}</small></td>
                         <td>{{ order.full_name }}<br><small class="text-body-secondary">{{ order.phone }}</small></td>
                         <td class="d-none d-md-table-cell">{{ order.district }}<br><small class="text-body-secondary">{{ order.upazila }}</small></td>
                         <td class="text-end fw-semibold">{{ order.total|taka }}</td>
@@ -36,11 +49,31 @@
                         <td class="d-none d-lg-table-cell small text-body-secondary">{{ order.created_at|date:"d M, h:i A" }}</td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="7" class="text-center text-body-secondary py-5"><i class="bi bi-inbox fs-1 d-block mb-2"></i>No orders here.</td></tr>
+                    <tr><td colspan="8" class="text-center text-body-secondary py-5"><i class="bi bi-inbox fs-1 d-block mb-2"></i>No orders here.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% include 'store/_pagination.html' %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const boxes = () => [...document.querySelectorAll('.js-select')];
+        const bar = document.querySelector('.bulk-bar');
+        const update = () => {
+            const n = boxes().filter((b) => b.checked).length;
+            bar.hidden = n === 0;
+            document.querySelector('.js-bulk-count').textContent = n;
+        };
+        document.querySelector('.js-select-all').addEventListener('change', (e) => { boxes().forEach((b) => { b.checked = e.target.checked; }); update(); });
+        boxes().forEach((b) => b.addEventListener('change', update));
+        document.getElementById('bulkForm').addEventListener('submit', (e) => {
+            const msg = e.submitter && e.submitter.dataset.confirmBulk;
+            if (msg && !window.confirm(msg)) e.preventDefault();
+        });
+    })();
+</script>
 {% endblock %}

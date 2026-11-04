@@ -103,3 +103,4 @@
 .formset-table td { min-width: 90px; }
 .formset-table .form-control, .formset-table .form-select { font-size: .875rem; padding: .3rem .5rem; }
 .stat-tile .value { position: relative; z-index: 1; }
+.bulk-bar { background: var(--bs-warning-bg-subtle); position: sticky; top: 60px; z-index: 5; }

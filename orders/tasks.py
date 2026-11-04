@@ -14,3 +14,10 @@ def send_order_email(order_id, kind):
 @shared_task
 def release_unpaid_orders():
     return services.release_unpaid_orders()
+
+
+@shared_task
+def sync_courier_status():
+    from .courier import sync_steadfast_statuses
+
+    return sync_steadfast_statuses()

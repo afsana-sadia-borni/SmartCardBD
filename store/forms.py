@@ -131,6 +131,23 @@ class AnswerForm(StyledFormMixin, forms.Form):
     answer = forms.CharField(widget=forms.Textarea(attrs={'rows': 2, 'placeholder': 'Write your answer...'}))
 
 
+class TrackingForm(StyledFormMixin, forms.Form):
+    """Tracking for a parcel booked outside the site (Pathao, RedX, Sundarban, ...)."""
+
+    courier_name = forms.CharField(max_length=40, label='Courier',
+                                   widget=forms.TextInput(attrs={'placeholder': 'Courier, e.g. Pathao'}))
+    tracking_code = forms.CharField(max_length=60, required=False, label='Tracking code',
+                                    widget=forms.TextInput(attrs={'placeholder': 'Tracking code'}))
+    tracking_link = forms.URLField(required=False, label='Tracking link (optional)',
+                                   widget=forms.URLInput(attrs={'placeholder': 'Tracking link (optional)'}))
+
+    def clean(self):
+        data = super().clean()
+        if not (data.get('tracking_code') or data.get('tracking_link')):
+            raise forms.ValidationError('Enter a tracking code or link.')
+        return data
+
+
 class TeamMemberForm(StyledFormMixin, forms.Form):
     email = forms.EmailField(help_text='They must sign up on the shop first.')
     role = forms.ChoiceField(choices=[(name, name) for name in ROLES])
