@@ -2,7 +2,8 @@ Hi {{ order.full_name }},
 
 Your order {{ order.order_number }} is now: {{ order.get_status_display }}.
 {% if order.status == 'shipped' %}
-It is on its way to {{ order.area }}, {{ order.district }}. Please keep BDT {{ order.total|floatformat:2 }} ready if you chose Cash on Delivery.
+It is on its way to {{ order.area }}, {{ order.district }}.{% if order.courier_tracking_url %}
+Track the parcel: {{ order.courier_tracking_url }}{% endif %} Please keep BDT {{ order.total|floatformat:2 }} ready if you chose Cash on Delivery.
 {% elif order.status == 'delivered' %}
 We hope you enjoy it! You can now leave a review for the products you bought.
 {% elif order.status == 'cancelled' and order.payment_method == 'sslcommerz' and order.payment_status != 'paid' %}

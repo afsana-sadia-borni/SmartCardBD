@@ -1,0 +1,10 @@
+{% extends 'emails/base.html' %}
+{% block content %}
+<h1 style="font-size:20px;margin:0 0 8px;">Thank you, {{ order.full_name }}!</h1>
+<p style="margin:0 0 4px;">We have received your order <strong>{{ order.order_number }}</strong>.</p>
+<p style="margin:0;color:#6c757d;">Payment: {{ order.payment_label }} ({{ order.get_payment_status_display }}){% if order.delivery_estimate %} &middot; Delivery in {{ order.delivery_estimate }}{% endif %}</p>
+{% include 'orders/emails/_items.html' %}
+<p style="margin:0 0 16px;"><strong>Delivery to:</strong><br>{{ order.full_name }}, {{ order.phone }}<br>{{ order.address_line }}, {{ order.area }}, {{ order.upazila }}, {{ order.district }}</p>
+<p style="margin:0 0 20px;"><a href="{{ order_url }}" style="display:inline-block;background:#ffc107;color:#212529;font-weight:bold;padding:12px 22px;border-radius:8px;text-decoration:none;">{% if order.user_id %}View your order{% else %}Track your order{% endif %}</a></p>
+<p style="margin:0;color:#6c757d;font-size:13px;">Your invoice is attached as a PDF. We will let you know when your order ships.</p>
+{% endblock %}
