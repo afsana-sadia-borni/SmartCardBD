@@ -1,0 +1,13 @@
+{% load shop_tags %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:16px 0;font-size:14px;">
+    {% for item in order.items.all %}
+        <tr><td style="padding:8px 0;border-bottom:1px solid #eee;">{{ item.product_title }}{% if item.variant_label %} <span style="color:#6c757d;">({{ item.variant_label }})</span>{% endif %} &times; {{ item.quantity }}</td>
+            <td align="right" style="padding:8px 0;border-bottom:1px solid #eee;white-space:nowrap;">{{ item.subtotal|taka }}</td></tr>
+    {% endfor %}
+    {% if order.discount %}<tr><td style="padding:4px 0;">Coupon</td><td align="right" style="color:#198754;">-{{ order.discount|taka }}</td></tr>{% endif %}
+    {% if order.bundle_discount %}<tr><td style="padding:4px 0;">Bundle discount</td><td align="right" style="color:#198754;">-{{ order.bundle_discount|taka }}</td></tr>{% endif %}
+    {% if order.points_discount %}<tr><td style="padding:4px 0;">Reward points</td><td align="right" style="color:#198754;">-{{ order.points_discount|taka }}</td></tr>{% endif %}
+    {% if order.gift_wrap_cost %}<tr><td style="padding:4px 0;">Gift wrap</td><td align="right">{{ order.gift_wrap_cost|taka }}</td></tr>{% endif %}
+    <tr><td style="padding:4px 0;">Delivery</td><td align="right">{{ order.shipping_cost|taka }}</td></tr>
+    <tr><td style="padding:8px 0;font-weight:bold;font-size:16px;">Total</td><td align="right" style="font-weight:bold;font-size:16px;">{{ order.total|taka }}</td></tr>
+</table>
