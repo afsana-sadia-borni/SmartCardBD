@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Create account | SmartCart BD{% endblock %}
+{% block title %}{% translate "Create account | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 <div class="container auth-page">
     <div class="auth-shell row g-0 mx-auto">
         <div class="col-lg-6 p-4 p-md-5">
-            <h1 class="h3 fw-bold mb-1">Create your account</h1>
-            <p class="text-body-secondary mb-4">Already have one? <a href="{{ login_url }}" class="fw-semibold">Log in</a></p>
+            <h1 class="h3 fw-bold mb-1">{% translate "Create your account" %}</h1>
+            <p class="text-body-secondary mb-4">{% translate "Already have one?" %} <a href="{{ login_url }}" class="fw-semibold">{% translate "Log in" %}</a></p>
 
             <form method="post" action="{% url 'account_signup' %}" novalidate>
                 {% csrf_token %}
@@ -20,14 +21,14 @@
                     <div class="col-md-6">{% include 'account/_auth_field.html' with field=form.password2 icon='lock' password=True %}</div>
                 </div>
                 <details class="mb-3" {% if form.referral_code.value or form.referral_code.errors %}open{% endif %}>
-                    <summary class="small text-body-secondary">Have a referral code?</summary>
+                    <summary class="small text-body-secondary">{% translate "Have a referral code?" %}</summary>
                     <div class="mt-2">{% include 'account/_auth_field.html' with field=form.referral_code icon='gift' %}</div>
                 </details>
                 {# Honeypot: hidden from people; bots that fill it in are rejected. #}
                 <div class="hp-wrap" aria-hidden="true">{{ form.website }}</div>
                 {{ redirect_field }}
-                <button type="submit" class="btn btn-warning btn-lg w-100 fw-semibold">Create account</button>
-                <p class="small text-body-secondary text-center mt-3 mb-0">By creating an account you agree to our <a href="{% url 'policy_page' 'terms' %}">Terms</a> and <a href="{% url 'policy_page' 'privacy' %}">Privacy policy</a>.</p>
+                <button type="submit" class="btn btn-warning btn-lg w-100 fw-semibold">{% translate "Create account" %}</button>
+                <p class="small text-body-secondary text-center mt-3 mb-0">{% translate "By creating an account you agree to our" %} <a href="{% url 'policy_page' 'terms' %}">{% translate "Terms" %}</a> {% translate "and" %} <a href="{% url 'policy_page' 'privacy' %}">{% translate "Privacy policy" %}</a>.</p>
             </form>
             {% include 'account/_social.html' %}
         </div>

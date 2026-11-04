@@ -1,10 +1,11 @@
+{% load i18n %}
 {# A login/signup field with an icon; password fields get a show/hide button. #}
 <div class="mb-3">
     <label class="form-label fw-semibold small" for="{{ field.id_for_label }}">{{ field.label }}</label>
     <div class="input-group auth-input {% if field.errors %}has-validation{% endif %}">
         <span class="input-group-text"><i class="bi bi-{{ icon }}"></i></span>
         {{ field }}
-        {% if password %}<button type="button" class="btn btn-outline-secondary js-toggle-password" aria-label="Show password"><i class="bi bi-eye"></i></button>{% endif %}
+        {% if password %}<button type="button" class="btn btn-outline-secondary js-toggle-password" aria-label="{% translate "Show password" %}"><i class="bi bi-eye"></i></button>{% endif %}
     </div>
     {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
     {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}

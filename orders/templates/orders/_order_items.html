@@ -1,7 +1,7 @@
-{% load shop_tags %}
+{% load i18n shop_tags %}
 <div class="table-responsive">
     <table class="table align-middle mb-0">
-        <thead><tr><th>Product</th><th class="text-center">Qty</th><th class="text-end">Price</th><th class="text-end">Subtotal</th></tr></thead>
+        <thead><tr><th>{% translate "Product" %}</th><th class="text-center">{% translate "Qty" %}</th><th class="text-end">{% translate "Price" %}</th><th class="text-end">{% translate "Subtotal" %}</th></tr></thead>
         <tbody>
             {% for item in order.items.all %}
                 <tr>
@@ -16,13 +16,13 @@
             {% endfor %}
         </tbody>
         <tfoot>
-            <tr><td colspan="3" class="text-end text-body-secondary">Subtotal</td><td class="text-end">{{ order.subtotal|taka }}</td></tr>
-            {% if order.bundle_discount %}<tr class="text-success"><td colspan="3" class="text-end">Bundle savings</td><td class="text-end">-{{ order.bundle_discount|taka }}</td></tr>{% endif %}
-            {% if order.discount %}<tr class="text-success"><td colspan="3" class="text-end">Discount{% if order.coupon %} ({{ order.coupon.code }}){% endif %}</td><td class="text-end">-{{ order.discount|taka }}</td></tr>{% endif %}
-            {% if order.points_discount %}<tr class="text-success"><td colspan="3" class="text-end">Reward points ({{ order.points_used|num }})</td><td class="text-end">-{{ order.points_discount|taka }}</td></tr>{% endif %}
-            {% if order.gift_wrap_cost %}<tr><td colspan="3" class="text-end text-body-secondary">Gift wrap</td><td class="text-end">{{ order.gift_wrap_cost|taka }}</td></tr>{% endif %}
-            <tr><td colspan="3" class="text-end text-body-secondary">Shipping</td><td class="text-end">{% if order.shipping_cost %}{{ order.shipping_cost|taka }}{% else %}Free{% endif %}</td></tr>
-            <tr class="fw-bold fs-5"><td colspan="3" class="text-end">Total</td><td class="text-end">{{ order.total|taka }}</td></tr>
+            <tr><td colspan="3" class="text-end text-body-secondary">{% translate "Subtotal" %}</td><td class="text-end">{{ order.subtotal|taka }}</td></tr>
+            {% if order.bundle_discount %}<tr class="text-success"><td colspan="3" class="text-end">{% translate "Bundle savings" %}</td><td class="text-end">-{{ order.bundle_discount|taka }}</td></tr>{% endif %}
+            {% if order.discount %}<tr class="text-success"><td colspan="3" class="text-end">{% translate "Discount" %}{% if order.coupon %} ({{ order.coupon.code }}){% endif %}</td><td class="text-end">-{{ order.discount|taka }}</td></tr>{% endif %}
+            {% if order.points_discount %}<tr class="text-success"><td colspan="3" class="text-end">{% blocktranslate with points=order.points_used|num %}Reward points ({{ points }}){% endblocktranslate %}</td><td class="text-end">-{{ order.points_discount|taka }}</td></tr>{% endif %}
+            {% if order.gift_wrap_cost %}<tr><td colspan="3" class="text-end text-body-secondary">{% translate "Gift wrap" %}</td><td class="text-end">{{ order.gift_wrap_cost|taka }}</td></tr>{% endif %}
+            <tr><td colspan="3" class="text-end text-body-secondary">{% translate "Shipping" %}</td><td class="text-end">{% if order.shipping_cost %}{{ order.shipping_cost|taka }}{% else %}{% translate "Free" %}{% endif %}</td></tr>
+            <tr class="fw-bold fs-5"><td colspan="3" class="text-end">{% translate "Total" %}</td><td class="text-end">{{ order.total|taka }}</td></tr>
         </tfoot>
     </table>
 </div>

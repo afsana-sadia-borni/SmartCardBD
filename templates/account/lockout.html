@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Too many attempts | SmartCart BD{% endblock %}
+{% block title %}{% translate "Too many attempts | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 {% include 'partials/error_page.html' with code='429' heading='Too many login attempts' icon='shield-lock' message="For your security, logins from this device are paused for 30 minutes. You can reset your password if you've forgotten it." %}

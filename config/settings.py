@@ -87,6 +87,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -170,7 +171,10 @@ AUTHENTICATION_BACKENDS = [
 
 # Internationalization
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+# The shop is in English and Bangla (the button in the top bar). The store panel stays in English.
+LANGUAGES = [('en', 'English'), ('bn', 'বাংলা')]
+LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = 'Asia/Dhaka'
 USE_I18N = True
 USE_TZ = True
@@ -235,8 +239,8 @@ ACCOUNT_LOGIN_METHODS = {'email', 'phone'}
 # Phone is optional here so older accounts without a number (and Google sign-ups) can still log in;
 # accounts.forms.SignupForm makes it required for new sign-ups.
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'phone', 'password1*', 'password2*']
-# Verifying the number needs an SMS gateway; until one is set up the number is saved unverified.
-ACCOUNT_PHONE_VERIFICATION_ENABLED = False
+# Mobile numbers are verified with an SMS code once an SMS provider is set (see SMS_API_KEY below);
+# until then they are saved unverified.
 ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = None
@@ -276,7 +280,10 @@ if EMAIL_HOST:
     EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-    EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', True)
+    # Port 587 uses TLS (Gmail, Brevo); port 465 uses SSL. Don't turn both on.
+    EMAIL_USE_SSL = env_bool('EMAIL_USE_SSL', EMAIL_PORT == 465)
+    EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', not EMAIL_USE_SSL)
+    EMAIL_TIMEOUT = 20
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'SmartCart BD <noreply@smartcartbd.local>')
@@ -316,6 +323,29 @@ SPECTACULAR_SETTINGS = {
 }
 
 
+# SMS (BulkSMSBD): order updates and mobile-number verification codes. Leave empty to only log them.
+SMS_API_KEY = os.getenv('SMS_API_KEY', '')
+SMS_SENDER_ID = os.getenv('SMS_SENDER_ID', '')
+# Text customers when their order is confirmed, shipped and delivered.
+SMS_ORDER_UPDATES = env_bool('SMS_ORDER_UPDATES', True)
+ACCOUNT_PHONE_VERIFICATION_ENABLED = bool(SMS_API_KEY and SMS_SENDER_ID)
+
+
+# Steadfast courier (https://steadfast.com.bd): book parcels from the store panel. Keys are in the
+# Steadfast portal under API. Leave empty to hide the button (tracking can still be typed in by hand).
+STEADFAST_API_KEY = os.getenv('STEADFAST_API_KEY', '')
+STEADFAST_SECRET_KEY = os.getenv('STEADFAST_SECRET_KEY', '')
+STEADFAST_BASE_URL = os.getenv('STEADFAST_BASE_URL', 'https://portal.packzy.com/api/v1').rstrip('/')
+STEADFAST_TRACKING_URL = os.getenv('STEADFAST_TRACKING_URL', 'https://steadfast.com.bd/t/{code}')
+
+
+# Fake Cash on Delivery orders. 'risky' asks for an SMS code only when an order looks suspicious,
+# 'always' for every COD order, 'off' never (needs an SMS provider either way).
+COD_OTP = os.getenv('COD_OTP', 'risky')
+# A first COD order above this needs a phone check (BDT).
+COD_REVIEW_AMOUNT = int(os.getenv('COD_REVIEW_AMOUNT', 10000))
+
+
 # Web push notifications. Generate keys once with: python manage.py generate_vapid_keys
 # Leave empty to turn push notifications off.
 VAPID_PUBLIC_KEY = os.getenv('VAPID_PUBLIC_KEY', '')
@@ -334,6 +364,7 @@ CELERY_BEAT_SCHEDULE = {
     'release-unpaid-orders': {'task': 'orders.tasks.release_unpaid_orders', 'schedule': timedelta(minutes=10)},
     'send-price-alerts': {'task': 'products.tasks.send_price_alerts', 'schedule': timedelta(minutes=15)},
     'send-abandoned-cart-emails': {'task': 'cart.tasks.send_abandoned_cart_emails', 'schedule': timedelta(hours=1)},
+    'sync-courier-status': {'task': 'orders.tasks.sync_courier_status', 'schedule': timedelta(minutes=30)},
 }
 
 
@@ -386,8 +417,39 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     # Test requests are plain HTTP, so don't redirect them to HTTPS.
     SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', True) and 'test' not in sys.argv
+    # Hosts' health checks call the app directly over http.
+    SECURE_REDIRECT_EXEMPT = [r'^healthz/$']
     # Browsers remember HSTS, so start short (1 hour) and raise it to e.g. 31536000
     # (1 year) once HTTPS works everywhere. Set to 0 to turn it off.
     SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', 3600))
     SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
     SECURE_HSTS_PRELOAD = env_bool('SECURE_HSTS_PRELOAD', False)
+
+
+# Logging: app messages (SMS, payments, courier) to the console, where the host's log viewer picks them up.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {'plain': {'format': '{levelname} {asctime} {name}: {message}', 'style': '{'}},
+    'handlers': {'console': {'class': 'logging.StreamHandler', 'formatter': 'plain'}},
+    'root': {'handlers': ['console'], 'level': 'WARNING'},
+    'loggers': {name: {'level': os.getenv('APP_LOG_LEVEL', 'INFO')}
+                for name in ('core', 'orders', 'accounts', 'products', 'cart', 'store')},
+}
+
+# Error monitoring (https://sentry.io, free plan). Errors in the site and in Celery jobs are reported
+# with the page, the code line and the logged-in user's id (no names, emails or passwords).
+SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+if SENTRY_DSN and 'test' not in sys.argv:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        environment=os.getenv('SENTRY_ENVIRONMENT', 'development' if DEBUG else 'production'),
+        traces_sample_rate=float(os.getenv('SENTRY_TRACES_SAMPLE_RATE', 0.1)),
+        send_default_pii=False,
+    )
+
+# Backups (python manage.py backup_db): where to keep them and how many.
+BACKUP_DIR = Path(os.getenv('BACKUP_DIR', BASE_DIR / 'backups'))
+BACKUP_KEEP = int(os.getenv('BACKUP_KEEP', 7))

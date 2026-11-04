@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from django.utils.translation import gettext as _
 
 from core.ratelimit import hit_limit
 from products.models import Product
@@ -83,7 +84,7 @@ def push_unsubscribe(request):
 def newsletter_subscribe(request):
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if hit_limit(request, 'newsletter', limit=5, window_seconds=600):
-        ok, msg = False, 'Too many attempts. Please try again later.'
+        ok, msg = False, _('Too many attempts. Please try again later.')
     else:
         email = request.POST.get('email', '').strip().lower()
         existing = Subscriber.objects.filter(email__iexact=email).first()
@@ -91,12 +92,12 @@ def newsletter_subscribe(request):
         if existing and form.is_valid():
             existing.is_active = True
             existing.save(update_fields=['is_active'])
-            ok, msg = True, "You're subscribed. Thanks!"
+            ok, msg = True, _("You're subscribed. Thanks!")
         elif form.is_valid():
             subscriber = form.save(commit=False)
             subscriber.email = email
             subscriber.save()
-            ok, msg = True, "You're subscribed. Watch your inbox for deals!"
+            ok, msg = True, _("You're subscribed. Watch your inbox for deals!")
         else:
             ok, msg = False, ' '.join(e for errors in form.errors.values() for e in errors)
     if is_ajax:
@@ -113,7 +114,7 @@ def newsletter_unsubscribe(request, token):
     if request.method == 'POST':
         subscriber.is_active = False
         subscriber.save(update_fields=['is_active'])
-        messages.success(request, 'You have been unsubscribed.')
+        messages.success(request, _('You have been unsubscribed.'))
         return redirect('home')
     return render(request, 'accounts/unsubscribe.html', {'subscriber': subscriber})
 
@@ -126,7 +127,7 @@ def address_form(request, pk=None):
         address = form.save(commit=False)
         address.user = request.user
         address.save()
-        messages.success(request, 'Address saved.')
+        messages.success(request, _('Address saved.'))
         return redirect('profile')
     return render(request, 'accounts/address_form.html', {'form': form, 'address': address})
 
@@ -142,7 +143,7 @@ def address_delete(request, pk):
         if next_default:
             next_default.is_default = True
             next_default.save()
-    messages.success(request, 'Address deleted.')
+    messages.success(request, _('Address deleted.'))
     return redirect('profile')
 
 
@@ -176,7 +177,7 @@ def wishlist_toggle(request, product_id):
 
     if is_ajax:
         return JsonResponse({'in_wishlist': created, 'count': request.user.wishlist.count()})
-    messages.success(request, 'Added to wishlist.' if created else 'Removed from wishlist.')
+    messages.success(request, _('Added to wishlist.') if created else _('Removed from wishlist.'))
     next_url = request.POST.get('next')
     if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}, request.is_secure()):
         return redirect(next_url)

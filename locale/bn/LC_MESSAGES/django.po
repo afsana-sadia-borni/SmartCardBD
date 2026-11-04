@@ -1,0 +1,2487 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-04 22:06+0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: bn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/adapter.py:15
+msgid "Enter a Bangladeshi mobile number, e.g. 01712345678."
+msgstr "বাংলাদেশি মোবাইল নম্বর লিখুন, যেমন 01712345678।"
+
+#: accounts/adapter.py:36 accounts/forms.py:88
+msgid "Mobile number"
+msgstr "মোবাইল নম্বর"
+
+#: accounts/forms.py:24
+msgid "Please choose an upazila / thana in the selected district."
+msgstr "বাছাই করা জেলার একটি উপজেলা / থানা বেছে নিন।"
+
+#: accounts/forms.py:66
+msgid "Email or mobile number"
+msgstr "ইমেইল বা মোবাইল নম্বর"
+
+#: accounts/forms.py:67
+msgid "you@example.com or 01XXXXXXXXX"
+msgstr "you@example.com বা 01XXXXXXXXX"
+
+#: accounts/forms.py:71
+msgid "Keep me logged in"
+msgstr "লগইন থাকুক"
+
+#: accounts/forms.py:72 accounts/forms.py:91
+msgid "Password"
+msgstr "পাসওয়ার্ড"
+
+#: accounts/forms.py:90
+msgid "At least 8 characters, not only numbers."
+msgstr "কমপক্ষে ৮ অক্ষর, শুধু সংখ্যা নয়।"
+
+#: accounts/forms.py:92
+msgid "Confirm password"
+msgstr "পাসওয়ার্ড আবার লিখুন"
+
+#: accounts/forms.py:93
+msgid "Repeat it"
+msgstr "আবার লিখুন"
+
+#: accounts/forms.py:94 accounts/templates/accounts/profile.html:16
+msgid "Email"
+msgstr "ইমেইল"
+
+#: accounts/forms.py:103
+#, python-brace-format
+msgid ""
+"This mobile number already has an account. <a href=\"{url}\">Log in</a> "
+"instead, or use a different number."
+msgstr ""
+"এই মোবাইল নম্বরে আগেই অ্যাকাউন্ট আছে। <a href=\"{url}\">লগইন করুন</a>, অথবা "
+"অন্য নম্বর দিন।"
+
+#: accounts/forms.py:109
+msgid "This referral code is not valid."
+msgstr "এই রেফারেল কোডটি সঠিক নয়।"
+
+#: accounts/models.py:10
+msgid "Enter a valid Bangladeshi mobile number, e.g. 01712345678."
+msgstr "সঠিক বাংলাদেশি মোবাইল নম্বর লিখুন, যেমন 01712345678।"
+
+#: accounts/templates/accounts/address_form.html:4
+#: accounts/templates/accounts/profile.html:84
+msgid "Edit"
+msgstr "এডিট"
+
+#: accounts/templates/accounts/address_form.html:4
+#: accounts/templates/accounts/profile.html:74
+msgid "New"
+msgstr "নতুন"
+
+#: accounts/templates/accounts/address_form.html:4
+msgid "address | SmartCart BD"
+msgstr "ঠিকানা | SmartCart BD"
+
+#: accounts/templates/accounts/address_form.html:8
+#: accounts/templates/accounts/profile.html:11 templates/base.html:108
+#: templates/base.html:180
+msgid "My account"
+msgstr "আমার অ্যাকাউন্ট"
+
+#: accounts/templates/accounts/address_form.html:10
+msgid "Edit address"
+msgstr "ঠিকানা এডিট করুন"
+
+#: accounts/templates/accounts/address_form.html:10
+msgid "New address"
+msgstr "নতুন ঠিকানা"
+
+#: accounts/templates/accounts/address_form.html:29
+msgid "Save address"
+msgstr "ঠিকানা সেভ করুন"
+
+#: accounts/templates/accounts/notifications.html:4
+msgid "Notifications | SmartCart BD"
+msgstr "নোটিফিকেশন | SmartCart BD"
+
+#: accounts/templates/accounts/notifications.html:8 templates/base.html:74
+#: templates/base.html:185
+msgid "Notifications"
+msgstr "নোটিফিকেশন"
+
+#: accounts/templates/accounts/notifications.html:12
+msgid ""
+"Get order updates and price drops on this device, even when the site is "
+"closed."
+msgstr "সাইট বন্ধ থাকলেও এই ডিভাইসে অর্ডারের আপডেট ও দাম কমার খবর পান।"
+
+#: accounts/templates/accounts/notifications.html:13
+msgid "Turn on"
+msgstr "চালু করুন"
+
+#: accounts/templates/accounts/profile.html:5
+msgid "My account | SmartCart BD"
+msgstr "আমার অ্যাকাউন্ট | SmartCart BD"
+
+#: accounts/templates/accounts/profile.html:15
+msgid "Change password"
+msgstr "পাসওয়ার্ড বদলান"
+
+#: accounts/templates/accounts/profile.html:21
+#: orders/templates/orders/order_detail.html:9
+#: orders/templates/orders/order_list.html:9 templates/base.html:109
+#: templates/base.html:183 templates/base.html:199
+msgid "My orders"
+msgstr "আমার অর্ডার"
+
+#: accounts/templates/accounts/profile.html:21
+msgid "Track &amp; manage"
+msgstr "ট্র্যাক ও ম্যানেজ করুন"
+
+#: accounts/templates/accounts/profile.html:22 templates/base.html:90
+#: templates/base.html:188
+msgid "Wishlist"
+msgstr "উইশলিস্ট"
+
+#: accounts/templates/accounts/profile.html:22
+#, python-format
+msgid "%(n)s saved item"
+msgid_plural "%(n)s saved items"
+msgstr[0] "%(n)sটি সেভ করা পণ্য"
+msgstr[1] "%(n)sটি সেভ করা পণ্য"
+
+#: accounts/templates/accounts/profile.html:23
+msgid "Add address"
+msgstr "ঠিকানা যোগ করুন"
+
+#: accounts/templates/accounts/profile.html:23
+msgid "For faster checkout"
+msgstr "দ্রুত চেকআউটের জন্য"
+
+#: accounts/templates/accounts/profile.html:31
+#: orders/templates/orders/checkout.html:128
+msgid "Reward points"
+msgstr "রিওয়ার্ড পয়েন্ট"
+
+#: accounts/templates/accounts/profile.html:33
+#, python-format
+msgid "Worth %(amount)s off your next order"
+msgstr "পরের অর্ডারে %(amount)s ছাড়"
+
+#: accounts/templates/accounts/profile.html:37
+msgid ""
+"Earn 1 point for every ৳100 you spend (added when your order is delivered). "
+"Every 100 points = ৳50 off at checkout."
+msgstr ""
+"প্রতি ৳১০০ কেনাকাটায় ১ পয়েন্ট (অর্ডার ডেলিভারি হলে যোগ হয়)। প্রতি ১০০ "
+"পয়েন্টে চেকআউটে ৳৫০ ছাড়।"
+
+#: accounts/templates/accounts/profile.html:39
+msgid "Points history"
+msgstr "পয়েন্টের হিসাব"
+
+#: accounts/templates/accounts/profile.html:49
+#, python-format
+msgid "Invite friends, get %(amount)s"
+msgstr "বন্ধুকে আমন্ত্রণ জানান, পান %(amount)s"
+
+#: accounts/templates/accounts/profile.html:50
+#, python-format
+msgid ""
+"When a friend signs up with your code and their first order is delivered, "
+"you both get a %(amount)s coupon."
+msgstr ""
+"আপনার কোড দিয়ে বন্ধু সাইন আপ করলে এবং তার প্রথম অর্ডার ডেলিভারি হলে, দুজনেই"
+" পাবেন %(amount)s কুপন।"
+
+#: accounts/templates/accounts/profile.html:52
+msgid "Your code"
+msgstr "আপনার কোড"
+
+#: accounts/templates/accounts/profile.html:53
+msgid "Your referral code"
+msgstr "আপনার রেফারেল কোড"
+
+#: accounts/templates/accounts/profile.html:54
+#: products/templates/products/product_detail.html:79
+msgid "Copy link"
+msgstr "লিংক কপি করুন"
+
+#: accounts/templates/accounts/profile.html:57
+#: accounts/templates/accounts/profile.html:58
+msgid "Share"
+msgstr "শেয়ার করুন"
+
+#: accounts/templates/accounts/profile.html:60
+#, python-format
+msgid "%(shown)s friend joined with your code."
+msgid_plural "%(shown)s friends joined with your code."
+msgstr[0] "%(shown)s জন বন্ধু আপনার কোড দিয়ে যোগ দিয়েছেন।"
+msgstr[1] "%(shown)s জন বন্ধু আপনার কোড দিয়ে যোগ দিয়েছেন।"
+
+#: accounts/templates/accounts/profile.html:62
+msgid "Your coupons"
+msgstr "আপনার কুপন"
+
+#: accounts/templates/accounts/profile.html:73
+msgid "Addresses"
+msgstr "ঠিকানা"
+
+#: accounts/templates/accounts/profile.html:80
+msgid "Default"
+msgstr "ডিফল্ট"
+
+#: accounts/templates/accounts/profile.html:86
+msgid "Make default"
+msgstr "ডিফল্ট করুন"
+
+#: accounts/templates/accounts/profile.html:88
+msgid "Delete"
+msgstr "মুছুন"
+
+#: accounts/templates/accounts/profile.html:92
+msgid ""
+"No saved addresses yet. Addresses you use at checkout can be saved here."
+msgstr "এখনো কোনো ঠিকানা সেভ নেই। চেকআউটে দেওয়া ঠিকানা এখানে সেভ করা যায়।"
+
+#: accounts/templates/accounts/profile.html:99
+msgid "Recent orders"
+msgstr "সাম্প্রতিক অর্ডার"
+
+#: accounts/templates/accounts/profile.html:100
+#: products/templates/products/home.html:93
+msgid "View all"
+msgstr "সব দেখুন"
+
+#: accounts/templates/accounts/profile.html:108
+msgid "You haven't placed any orders yet."
+msgstr "আপনি এখনো কোনো অর্ডার করেননি।"
+
+#: accounts/templates/accounts/unsubscribe.html:4
+msgid "Unsubscribe | SmartCart BD"
+msgstr "আনসাবস্ক্রাইব | SmartCart BD"
+
+#: accounts/templates/accounts/unsubscribe.html:10
+#, python-format
+msgid "Unsubscribe %(email)s?"
+msgstr "%(email)s আনসাবস্ক্রাইব করবেন?"
+
+#: accounts/templates/accounts/unsubscribe.html:11
+msgid "You won't get deal emails from us any more."
+msgstr "আমাদের অফারের ইমেইল আর পাবেন না।"
+
+#: accounts/templates/accounts/unsubscribe.html:12
+msgid "Unsubscribe"
+msgstr "আনসাবস্ক্রাইব"
+
+#: accounts/templates/accounts/wishlist.html:4
+msgid "Wishlist | SmartCart BD"
+msgstr "উইশলিস্ট | SmartCart BD"
+
+#: accounts/templates/accounts/wishlist.html:8
+msgid "My wishlist"
+msgstr "আমার উইশলিস্ট"
+
+#: accounts/templates/accounts/wishlist.html:15
+#: products/templates/products/compare.html:29
+msgid "Remove"
+msgstr "সরান"
+
+#: accounts/views.py:87
+msgid "Too many attempts. Please try again later."
+msgstr "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।"
+
+#: accounts/views.py:95
+msgid "You're subscribed. Thanks!"
+msgstr "সাবস্ক্রাইব হয়েছে। ধন্যবাদ!"
+
+#: accounts/views.py:100
+msgid "You're subscribed. Watch your inbox for deals!"
+msgstr "সাবস্ক্রাইব হয়েছে। অফারের জন্য ইনবক্স দেখুন!"
+
+#: accounts/views.py:117
+msgid "You have been unsubscribed."
+msgstr "আপনাকে আনসাবস্ক্রাইব করা হয়েছে।"
+
+#: accounts/views.py:130
+msgid "Address saved."
+msgstr "ঠিকানা সেভ হয়েছে।"
+
+#: accounts/views.py:146
+msgid "Address deleted."
+msgstr "ঠিকানা মুছে ফেলা হয়েছে।"
+
+#: accounts/views.py:180
+msgid "Added to wishlist."
+msgstr "উইশলিস্টে যোগ হয়েছে।"
+
+#: accounts/views.py:180
+msgid "Removed from wishlist."
+msgstr "উইশলিস্ট থেকে সরানো হয়েছে।"
+
+#: cart/templates/cart/_mini_cart.html:22
+#: cart/templates/cart/cart_summary.html:61
+#: orders/templates/orders/_order_items.html:20
+#: orders/templates/orders/checkout.html:123
+msgid "Bundle savings"
+msgstr "বান্ডেল ছাড়"
+
+#: cart/templates/cart/_mini_cart.html:25
+#: cart/templates/cart/cart_summary.html:57
+#: orders/templates/orders/_order_items.html:4
+#: orders/templates/orders/_order_items.html:19
+#: orders/templates/orders/checkout.html:121
+msgid "Subtotal"
+msgstr "সাবটোটাল"
+
+#: cart/templates/cart/_mini_cart.html:29
+#: orders/templates/orders/checkout.html:5
+#: orders/templates/orders/checkout.html:15
+msgid "Checkout"
+msgstr "চেকআউট"
+
+#: cart/templates/cart/_mini_cart.html:30
+msgid "View cart"
+msgstr "কার্ট দেখুন"
+
+#: cart/templates/cart/cart_summary.html:5
+msgid "Your cart | SmartCart BD"
+msgstr "আপনার কার্ট | SmartCart BD"
+
+#: cart/templates/cart/cart_summary.html:9
+msgid "Shopping cart"
+msgstr "শপিং কার্ট"
+
+#: cart/templates/cart/cart_summary.html:29
+#, python-format
+msgid "%(price)s each"
+msgstr "প্রতিটি %(price)s"
+
+#: cart/templates/cart/cart_summary.html:31
+msgid "Flash"
+msgstr "ফ্ল্যাশ"
+
+#: cart/templates/cart/cart_summary.html:34
+#, python-format
+msgid "Only %(n)s left in stock"
+msgstr "স্টকে মাত্র %(n)sটি আছে"
+
+#: cart/templates/cart/cart_summary.html:36
+#, python-format
+msgid "Only %(n)s left"
+msgstr "মাত্র %(n)sটি বাকি"
+
+#: cart/templates/cart/cart_summary.html:40
+msgid "Decrease quantity"
+msgstr "পরিমাণ কমান"
+
+#: cart/templates/cart/cart_summary.html:41
+#: products/templates/products/_buy_box.html:47
+msgid "Quantity"
+msgstr "পরিমাণ"
+
+#: cart/templates/cart/cart_summary.html:42
+msgid "Increase quantity"
+msgstr "পরিমাণ বাড়ান"
+
+#: cart/templates/cart/cart_summary.html:50
+#: orders/templates/orders/order_success.html:36
+msgid "Continue shopping"
+msgstr "আরও কেনাকাটা করুন"
+
+#: cart/templates/cart/cart_summary.html:55
+msgid "Order summary"
+msgstr "অর্ডারের সারাংশ"
+
+#: cart/templates/cart/cart_summary.html:66
+#: orders/templates/orders/_order_items.html:21
+msgid "Discount"
+msgstr "ছাড়"
+
+#: cart/templates/cart/cart_summary.html:70
+#: orders/templates/orders/_order_items.html:24
+#: orders/templates/orders/checkout.html:130
+msgid "Shipping"
+msgstr "ডেলিভারি চার্জ"
+
+#: cart/templates/cart/cart_summary.html:70
+msgid "Calculated at checkout"
+msgstr "চেকআউটে হিসাব হবে"
+
+#: cart/templates/cart/cart_summary.html:74
+#: orders/templates/orders/_order_items.html:25
+#: orders/templates/orders/checkout.html:133
+msgid "Total"
+msgstr "মোট"
+
+#: cart/templates/cart/cart_summary.html:81
+#, python-format
+msgid "Remove coupon %(code)s"
+msgstr "কুপন %(code)s সরান"
+
+#: cart/templates/cart/cart_summary.html:86
+msgid "Coupon code"
+msgstr "কুপন কোড"
+
+#: cart/templates/cart/cart_summary.html:87
+msgid "Apply"
+msgstr "প্রয়োগ করুন"
+
+#: cart/templates/cart/cart_summary.html:92
+msgid "Proceed to checkout"
+msgstr "চেকআউটে যান"
+
+#: cart/views.py:75
+#, python-brace-format
+msgid "Please choose an option for \"{name}\"."
+msgstr "\"{name}\"-এর একটি অপশন বেছে নিন।"
+
+#: cart/views.py:87
+#, python-brace-format
+msgid "Sorry, \"{name}\" is out of stock."
+msgstr "দুঃখিত, \"{name}\" স্টকে নেই।"
+
+#: cart/views.py:89
+#, python-brace-format
+msgid "Only {stock} of \"{name}\" available. Your cart has {qty}."
+msgstr "\"{name}\" মাত্র {stock}টি আছে। আপনার কার্টে আছে {qty}টি।"
+
+#: cart/views.py:91
+#, python-brace-format
+msgid "\"{name}\" added to your cart."
+msgstr "\"{name}\" কার্টে যোগ হয়েছে।"
+
+#: cart/views.py:136
+msgid "Invalid coupon code."
+msgstr "কুপন কোডটি সঠিক নয়।"
+
+#: cart/views.py:141
+#, python-brace-format
+msgid "Coupon \"{code}\" applied."
+msgstr "কুপন \"{code}\" প্রয়োগ হয়েছে।"
+
+#: cart/views.py:150
+msgid "Coupon removed."
+msgstr "কুপন সরানো হয়েছে।"
+
+#: core/forms.py:21
+msgid "Your submission looks automated. Please try again."
+msgstr "স্বয়ংক্রিয় সাবমিশন মনে হচ্ছে। আবার চেষ্টা করুন।"
+
+#: core/templates/core/offline.html:4
+msgid "You're offline | SmartCart BD"
+msgstr "আপনি অফলাইনে | SmartCart BD"
+
+#: core/templates/core/offline.html:10
+msgid "You're offline"
+msgstr "আপনি অফলাইনে আছেন"
+
+#: core/templates/core/offline.html:11
+msgid ""
+"Check your internet connection. Your cart is saved and will be here when "
+"you're back."
+msgstr "ইন্টারনেট সংযোগ দেখুন। আপনার কার্ট সেভ আছে, ফিরে এলে পাবেন।"
+
+#: core/templates/core/offline.html:12
+msgid "Try again"
+msgstr "আবার চেষ্টা করুন"
+
+#: core/templates/core/pages/_contact.html:2
+msgid "Contact us"
+msgstr "যোগাযোগ"
+
+#: core/templates/core/pages/_contact.html:8
+#, python-format
+msgid "Trade licence: %(trade_license)s"
+msgstr "ট্রেড লাইসেন্স: %(trade_license)s"
+
+#: core/templates/core/pages/_contact.html:9
+msgid "Order questions:"
+msgstr "অর্ডার নিয়ে প্রশ্ন:"
+
+#: core/templates/core/pages/_contact.html:9
+msgid "track your order"
+msgstr "অর্ডার ট্র্যাক করুন"
+
+#: core/templates/core/pages/_contact.html:9
+msgid "with your order number and phone."
+msgstr "অর্ডার নম্বর ও ফোন নম্বর দিয়ে।"
+
+#: core/templates/core/pages/_page.html:9
+#: products/templates/products/product_detail.html:10
+#: products/templates/products/product_list.html:9
+msgid "breadcrumb"
+msgstr "ব্রেডক্রাম্ব"
+
+#: core/templates/core/pages/_page.html:11
+#: products/templates/products/product_detail.html:12
+#: products/templates/products/product_list.html:11 templates/base.html:158
+msgid "Home"
+msgstr "হোম"
+
+#: core/templates/core/pages/_page.html:17
+#, python-format
+msgid "Last updated: %(updated)s"
+msgstr "সর্বশেষ আপডেট: %(updated)s"
+
+#: core/templates/core/pages/_page.html:20
+msgid "Store policies"
+msgstr "স্টোর নীতিমালা"
+
+#: core/templates/core/pages/about.html:6
+msgid ""
+"SmartCart BD is an online shop for Bangladesh: phones, gadgets, fashion and "
+"home essentials, delivered to all 64 districts."
+msgstr ""
+"SmartCart BD বাংলাদেশের একটি অনলাইন শপ: ফোন, গ্যাজেট, ফ্যাশন ও ঘরের "
+"প্রয়োজনীয় জিনিস, ৬৪ জেলায় ডেলিভারি।"
+
+#: core/templates/core/pages/about.html:8
+msgid "What we promise"
+msgstr "আমাদের প্রতিশ্রুতি"
+
+#: core/templates/core/pages/about.html:10
+msgid "Genuine products."
+msgstr "আসল পণ্য।"
+
+#: core/templates/core/pages/about.html:10
+msgid "Every product page shows the brand, real customer reviews and photos."
+msgstr "প্রতিটি পণ্যের পেজে ব্র্যান্ড, আসল গ্রাহকের রিভিউ ও ছবি থাকে।"
+
+#: core/templates/core/pages/about.html:11
+msgid "Fair, clear prices."
+msgstr "ন্যায্য ও স্পষ্ট দাম।"
+
+#: core/templates/core/pages/about.html:11
+msgid ""
+"The price you see, including any sale or flash sale, is the price you pay. "
+"Delivery charges are shown before you order."
+msgstr ""
+"সেল বা ফ্ল্যাশ সেলসহ যে দাম দেখছেন, সেটাই দেবেন। অর্ডারের আগেই ডেলিভারি "
+"চার্জ দেখানো হয়।"
+
+#: core/templates/core/pages/about.html:12
+msgid "Pay the way you like."
+msgstr "যেভাবে খুশি পেমেন্ট করুন।"
+
+#: core/templates/core/pages/about.html:12
+msgid "Cash on Delivery everywhere"
+msgstr "সব জায়গায় ক্যাশ অন ডেলিভারি"
+
+#: core/templates/core/pages/about.html:12
+msgid ", or bKash, Nagad and cards through SSLCommerz"
+msgstr ", অথবা SSLCommerz-এর মাধ্যমে bKash, Nagad ও কার্ড"
+
+#: core/templates/core/pages/about.html:13
+#, python-format
+msgid ""
+"<strong>Easy returns.</strong> Changed your mind? Request a return within "
+"%(return_days)s days of delivery. <a href=\"%(returns_url)s\">How returns "
+"work</a>."
+msgstr ""
+"<strong>সহজ রিটার্ন।</strong> মত বদলেছেন? ডেলিভারির %(return_days)s দিনের "
+"মধ্যে রিটার্নের অনুরোধ করুন। <a href=\"%(returns_url)s\">রিটার্ন কীভাবে "
+"হয়</a>।"
+
+#: core/templates/core/pages/about.html:16
+msgid "Rewards"
+msgstr "রিওয়ার্ড"
+
+#: core/templates/core/pages/about.html:17
+#, python-format
+msgid ""
+"You earn 1 reward point for every %(per)s you spend, credited when your "
+"order is delivered. Every %(points_block)s points take %(value)s off a later"
+" order. Invite a friend with your referral link and you both get a "
+"%(reward)s coupon after their first delivery."
+msgstr ""
+"প্রতি %(per)s কেনাকাটায় ১ রিওয়ার্ড পয়েন্ট পাবেন, অর্ডার ডেলিভারি হলে যোগ "
+"হয়। প্রতি %(points_block)s পয়েন্টে পরের অর্ডারে %(value)s ছাড়। রেফারেল "
+"লিংক দিয়ে বন্ধুকে আমন্ত্রণ জানান, তার প্রথম ডেলিভারির পর দুজনেই পাবেন "
+"%(reward)s কুপন।"
+
+#: core/templates/core/pages/privacy.html:5
+msgid ""
+"This page explains what personal information SmartCart BD collects, why, and"
+" the choices you have."
+msgstr ""
+"SmartCart BD কী ব্যক্তিগত তথ্য নেয়, কেন নেয়, এবং আপনার কী কী বিকল্প আছে, "
+"তা এই পেজে বলা আছে।"
+
+#: core/templates/core/pages/privacy.html:7
+msgid "What we collect"
+msgstr "আমরা কী তথ্য নিই"
+
+#: core/templates/core/pages/privacy.html:9
+msgid "Account:"
+msgstr "অ্যাকাউন্ট:"
+
+#: core/templates/core/pages/privacy.html:9
+msgid ""
+"your email address and password (stored only as a secure hash), or your "
+"Google profile if you log in with Google."
+msgstr ""
+"আপনার ইমেইল ও পাসওয়ার্ড (শুধু নিরাপদ হ্যাশ হিসেবে রাখা হয়), অথবা Google "
+"দিয়ে লগইন করলে আপনার Google প্রোফাইল।"
+
+#: core/templates/core/pages/privacy.html:10
+msgid "Orders:"
+msgstr "অর্ডার:"
+
+#: core/templates/core/pages/privacy.html:10
+msgid ""
+"name, phone number, email, delivery address, the products you buy and how "
+"you pay. Card and mobile-wallet details are entered on the SSLCommerz "
+"payment page; we never see or store them."
+msgstr ""
+"নাম, ফোন নম্বর, ইমেইল, ডেলিভারি ঠিকানা, কী কিনলেন এবং কীভাবে পেমেন্ট করলেন। "
+"কার্ড ও মোবাইল ওয়ালেটের তথ্য SSLCommerz-এর পেজে দেওয়া হয়; আমরা তা দেখি না"
+" বা রাখি না।"
+
+#: core/templates/core/pages/privacy.html:11
+msgid "Your cart:"
+msgstr "আপনার কার্ট:"
+
+#: core/templates/core/pages/privacy.html:11
+msgid ""
+"what is in it and when it last changed. If you type your email at checkout "
+"but don't finish the order, we may send you one reminder."
+msgstr ""
+"কার্টে কী আছে এবং শেষ কবে বদলেছে। চেকআউটে ইমেইল দিয়ে অর্ডার শেষ না করলে "
+"আমরা একবার মনে করিয়ে দিতে পারি।"
+
+#: core/templates/core/pages/privacy.html:12
+msgid "Optional:"
+msgstr "ঐচ্ছিক:"
+
+#: core/templates/core/pages/privacy.html:12
+msgid ""
+"saved addresses, wishlist, reviews and photos, questions, price alerts, "
+"newsletter subscription and push notifications."
+msgstr ""
+"সেভ করা ঠিকানা, উইশলিস্ট, রিভিউ ও ছবি, প্রশ্ন, প্রাইস অ্যালার্ট, নিউজলেটার "
+"এবং পুশ নোটিফিকেশন।"
+
+#: core/templates/core/pages/privacy.html:13
+msgid "Technical:"
+msgstr "টেকনিক্যাল:"
+
+#: core/templates/core/pages/privacy.html:13
+msgid ""
+"cookies needed for login, the cart and security (to block repeated failed "
+"logins), plus your theme and digit preferences."
+msgstr ""
+"লগইন, কার্ট ও নিরাপত্তার জন্য (বারবার ভুল লগইন আটকাতে) দরকারি কুকি, আর আপনার"
+" থিম ও ভাষার পছন্দ।"
+
+#: core/templates/core/pages/privacy.html:16
+msgid "How we use it"
+msgstr "আমরা তথ্য কীভাবে ব্যবহার করি"
+
+#: core/templates/core/pages/privacy.html:18
+msgid ""
+"To deliver your orders and keep you updated by email, in-site notifications "
+"and, if you turn them on, push notifications."
+msgstr ""
+"আপনার অর্ডার ডেলিভারি করতে এবং ইমেইল, সাইটের নোটিফিকেশন ও (চালু করলে) পুশ "
+"নোটিফিকেশনে আপডেট দিতে।"
+
+#: core/templates/core/pages/privacy.html:19
+msgid ""
+"To run reward points and referrals, and to show recommendations based on "
+"what is in the shop."
+msgstr "রিওয়ার্ড পয়েন্ট ও রেফারেল চালাতে, এবং শপের পণ্য থেকে সাজেশন দেখাতে।"
+
+#: core/templates/core/pages/privacy.html:20
+msgid "To protect accounts and stop fraud."
+msgstr "অ্যাকাউন্ট সুরক্ষিত রাখতে ও প্রতারণা ঠেকাতে।"
+
+#: core/templates/core/pages/privacy.html:21
+msgid ""
+"To send offers, only if you subscribe to the newsletter. Every email has an "
+"unsubscribe link."
+msgstr ""
+"অফার পাঠাতে, শুধু নিউজলেটারে সাবস্ক্রাইব করলে। প্রতিটি ইমেইলে আনসাবস্ক্রাইব "
+"লিংক থাকে।"
+
+#: core/templates/core/pages/privacy.html:24
+msgid "Who we share it with"
+msgstr "কার সাথে তথ্য শেয়ার করি"
+
+#: core/templates/core/pages/privacy.html:25
+msgid ""
+"Only with the services needed to complete your order: the courier (name, "
+"phone and address), the payment gateway (order amount and contact details) "
+"and our email provider. We do not sell your information."
+msgstr ""
+"শুধু অর্ডার সম্পূর্ণ করতে যাদের দরকার: কুরিয়ার (নাম, ফোন ও ঠিকানা), পেমেন্ট"
+" গেটওয়ে (অর্ডারের টাকা ও যোগাযোগের তথ্য) এবং আমাদের ইমেইল সেবা। আমরা আপনার "
+"তথ্য বিক্রি করি না।"
+
+#: core/templates/core/pages/privacy.html:27
+msgid "Your choices"
+msgstr "আপনার বিকল্প"
+
+#: core/templates/core/pages/privacy.html:29
+msgid ""
+"Edit or delete saved addresses from your profile, and turn push "
+"notifications off on the notifications page."
+msgstr ""
+"প্রোফাইল থেকে সেভ করা ঠিকানা এডিট বা মুছুন, এবং নোটিফিকেশন পেজ থেকে পুশ "
+"নোটিফিকেশন বন্ধ করুন।"
+
+#: core/templates/core/pages/privacy.html:30
+msgid "Unsubscribe from the newsletter with the link in any newsletter email."
+msgstr "যেকোনো নিউজলেটার ইমেইলের লিংক দিয়ে আনসাবস্ক্রাইব করুন।"
+
+#: core/templates/core/pages/privacy.html:31
+msgid ""
+"Ask us to delete your account. Order records are kept as long as the law "
+"requires for accounting."
+msgstr ""
+"অ্যাকাউন্ট মুছে ফেলতে আমাদের বলুন। হিসাবের জন্য আইন অনুযায়ী যতদিন দরকার, "
+"অর্ডারের রেকর্ড রাখা হয়।"
+
+#: core/templates/core/pages/returns.html:5
+#, python-format
+msgid ""
+"If something is wrong with your order, or you changed your mind, you can ask"
+" for a return within <strong>%(return_days)s days of delivery</strong>."
+msgstr ""
+"অর্ডারে সমস্যা থাকলে বা মত বদলালে, <strong>ডেলিভারির %(return_days)s দিনের "
+"মধ্যে</strong> রিটার্নের অনুরোধ করতে পারেন।"
+
+#: core/templates/core/pages/returns.html:7
+msgid "How to return"
+msgstr "কীভাবে রিটার্ন করবেন"
+
+#: core/templates/core/pages/returns.html:9
+#, python-format
+msgid ""
+"Open the order in <a href=\"%(orders_url)s\">My orders</a> and choose "
+"<em>Request a return</em> (shown for %(return_days)s days after delivery)."
+msgstr ""
+"<a href=\"%(orders_url)s\">আমার অর্ডার</a> থেকে অর্ডারটি খুলে <em>রিটার্নের "
+"অনুরোধ</em> চাপুন (ডেলিভারির পর %(return_days)s দিন দেখা যায়)।"
+
+#: core/templates/core/pages/returns.html:10
+msgid ""
+"Tell us the reason and add any details. We reply within 2 working days."
+msgstr "কারণ ও বিস্তারিত লিখুন। আমরা ২ কর্মদিবসের মধ্যে উত্তর দিই।"
+
+#: core/templates/core/pages/returns.html:11
+msgid "Once approved, we arrange pickup or tell you where to send the item."
+msgstr ""
+"অনুমোদন হলে আমরা পণ্য নিয়ে আসার ব্যবস্থা করি, অথবা কোথায় পাঠাবেন জানিয়ে "
+"দিই।"
+
+#: core/templates/core/pages/returns.html:14
+msgid "What can be returned"
+msgstr "কী রিটার্ন করা যায়"
+
+#: core/templates/core/pages/returns.html:16
+msgid ""
+"Wrong, damaged or defective items: always, and we pay the return delivery."
+msgstr "ভুল, ভাঙা বা ত্রুটিপূর্ণ পণ্য: সবসময়, আর রিটার্নের খরচ আমাদের।"
+
+#: core/templates/core/pages/returns.html:17
+msgid ""
+"Change of mind: unused items in the original packaging with all tags and "
+"accessories. The return delivery charge is deducted from the refund."
+msgstr ""
+"মত বদল: অব্যবহৃত পণ্য, আসল প্যাকেটে, সব ট্যাগ ও এক্সেসরিজসহ। রিটার্নের "
+"ডেলিভারি চার্জ রিফান্ড থেকে কাটা হয়।"
+
+#: core/templates/core/pages/returns.html:18
+msgid ""
+"Not returnable for hygiene reasons: opened personal care items, innerwear "
+"and earphones with a broken seal (unless faulty)."
+msgstr ""
+"স্বাস্থ্যগত কারণে রিটার্ন হয় না: খোলা পার্সোনাল কেয়ার পণ্য, অন্তর্বাস ও "
+"সিল খোলা ইয়ারফোন (ত্রুটি থাকলে ছাড়া)।"
+
+#: core/templates/core/pages/returns.html:21
+msgid "Refunds"
+msgstr "রিফান্ড"
+
+#: core/templates/core/pages/returns.html:23
+msgid ""
+"Online payments are refunded to the same bKash, Nagad or card account within"
+" 7-10 working days after we receive the item."
+msgstr ""
+"পণ্য ফেরত পাওয়ার পর ৭-১০ কর্মদিবসের মধ্যে একই bKash, Nagad বা কার্ডে অনলাইন"
+" পেমেন্ট রিফান্ড হয়।"
+
+#: core/templates/core/pages/returns.html:24
+msgid ""
+"Cash on Delivery orders are refunded to your bKash or Nagad number, or a "
+"bank account."
+msgstr ""
+"ক্যাশ অন ডেলিভারি অর্ডারের টাকা আপনার bKash, Nagad নম্বর বা ব্যাংক "
+"অ্যাকাউন্টে ফেরত দেওয়া হয়।"
+
+#: core/templates/core/pages/returns.html:25
+msgid "Reward points used on the order are returned to your account."
+msgstr "অর্ডারে ব্যবহার করা রিওয়ার্ড পয়েন্ট আপনার অ্যাকাউন্টে ফেরত যায়।"
+
+#: core/templates/core/pages/returns.html:28
+msgid "Cancelling an order"
+msgstr "অর্ডার বাতিল"
+
+#: core/templates/core/pages/returns.html:29
+msgid ""
+"You can cancel an order yourself from the order page until it is shipped. "
+"The items go back on sale and any points you used are returned."
+msgstr ""
+"শিপ হওয়ার আগ পর্যন্ত অর্ডার পেজ থেকে নিজেই বাতিল করতে পারেন। পণ্য আবার "
+"বিক্রিতে যায় এবং ব্যবহৃত পয়েন্ট ফেরত আসে।"
+
+#: core/templates/core/pages/shipping.html:6
+msgid ""
+"We deliver to every district in Bangladesh through our courier partners. The"
+" charge and the expected time depend on where you live:"
+msgstr ""
+"আমাদের কুরিয়ার পার্টনারদের মাধ্যমে বাংলাদেশের প্রতিটি জেলায় ডেলিভারি দিই। "
+"চার্জ ও সময় আপনার এলাকার উপর নির্ভর করে:"
+
+#: core/templates/core/pages/shipping.html:10
+msgid "Area"
+msgstr "এলাকা"
+
+#: core/templates/core/pages/shipping.html:10
+msgid "Delivery charge"
+msgstr "ডেলিভারি চার্জ"
+
+#: core/templates/core/pages/shipping.html:10
+msgid "Delivery time"
+msgstr "ডেলিভারির সময়"
+
+#: core/templates/core/pages/shipping.html:14
+msgid "(all other districts)"
+msgstr "(বাকি সব জেলা)"
+
+#: core/templates/core/pages/shipping.html:19
+msgid "Inside Dhaka"
+msgstr "ঢাকার ভেতরে"
+
+#: core/templates/core/pages/shipping.html:19
+msgid "1-2 days"
+msgstr "১-২ দিন"
+
+#: core/templates/core/pages/shipping.html:20
+msgid "Rest of Bangladesh"
+msgstr "বাংলাদেশের বাকি অংশ"
+
+#: core/templates/core/pages/shipping.html:20
+msgid "3-5 days"
+msgstr "৩-৫ দিন"
+
+#: core/templates/core/pages/shipping.html:27
+#, python-format
+msgid ""
+"<strong>Free delivery</strong> on orders of %(amount)s or more (after "
+"discounts)."
+msgstr ""
+"%(amount)s বা তার বেশি অর্ডারে (ছাড়ের পর) <strong>ফ্রি ডেলিভারি</strong>।"
+
+#: core/templates/core/pages/shipping.html:28
+msgid ""
+"Times are working days from when we confirm your order. Hartals, floods and "
+"public holidays can add delays; we will let you know."
+msgstr ""
+"সময় গোনা হয় অর্ডার কনফার্মের পর থেকে, কর্মদিবসে। হরতাল, বন্যা ও সরকারি "
+"ছুটিতে দেরি হতে পারে; আমরা জানিয়ে দেব।"
+
+#: core/templates/core/pages/shipping.html:29
+msgid ""
+"Checkout shows the exact charge and time for your district before you place "
+"the order."
+msgstr "অর্ডারের আগে চেকআউটে আপনার জেলার সঠিক চার্জ ও সময় দেখানো হয়।"
+
+#: core/templates/core/pages/shipping.html:30
+#, python-format
+msgid "Gift wrap is available for %(price)s."
+msgstr "%(price)s-এ গিফট র‍্যাপ পাওয়া যায়।"
+
+#: core/templates/core/pages/shipping.html:31
+msgid "You get an email and a notification when your order ships. Guests can"
+msgstr "অর্ডার শিপ হলে ইমেইল ও নোটিফিকেশন পাবেন। অ্যাকাউন্ট ছাড়াও"
+
+#: core/templates/core/pages/shipping.html:31
+msgid "track an order"
+msgstr "অর্ডার ট্র্যাক করা যায়"
+
+#: core/templates/core/pages/shipping.html:31
+msgid "with the order number and phone number."
+msgstr "অর্ডার নম্বর ও ফোন নম্বর দিয়ে।"
+
+#: core/templates/core/pages/shipping.html:34 orders/forms.py:70
+#: orders/models.py:120 products/templates/products/home.html:61
+#: templates/base.html:207 templates/base.html:251
+msgid "Cash on Delivery"
+msgstr "ক্যাশ অন ডেলিভারি"
+
+#: core/templates/core/pages/shipping.html:35
+msgid ""
+"Please keep the exact amount ready. You may check the outside of the parcel "
+"in front of the delivery person. If the parcel is clearly damaged, you can "
+"refuse it and we will send a replacement."
+msgstr ""
+"সঠিক টাকা হাতে রাখুন। ডেলিভারিম্যানের সামনে পার্সেলের বাইরেটা দেখে নিতে "
+"পারেন। পার্সেল স্পষ্টভাবে ক্ষতিগ্রস্ত হলে ফিরিয়ে দিন, আমরা নতুন পাঠাব।"
+
+#: core/templates/core/pages/terms.html:6
+msgid "By using SmartCart BD and placing an order, you agree to these terms."
+msgstr ""
+"SmartCart BD ব্যবহার করে এবং অর্ডার দিয়ে আপনি এই শর্তগুলোতে সম্মত হচ্ছেন।"
+
+#: core/templates/core/pages/terms.html:8
+msgid "Orders and prices"
+msgstr "অর্ডার ও দাম"
+
+#: core/templates/core/pages/terms.html:10
+msgid ""
+"All prices are in Bangladeshi Taka (BDT) and include VAT where applicable."
+msgstr "সব দাম বাংলাদেশি টাকায় (BDT), প্রযোজ্য ক্ষেত্রে ভ্যাটসহ।"
+
+#: core/templates/core/pages/terms.html:11
+msgid ""
+"An order is accepted when we confirm it. We may cancel an order if a product"
+" is out of stock, the price was clearly wrong, or the order looks "
+"fraudulent; any payment is then refunded in full."
+msgstr ""
+"আমরা কনফার্ম করলে অর্ডার গৃহীত হয়। পণ্য স্টকে না থাকলে, দাম স্পষ্টভাবে ভুল "
+"হলে বা অর্ডার সন্দেহজনক মনে হলে বাতিল করতে পারি; তখন পুরো টাকা ফেরত দেওয়া "
+"হয়।"
+
+#: core/templates/core/pages/terms.html:12
+msgid ""
+"Flash sale prices apply only while the countdown is running and stock lasts."
+msgstr "ফ্ল্যাশ সেলের দাম শুধু কাউন্টডাউন চলা পর্যন্ত এবং স্টক থাকা পর্যন্ত।"
+
+#: core/templates/core/pages/terms.html:15
+#: orders/templates/orders/order_detail.html:52
+msgid "Payment"
+msgstr "পেমেন্ট"
+
+#: core/templates/core/pages/terms.html:17
+msgid "Cash on Delivery: pay the courier the order total in cash."
+msgstr "ক্যাশ অন ডেলিভারি: কুরিয়ারকে অর্ডারের পুরো টাকা নগদে দিন।"
+
+#: core/templates/core/pages/terms.html:18
+#, python-format
+msgid ""
+"Online payment: processed by SSLCommerz. An order left unpaid for "
+"%(unpaid_minutes)s minutes is cancelled and its items released."
+msgstr ""
+"অনলাইন পেমেন্ট: SSLCommerz-এর মাধ্যমে। %(unpaid_minutes)s মিনিটের মধ্যে "
+"পেমেন্ট না হলে অর্ডার বাতিল হয়ে পণ্য ছেড়ে দেওয়া হয়।"
+
+#: core/templates/core/pages/terms.html:21
+msgid "Coupons, points and referrals"
+msgstr "কুপন, পয়েন্ট ও রেফারেল"
+
+#: core/templates/core/pages/terms.html:23
+msgid ""
+"One coupon per order. Coupons can have a minimum order, an expiry date and a"
+" usage limit, and some are for one customer only."
+msgstr ""
+"প্রতি অর্ডারে একটি কুপন। কুপনে সর্বনিম্ন অর্ডার, মেয়াদ ও ব্যবহারের সীমা "
+"থাকতে পারে, কিছু কুপন শুধু একজন গ্রাহকের জন্য।"
+
+#: core/templates/core/pages/terms.html:24
+msgid ""
+"Reward points have no cash value and cannot be transferred. Points from a "
+"cancelled or returned order are removed."
+msgstr ""
+"রিওয়ার্ড পয়েন্টের নগদ মূল্য নেই এবং হস্তান্তর করা যায় না। বাতিল বা "
+"রিটার্ন হওয়া অর্ডারের পয়েন্ট কেটে নেওয়া হয়।"
+
+#: core/templates/core/pages/terms.html:25
+msgid ""
+"Referral rewards are given once per new customer, after their first "
+"delivered order. Self-referrals are not allowed."
+msgstr ""
+"প্রতি নতুন গ্রাহকের প্রথম ডেলিভারির পর একবার রেফারেল রিওয়ার্ড দেওয়া হয়। "
+"নিজেকে রেফার করা যাবে না।"
+
+#: core/templates/core/pages/terms.html:28
+msgid "Your account"
+msgstr "আপনার অ্যাকাউন্ট"
+
+#: core/templates/core/pages/terms.html:30
+#, python-format
+msgid ""
+"Keep your password private. After %(lockout_attempts)s failed logins, the "
+"account is locked for a short time to protect it."
+msgstr ""
+"পাসওয়ার্ড গোপন রাখুন। %(lockout_attempts)s বার ভুল লগইনের পর সুরক্ষার জন্য "
+"অ্যাকাউন্ট কিছুক্ষণ লক থাকে।"
+
+#: core/templates/core/pages/terms.html:31
+msgid ""
+"Reviews, photos and questions must be about the product and must not be "
+"abusive, false or someone else's work. We may remove them."
+msgstr ""
+"রিভিউ, ছবি ও প্রশ্ন পণ্য নিয়ে হতে হবে; অপমানজনক, মিথ্যা বা অন্যের কাজ হলে "
+"আমরা সরিয়ে দিতে পারি।"
+
+#: core/templates/core/pages/terms.html:34
+msgid "Delivery and returns"
+msgstr "ডেলিভারি ও রিটার্ন"
+
+#: core/templates/core/pages/terms.html:35
+msgid "See the"
+msgstr "দেখুন"
+
+#: core/templates/core/pages/terms.html:35
+msgid "delivery policy"
+msgstr "ডেলিভারি নীতি"
+
+#: core/templates/core/pages/terms.html:35
+msgid "and the"
+msgstr "এবং"
+
+#: core/templates/core/pages/terms.html:35
+msgid "return and refund policy"
+msgstr "রিটার্ন ও রিফান্ড নীতি"
+
+#: core/templates/core/pages/terms.html:37
+msgid "Law"
+msgstr "আইন"
+
+#: core/templates/core/pages/terms.html:38
+msgid ""
+"These terms are governed by the laws of Bangladesh, including the Consumer "
+"Rights Protection Act 2009 and the Digital Commerce Operation Guidelines "
+"2021."
+msgstr ""
+"এই শর্তগুলো বাংলাদেশের আইন অনুযায়ী, যার মধ্যে আছে ভোক্তা-অধিকার সংরক্ষণ আইন"
+" ২০০৯ এবং ডিজিটাল কমার্স পরিচালনা নির্দেশিকা ২০২১।"
+
+#: orders/forms.py:61
+#, python-brace-format
+msgid "Wrapped with a card, +৳{price}"
+msgstr "কার্ডসহ র‍্যাপ করা, +৳{price}"
+
+#: orders/forms.py:100
+#, python-brace-format
+msgid "Photo must be smaller than {mb} MB."
+msgstr "ছবি {mb} MB-এর চেয়ে ছোট হতে হবে।"
+
+#: orders/models.py:52
+msgid "This coupon belongs to another account."
+msgstr "এই কুপনটি অন্য অ্যাকাউন্টের।"
+
+#: orders/models.py:54
+msgid "This coupon is no longer active."
+msgstr "এই কুপনটি আর চালু নেই।"
+
+#: orders/models.py:56
+msgid "This coupon is not active yet."
+msgstr "এই কুপনটি এখনো চালু হয়নি।"
+
+#: orders/models.py:58
+msgid "This coupon has expired."
+msgstr "এই কুপনের মেয়াদ শেষ।"
+
+#: orders/models.py:60
+msgid "This coupon has reached its usage limit."
+msgstr "এই কুপনের ব্যবহারের সীমা শেষ।"
+
+#: orders/models.py:62
+#, python-brace-format
+msgid "Minimum order amount for this coupon is ৳{amount}."
+msgstr "এই কুপনের জন্য সর্বনিম্ন অর্ডার ৳{amount}।"
+
+#: orders/models.py:113
+msgid "Pending"
+msgstr "অপেক্ষমাণ"
+
+#: orders/models.py:114
+msgid "Confirmed"
+msgstr "কনফার্মড"
+
+#: orders/models.py:115
+msgid "Shipped"
+msgstr "শিপ হয়েছে"
+
+#: orders/models.py:116
+msgid "Delivered"
+msgstr "ডেলিভারি হয়েছে"
+
+#: orders/models.py:117
+msgid "Cancelled"
+msgstr "বাতিল"
+
+#: orders/models.py:121
+msgid "Online Payment (bKash, Nagad, Card)"
+msgstr "অনলাইন পেমেন্ট (bKash, Nagad, কার্ড)"
+
+#: orders/models.py:128
+msgid "Card"
+msgstr "কার্ড"
+
+#: orders/models.py:129
+msgid "Internet banking"
+msgstr "ইন্টারনেট ব্যাংকিং"
+
+#: orders/models.py:132
+msgid "Unpaid"
+msgstr "অপরিশোধিত"
+
+#: orders/models.py:133 orders/templates/orders/_status_badge.html:3
+msgid "Paid"
+msgstr "পরিশোধিত"
+
+#: orders/models.py:134
+msgid "Failed"
+msgstr "ব্যর্থ"
+
+#: orders/models.py:219
+#, python-brace-format
+msgid "Online: {method}"
+msgstr "অনলাইন: {method}"
+
+#: orders/models.py:220
+msgid "Online payment"
+msgstr "অনলাইন পেমেন্ট"
+
+#: orders/models.py:297
+msgid "Item arrived damaged"
+msgstr "পণ্য ভাঙা অবস্থায় এসেছে"
+
+#: orders/models.py:298
+msgid "Wrong item delivered"
+msgstr "ভুল পণ্য এসেছে"
+
+#: orders/models.py:299
+msgid "Not as described"
+msgstr "বর্ণনার সাথে মেলে না"
+
+#: orders/models.py:300
+msgid "Size or fit problem"
+msgstr "সাইজ বা ফিটিং সমস্যা"
+
+#: orders/models.py:301
+msgid "Other"
+msgstr "অন্যান্য"
+
+#: orders/models.py:304
+msgid "Pending review"
+msgstr "যাচাই চলছে"
+
+#: orders/models.py:305
+msgid "Approved"
+msgstr "অনুমোদিত"
+
+#: orders/models.py:306
+msgid "Rejected"
+msgstr "প্রত্যাখ্যাত"
+
+#: orders/models.py:307
+msgid "Refunded"
+msgstr "রিফান্ড হয়েছে"
+
+#: orders/services.py:69 orders/views.py:135
+msgid "Your cart is empty."
+msgstr "আপনার কার্ট খালি।"
+
+#: orders/services.py:87
+msgid ""
+"A product in your cart is no longer available. Please review your cart."
+msgstr "আপনার কার্টের একটি পণ্য আর পাওয়া যাচ্ছে না। কার্টটি দেখে নিন।"
+
+#: orders/services.py:89
+#, python-brace-format
+msgid "Please choose an option for \"{name}\" in your cart."
+msgstr "কার্টে \"{name}\"-এর একটি অপশন বেছে নিন।"
+
+#: orders/services.py:95
+#, python-brace-format
+msgid "Only {stock} of \"{name}\" left in stock. Please update your cart."
+msgstr "\"{name}\" স্টকে মাত্র {stock}টি আছে। কার্ট আপডেট করুন।"
+
+#: orders/services.py:114
+#, python-brace-format
+msgid "Coupon \"{code}\" can no longer be used: {reason}"
+msgstr "কুপন \"{code}\" আর ব্যবহার করা যাবে না: {reason}"
+
+#: orders/services.py:175
+msgid "This order can no longer be cancelled."
+msgstr "এই অর্ডার আর বাতিল করা যাবে না।"
+
+#: orders/templates/orders/_order_items.html:4
+#: products/templates/products/compare.html:22
+msgid "Product"
+msgstr "পণ্য"
+
+#: orders/templates/orders/_order_items.html:4
+msgid "Qty"
+msgstr "পরিমাণ"
+
+#: orders/templates/orders/_order_items.html:4
+#: products/templates/products/compare.html:33
+msgid "Price"
+msgstr "দাম"
+
+#: orders/templates/orders/_order_items.html:22
+#, python-format
+msgid "Reward points (%(points)s)"
+msgstr "রিওয়ার্ড পয়েন্ট (%(points)s)"
+
+#: orders/templates/orders/_order_items.html:23
+#: orders/templates/orders/checkout.html:129
+msgid "Gift wrap"
+msgstr "গিফট র‍্যাপ"
+
+#: orders/templates/orders/_order_items.html:24
+msgid "Free"
+msgstr "ফ্রি"
+
+#: orders/templates/orders/_status_badge.html:3
+msgid "Payment failed"
+msgstr "পেমেন্ট ব্যর্থ"
+
+#: orders/templates/orders/checkout.html:19
+msgid "Have an account? Log in to earn reward points and save addresses."
+msgstr "অ্যাকাউন্ট আছে? লগইন করে রিওয়ার্ড পয়েন্ট পান ও ঠিকানা সেভ করুন।"
+
+#: orders/templates/orders/checkout.html:20
+#: products/templates/products/product_detail.html:140
+#: templates/account/login.html:30 templates/account/signup.html:11
+#: templates/base.html:126 templates/base.html:151 templates/base.html:200
+msgid "Log in"
+msgstr "লগইন"
+
+#: orders/templates/orders/checkout.html:29
+#: orders/templates/orders/order_detail.html:44
+msgid "Delivery address"
+msgstr "ডেলিভারি ঠিকানা"
+
+#: orders/templates/orders/checkout.html:36
+msgid "Division"
+msgstr "বিভাগ"
+
+#: orders/templates/orders/checkout.html:38
+msgid "All divisions"
+msgstr "সব বিভাগ"
+
+#: orders/templates/orders/checkout.html:40
+msgid "Narrows down the districts."
+msgstr "জেলার তালিকা ছোট করে।"
+
+#: orders/templates/orders/checkout.html:62
+msgid "Extras"
+msgstr "অতিরিক্ত"
+
+#: orders/templates/orders/checkout.html:65
+msgid "Gift wrap this order"
+msgstr "এই অর্ডার গিফট র‍্যাপ করুন"
+
+#: orders/templates/orders/checkout.html:65
+#, python-format
+msgid "(+%(price)s, wrapped with a card)"
+msgstr "(+%(price)s, কার্ডসহ র‍্যাপ)"
+
+#: orders/templates/orders/checkout.html:71
+#, python-format
+msgid "Use %(points)s reward points for <strong>%(amount)s</strong> off"
+msgstr ""
+"%(points)s রিওয়ার্ড পয়েন্ট দিয়ে <strong>%(amount)s</strong> ছাড় নিন"
+
+#: orders/templates/orders/checkout.html:72
+#, python-format
+msgid "(you have %(points)s)"
+msgstr "(আপনার আছে %(points)s)"
+
+#: orders/templates/orders/checkout.html:76
+#, python-format
+msgid "You have %(points)s reward points. Collect 100 to get ৳50 off."
+msgstr ""
+"আপনার %(points)s রিওয়ার্ড পয়েন্ট আছে। ১০০ পয়েন্ট হলে ৳৫০ ছাড় পাবেন।"
+
+#: orders/templates/orders/checkout.html:81
+msgid "Payment method"
+msgstr "পেমেন্ট পদ্ধতি"
+
+#: orders/templates/orders/checkout.html:94
+msgid "Pay in cash when your order arrives."
+msgstr "অর্ডার হাতে পেয়ে নগদে টাকা দিন।"
+
+#: orders/templates/orders/checkout.html:96
+msgid "Pay from your bank account"
+msgstr "ব্যাংক অ্যাকাউন্ট থেকে পেমেন্ট"
+
+#: orders/templates/orders/checkout.html:97
+msgid "Upay, Tap and more"
+msgstr "Upay, Tap ও আরও"
+
+#: orders/templates/orders/checkout.html:98
+#, python-format
+msgid "Pay from your %(method)s account"
+msgstr "আপনার %(method)s অ্যাকাউন্ট থেকে পেমেন্ট"
+
+#: orders/templates/orders/checkout.html:106
+msgid ""
+"Online payments are processed securely by SSLCommerz. We never see your PIN "
+"or card number."
+msgstr ""
+"অনলাইন পেমেন্ট নিরাপদে SSLCommerz-এর মাধ্যমে হয়। আমরা আপনার পিন বা কার্ড "
+"নম্বর দেখি না।"
+
+#: orders/templates/orders/checkout.html:113
+msgid "Your order"
+msgstr "আপনার অর্ডার"
+
+#: orders/templates/orders/checkout.html:126
+#, python-format
+msgid "Discount (%(code)s)"
+msgstr "ছাড় (%(code)s)"
+
+#: orders/templates/orders/checkout.html:130
+msgid "Select district"
+msgstr "জেলা বেছে নিন"
+
+#: orders/templates/orders/checkout.html:136
+#, python-format
+msgid "Free delivery on orders over %(amount)s."
+msgstr "%(amount)s-এর বেশি অর্ডারে ফ্রি ডেলিভারি।"
+
+#: orders/templates/orders/checkout.html:137
+msgid "Place order"
+msgstr "অর্ডার করুন"
+
+#: orders/templates/orders/checkout.html:138
+msgid "Back to cart"
+msgstr "কার্টে ফিরুন"
+
+#: orders/templates/orders/checkout_verify.html:4
+msgid "Confirm your number | SmartCart BD"
+msgstr "নম্বর নিশ্চিত করুন | SmartCart BD"
+
+#: orders/templates/orders/checkout_verify.html:10
+msgid "Confirm your mobile number"
+msgstr "মোবাইল নম্বর নিশ্চিত করুন"
+
+#: orders/templates/orders/checkout_verify.html:11
+msgid "We sent a 6-digit code to"
+msgstr "৬ সংখ্যার একটি কোড পাঠিয়েছি"
+
+#: orders/templates/orders/checkout_verify.html:11
+msgid ". Enter it to place your Cash on Delivery order."
+msgstr " নম্বরে। ক্যাশ অন ডেলিভারি অর্ডার করতে কোডটি লিখুন।"
+
+#: orders/templates/orders/checkout_verify.html:15
+msgid "6-digit code"
+msgstr "৬ সংখ্যার কোড"
+
+#: orders/templates/orders/checkout_verify.html:16
+msgid "Confirm and place order"
+msgstr "নিশ্চিত করে অর্ডার করুন"
+
+#: orders/templates/orders/checkout_verify.html:20
+msgid "Send a new code"
+msgstr "নতুন কোড পাঠান"
+
+#: orders/templates/orders/checkout_verify.html:22
+msgid "Change details"
+msgstr "তথ্য বদলান"
+
+#: orders/templates/orders/order_detail.html:5
+#: orders/templates/orders/return_request.html:8
+#, python-format
+msgid "Order %(number)s"
+msgstr "অর্ডার %(number)s"
+
+#: orders/templates/orders/order_detail.html:12
+#: orders/templates/orders/track.html:34
+msgid "Order"
+msgstr "অর্ডার"
+
+#: orders/templates/orders/order_detail.html:13
+#: orders/templates/orders/track.html:35
+#, python-format
+msgid "Placed on %(when)s"
+msgstr "অর্ডারের সময়: %(when)s"
+
+#: orders/templates/orders/order_detail.html:20
+#: orders/templates/orders/track.html:40
+msgid "This order was cancelled."
+msgstr "এই অর্ডারটি বাতিল হয়েছে।"
+
+#: orders/templates/orders/order_detail.html:21
+#, python-format
+msgid ""
+"Your payment was received after the order was cancelled. We will refund "
+"%(amount)s to you."
+msgstr "অর্ডার বাতিলের পর আপনার পেমেন্ট এসেছে। আমরা %(amount)s ফেরত দেব।"
+
+#: orders/templates/orders/order_detail.html:38
+msgid "Items"
+msgstr "পণ্য"
+
+#: orders/templates/orders/order_detail.html:46
+#, python-format
+msgid "Delivery in %(time)s"
+msgstr "%(time)s-এর মধ্যে ডেলিভারি"
+
+#: orders/templates/orders/order_detail.html:47
+#: orders/templates/orders/track.html:50
+msgid "the courier"
+msgstr "কুরিয়ার"
+
+#: orders/templates/orders/order_detail.html:47
+#: orders/templates/orders/track.html:50
+#, python-format
+msgid "Track with %(courier)s"
+msgstr "%(courier)s-এ ট্র্যাক করুন"
+
+#: orders/templates/orders/order_detail.html:48
+msgid "Gift wrapped"
+msgstr "গিফট র‍্যাপ করা"
+
+#: orders/templates/orders/order_detail.html:49
+msgid "Note"
+msgstr "নোট"
+
+#: orders/templates/orders/order_detail.html:53
+msgid "Status:"
+msgstr "স্ট্যাটাস:"
+
+#: orders/templates/orders/order_detail.html:57
+#, python-format
+msgid "Pay %(amount)s now"
+msgstr "এখনই %(amount)s পেমেন্ট করুন"
+
+#: orders/templates/orders/order_detail.html:60
+msgid "Download invoice (PDF)"
+msgstr "ইনভয়েস ডাউনলোড (PDF)"
+
+#: orders/templates/orders/order_detail.html:61
+#, python-format
+msgid "You earned %(points)s reward points."
+msgstr "আপনি %(points)s রিওয়ার্ড পয়েন্ট পেয়েছেন।"
+
+#: orders/templates/orders/order_detail.html:64
+msgid "Return request:"
+msgstr "রিটার্নের অনুরোধ:"
+
+#: orders/templates/orders/order_detail.html:68
+#: orders/templates/orders/return_request.html:10
+msgid "Request a return"
+msgstr "রিটার্নের অনুরোধ"
+
+#: orders/templates/orders/order_detail.html:73
+msgid "Cancel order"
+msgstr "অর্ডার বাতিল করুন"
+
+#: orders/templates/orders/order_list.html:5
+msgid "My orders | SmartCart BD"
+msgstr "আমার অর্ডার | SmartCart BD"
+
+#: orders/templates/orders/order_list.html:15
+#, python-format
+msgid "%(n)s item"
+msgid_plural "%(n)s items"
+msgstr[0] "%(n)sটি পণ্য"
+msgstr[1] "%(n)sটি পণ্য"
+
+#: orders/templates/orders/order_success.html:5
+msgid "Order placed | SmartCart BD"
+msgstr "অর্ডার হয়েছে | SmartCart BD"
+
+#: orders/templates/orders/order_success.html:11
+#, python-format
+msgid "Thank you, %(name)s!"
+msgstr "ধন্যবাদ, %(name)s!"
+
+#: orders/templates/orders/order_success.html:12
+msgid "Your order has been placed. A confirmation has been sent to"
+msgstr "আপনার অর্ডার হয়েছে। কনফার্মেশন পাঠানো হয়েছে"
+
+#: orders/templates/orders/order_success.html:14
+#: orders/templates/orders/track.html:17
+msgid "Order number"
+msgstr "অর্ডার নম্বর"
+
+#: orders/templates/orders/order_success.html:19
+msgid "Paid online"
+msgstr "অনলাইনে পরিশোধিত"
+
+#: orders/templates/orders/order_success.html:21
+#, python-format
+msgid "Pay %(amount)s on delivery"
+msgstr "ডেলিভারিতে %(amount)s দিন"
+
+#: orders/templates/orders/order_success.html:27
+msgid "Order details"
+msgstr "অর্ডারের বিস্তারিত"
+
+#: orders/templates/orders/order_success.html:30
+msgid "Delivering to"
+msgstr "ডেলিভারি ঠিকানা"
+
+#: orders/templates/orders/order_success.html:35
+msgid "Track this order"
+msgstr "অর্ডার ট্র্যাক করুন"
+
+#: orders/templates/orders/return_request.html:4
+msgid "Request a return | SmartCart BD"
+msgstr "রিটার্নের অনুরোধ | SmartCart BD"
+
+#: orders/templates/orders/return_request.html:11
+msgid "Tell us what went wrong. A photo helps us decide faster."
+msgstr "কী সমস্যা হয়েছে লিখুন। ছবি দিলে দ্রুত সিদ্ধান্ত নিতে পারি।"
+
+#: orders/templates/orders/return_request.html:16
+msgid "(optional)"
+msgstr "(ঐচ্ছিক)"
+
+#: orders/templates/orders/return_request.html:21
+msgid "Send request"
+msgstr "অনুরোধ পাঠান"
+
+#: orders/templates/orders/track.html:5
+msgid "Track your order | SmartCart BD"
+msgstr "অর্ডার ট্র্যাক করুন | SmartCart BD"
+
+#: orders/templates/orders/track.html:9
+msgid "Track your order"
+msgstr "অর্ডার ট্র্যাক করুন"
+
+#: orders/templates/orders/track.html:10
+msgid ""
+"No account needed. Enter your order number and the phone number you used at "
+"checkout."
+msgstr "অ্যাকাউন্ট লাগবে না। অর্ডার নম্বর ও চেকআউটে দেওয়া ফোন নম্বর লিখুন।"
+
+#: orders/templates/orders/track.html:22
+msgid "Phone"
+msgstr "ফোন"
+
+#: orders/templates/orders/track.html:26
+msgid "Track"
+msgstr "ট্র্যাক করুন"
+
+#: orders/templates/orders/track.html:35
+#, python-format
+msgid "%(shown)s item"
+msgid_plural "%(shown)s items"
+msgstr[0] "%(shown)sটি পণ্য"
+msgstr[1] "%(shown)sটি পণ্য"
+
+#: orders/templates/orders/track.html:51
+#, python-format
+msgid "Expected delivery: %(time)s after confirmation (%(district)s)"
+msgstr "আনুমানিক ডেলিভারি: কনফার্মের পর %(time)s (%(district)s)"
+
+#: orders/views.py:56
+#, python-brace-format
+msgid "{error} You can retry payment from the order page."
+msgstr "{error} অর্ডার পেজ থেকে আবার পেমেন্ট করতে পারেন।"
+
+#: orders/views.py:92
+msgid ""
+"Cash on Delivery isn't available for this number. Please pay online, or "
+"contact us."
+msgstr ""
+"এই নম্বরে ক্যাশ অন ডেলিভারি নেই। অনলাইনে পেমেন্ট করুন অথবা আমাদের সাথে "
+"যোগাযোগ করুন।"
+
+#: orders/views.py:181
+msgid "Too many codes sent. Please wait a few minutes."
+msgstr "অনেক কোড পাঠানো হয়েছে। কয়েক মিনিট অপেক্ষা করুন।"
+
+#: orders/views.py:183
+msgid "A new code is on its way."
+msgstr "নতুন কোড পাঠানো হচ্ছে।"
+
+#: orders/views.py:186
+msgid "We could not send a code right now. Please try again."
+msgstr "এখন কোড পাঠানো গেল না। আবার চেষ্টা করুন।"
+
+#: orders/views.py:192
+msgid "This code has expired. Send a new one."
+msgstr "কোডের মেয়াদ শেষ। নতুন কোড নিন।"
+
+#: orders/views.py:201
+msgid "Please check your details and place the order again."
+msgstr "তথ্য দেখে আবার অর্ডার করুন।"
+
+#: orders/views.py:204
+msgid "That code is not right. Please check the SMS and try again."
+msgstr "কোডটি সঠিক নয়। SMS দেখে আবার চেষ্টা করুন।"
+
+#: orders/views.py:236
+#, python-brace-format
+msgid "Order {number} has been cancelled."
+msgstr "অর্ডার {number} বাতিল হয়েছে।"
+
+#: orders/views.py:248
+msgid "Too many attempts. Please wait a few minutes and try again."
+msgstr "অনেকবার চেষ্টা হয়েছে। কয়েক মিনিট পর আবার চেষ্টা করুন।"
+
+#: orders/views.py:265
+#, python-brace-format
+msgid ""
+"A return can be requested within {days} days of delivery, once per order."
+msgstr ""
+"ডেলিভারির {days} দিনের মধ্যে, প্রতি অর্ডারে একবার রিটার্নের অনুরোধ করা যায়।"
+
+#: orders/views.py:271
+msgid "Return request sent. We will get back to you within 2 working days."
+msgstr "রিটার্নের অনুরোধ পাঠানো হয়েছে। ২ কর্মদিবসের মধ্যে জানাব।"
+
+#: orders/views.py:280
+msgid "This order cannot be paid online."
+msgstr "এই অর্ডারে অনলাইন পেমেন্ট করা যাবে না।"
+
+#: orders/views.py:343
+msgid "Payment failed. Your order is saved. You can try paying again."
+msgstr "পেমেন্ট ব্যর্থ হয়েছে। আপনার অর্ডার সেভ আছে, আবার পেমেন্ট করতে পারেন।"
+
+#: orders/views.py:345
+msgid ""
+"Payment was cancelled. Your order is saved. You can pay later or cancel it."
+msgstr ""
+"পেমেন্ট বাতিল হয়েছে। অর্ডার সেভ আছে, পরে পেমেন্ট করতে বা বাতিল করতে পারেন।"
+
+#: products/filters.py:6
+msgid "Newest"
+msgstr "নতুন আগে"
+
+#: products/filters.py:7
+msgid "Price: Low to High"
+msgstr "দাম: কম থেকে বেশি"
+
+#: products/filters.py:8
+msgid "Price: High to Low"
+msgstr "দাম: বেশি থেকে কম"
+
+#: products/filters.py:9
+#| msgid "Top rated"
+msgid "Top Rated"
+msgstr "সেরা রেটিং"
+
+#: products/templates/products/_buy_box.html:7
+#, python-format
+msgid "Save %(pct)s%%"
+msgstr "%(pct)s%% সাশ্রয়"
+
+#: products/templates/products/_buy_box.html:12 templates/base.html:160
+msgid "Flash sale"
+msgstr "ফ্ল্যাশ সেল"
+
+#: products/templates/products/_buy_box.html:19
+#: products/templates/products/compare.html:38
+#: templates/partials/product_card.html:9
+#: templates/partials/product_card.html:52
+msgid "Out of stock"
+msgstr "স্টকে নেই"
+
+#: products/templates/products/_buy_box.html:21
+#, python-format
+msgid "Only %(n)s left - order soon"
+msgstr "মাত্র %(n)sটি বাকি - তাড়াতাড়ি অর্ডার করুন"
+
+#: products/templates/products/_buy_box.html:23
+#: products/templates/products/compare.html:38
+msgid "In stock"
+msgstr "স্টকে আছে"
+
+#: products/templates/products/_buy_box.html:36
+msgid "Colour"
+msgstr "রং"
+
+#: products/templates/products/_buy_box.html:36
+msgid "Size"
+msgstr "সাইজ"
+
+#: products/templates/products/_buy_box.html:36
+#| msgid "Store"
+msgid "Storage"
+msgstr "স্টোরেজ"
+
+#: products/templates/products/_buy_box.html:36
+msgid "Choose"
+msgstr "বেছে নিন"
+
+#: products/templates/products/_buy_box.html:50
+msgid "Choose an option"
+msgstr "একটি অপশন বেছে নিন"
+
+#: products/templates/products/_buy_box.html:50
+#: templates/partials/product_card.html:52
+msgid "Add to cart"
+msgstr "কার্টে যোগ করুন"
+
+#: products/templates/products/_quick_view.html:14
+msgid "See full details"
+msgstr "সম্পূর্ণ বিস্তারিত দেখুন"
+
+#: products/templates/products/compare.html:5
+msgid "Compare products | SmartCart BD"
+msgstr "পণ্য তুলনা | SmartCart BD"
+
+#: products/templates/products/compare.html:10 templates/base.html:235
+msgid "Compare products"
+msgstr "পণ্য তুলনা"
+
+#: products/templates/products/compare.html:12
+#: products/templates/products/product_list.html:79
+msgid "Clear all"
+msgstr "সব মুছুন"
+
+#: products/templates/products/compare.html:34
+#: products/templates/products/product_list.html:66
+msgid "Brand"
+msgstr "ব্র্যান্ড"
+
+#: products/templates/products/compare.html:35
+#: products/templates/products/product_list.html:51
+msgid "Category"
+msgstr "ক্যাটাগরি"
+
+#: products/templates/products/compare.html:36
+#: products/templates/products/product_detail.html:163
+msgid "Rating"
+msgstr "রেটিং"
+
+#: products/templates/products/compare.html:36
+msgid "No reviews"
+msgstr "রিভিউ নেই"
+
+#: products/templates/products/compare.html:37
+msgid "Sold"
+msgstr "বিক্রি"
+
+#: products/templates/products/compare.html:38
+msgid "Availability"
+msgstr "স্টক"
+
+#: products/templates/products/compare.html:39
+msgid "Options"
+msgstr "অপশন"
+
+#: products/templates/products/compare.html:40
+msgid "Details"
+msgstr "বিস্তারিত"
+
+#: products/templates/products/compare.html:41
+msgid "View &amp; buy"
+msgstr "দেখুন ও কিনুন"
+
+#: products/templates/products/home.html:31
+#: templates/partials/pagination.html:6
+msgid "Previous"
+msgstr "আগের"
+
+#: products/templates/products/home.html:32
+#: templates/partials/pagination.html:20
+msgid "Next"
+msgstr "পরের"
+
+#: products/templates/products/home.html:39
+msgid "Cash on Delivery · All 64 districts"
+msgstr "ক্যাশ অন ডেলিভারি · ৬৪ জেলায়"
+
+#: products/templates/products/home.html:40
+msgid "Smart shopping,"
+msgstr "স্মার্ট কেনাকাটা,"
+
+#: products/templates/products/home.html:40
+msgid "delivered to your door."
+msgstr "পৌঁছে যাবে আপনার দরজায়।"
+
+#: products/templates/products/home.html:41
+msgid "Genuine products, honest prices. Free delivery on orders over ৳2,000."
+msgstr "আসল পণ্য, ন্যায্য দাম। ৳২,০০০-এর বেশি অর্ডারে ফ্রি ডেলিভারি।"
+
+#: products/templates/products/home.html:42
+msgid "Shop now"
+msgstr "এখনই কিনুন"
+
+#: products/templates/products/home.html:60
+msgid "Nationwide delivery"
+msgstr "সারাদেশে ডেলিভারি"
+
+#: products/templates/products/home.html:62
+msgid "Secure payment"
+msgstr "নিরাপদ পেমেন্ট"
+
+#: products/templates/products/home.html:63
+msgid "Easy returns"
+msgstr "সহজ রিটার্ন"
+
+#: products/templates/products/home.html:81
+msgid "Hot deals"
+msgstr "হট ডিল"
+
+#: products/templates/products/home.html:82 templates/base.html:87
+msgid "See all"
+msgstr "সব দেখুন"
+
+#: products/templates/products/home.html:92
+msgid "Featured products"
+msgstr "বাছাই করা পণ্য"
+
+#: products/templates/products/home.html:101
+msgid "No products yet. Add some from the admin panel."
+msgstr "এখনো কোনো পণ্য নেই।"
+
+#: products/templates/products/home.html:109
+msgid "New arrivals"
+msgstr "নতুন এসেছে"
+
+#: products/templates/products/product_detail.html:23
+msgid "Product image. Hover to zoom."
+msgstr "পণ্যের ছবি। জুম করতে মাউস রাখুন।"
+
+#: products/templates/products/product_detail.html:42
+msgid "Brand:"
+msgstr "ব্র্যান্ড:"
+
+#: products/templates/products/product_detail.html:50
+msgid "No reviews yet"
+msgstr "এখনো রিভিউ নেই"
+
+#: products/templates/products/product_detail.html:60
+msgid "In wishlist"
+msgstr "উইশলিস্টে আছে"
+
+#: products/templates/products/product_detail.html:60
+msgid "Add to wishlist"
+msgstr "উইশলিস্টে যোগ করুন"
+
+#: products/templates/products/product_detail.html:64
+msgid "Price alert on"
+msgstr "প্রাইস অ্যালার্ট চালু"
+
+#: products/templates/products/product_detail.html:64
+msgid "Notify me if price drops"
+msgstr "দাম কমলে জানাবেন"
+
+#: products/templates/products/product_detail.html:67
+msgid "Log in to save or get price alerts"
+msgstr "সেভ করতে বা প্রাইস অ্যালার্ট পেতে লগইন করুন"
+
+#: products/templates/products/product_detail.html:70
+msgid "In compare"
+msgstr "তুলনায় আছে"
+
+#: products/templates/products/product_detail.html:70 templates/base.html:163
+msgid "Compare"
+msgstr "তুলনা করুন"
+
+#: products/templates/products/product_detail.html:75
+msgid "Share:"
+msgstr "শেয়ার:"
+
+#: products/templates/products/product_detail.html:77
+msgid "Share on Facebook"
+msgstr "Facebook-এ শেয়ার করুন"
+
+#: products/templates/products/product_detail.html:78
+msgid "Share on WhatsApp"
+msgstr "WhatsApp-এ শেয়ার করুন"
+
+#: products/templates/products/product_detail.html:84
+msgid "Delivery in 1-2 days inside Dhaka, 3-5 days elsewhere"
+msgstr "ঢাকায় ১-২ দিনে, অন্যত্র ৩-৫ দিনে ডেলিভারি"
+
+#: products/templates/products/product_detail.html:85
+msgid "Cash on Delivery available"
+msgstr "ক্যাশ অন ডেলিভারি আছে"
+
+#: products/templates/products/product_detail.html:86
+msgid "Easy returns within 7 days of delivery"
+msgstr "ডেলিভারির ৭ দিনের মধ্যে সহজ রিটার্ন"
+
+#: products/templates/products/product_detail.html:96
+#, python-format
+msgid "Save %(amount)s"
+msgstr "%(amount)s সাশ্রয়"
+
+#: products/templates/products/product_detail.html:108
+msgid "Bundle price"
+msgstr "বান্ডেল দাম"
+
+#: products/templates/products/product_detail.html:110
+msgid "Add all items to your cart and the discount applies automatically."
+msgstr "সব পণ্য কার্টে যোগ করলে ছাড় নিজে থেকেই প্রয়োগ হবে।"
+
+#: products/templates/products/product_detail.html:117
+msgid "Description"
+msgstr "বিবরণ"
+
+#: products/templates/products/product_detail.html:123
+msgid "Frequently bought together"
+msgstr "একসাথে প্রায়ই কেনা হয়"
+
+#: products/templates/products/product_detail.html:131
+msgid "Questions &amp; answers"
+msgstr "প্রশ্ন ও উত্তর"
+
+#: products/templates/products/product_detail.html:135
+msgid "Have a question about this product?"
+msgstr "এই পণ্য নিয়ে প্রশ্ন আছে?"
+
+#: products/templates/products/product_detail.html:137
+msgid "Ask"
+msgstr "জিজ্ঞাসা করুন"
+
+#: products/templates/products/product_detail.html:140
+msgid "to ask a question."
+msgstr "করে প্রশ্ন করুন।"
+
+#: products/templates/products/product_detail.html:148
+msgid "Waiting for an answer. We'll notify you."
+msgstr "উত্তরের অপেক্ষায়। আমরা জানিয়ে দেব।"
+
+#: products/templates/products/product_detail.html:152
+msgid "No questions yet. Be the first to ask!"
+msgstr "এখনো কোনো প্রশ্ন নেই। প্রথম প্রশ্নটি আপনিই করুন!"
+
+#: products/templates/products/product_detail.html:157
+msgid "Ratings &amp; reviews"
+msgstr "রেটিং ও রিভিউ"
+
+#: products/templates/products/product_detail.html:161
+msgid "Update your review"
+msgstr "আপনার রিভিউ আপডেট করুন"
+
+#: products/templates/products/product_detail.html:161
+msgid "Write a review"
+msgstr "রিভিউ লিখুন"
+
+#: products/templates/products/product_detail.html:164
+msgid "Review"
+msgstr "রিভিউ"
+
+#: products/templates/products/product_detail.html:166
+msgid "Add up to 3 photos (optional)"
+msgstr "৩টি পর্যন্ত ছবি দিন (ঐচ্ছিক)"
+
+#: products/templates/products/product_detail.html:170
+msgid "Submit review"
+msgstr "রিভিউ জমা দিন"
+
+#: products/templates/products/product_detail.html:173
+msgid "You can review this product once it's been delivered to you."
+msgstr "পণ্যটি ডেলিভারি পাওয়ার পর রিভিউ দিতে পারবেন।"
+
+#: products/templates/products/product_detail.html:190
+msgid "Verified purchase"
+msgstr "যাচাইকৃত ক্রেতা"
+
+#: products/templates/products/product_detail.html:193
+msgid "No reviews yet."
+msgstr "এখনো রিভিউ নেই।"
+
+#: products/templates/products/product_detail.html:199
+msgid "You may also like"
+msgstr "আপনার পছন্দ হতে পারে"
+
+#: products/templates/products/product_list.html:5
+#, python-format
+msgid "Search: %(q)s"
+msgstr "সার্চ: %(q)s"
+
+#: products/templates/products/product_list.html:5
+#: products/templates/products/product_list.html:13
+#: products/templates/products/product_list.html:16 templates/base.html:157
+msgid "Shop"
+msgstr "শপ"
+
+#: products/templates/products/product_list.html:23
+#, python-format
+msgid "Results for \"%(q)s\""
+msgstr "\"%(q)s\"-এর ফলাফল"
+
+#: products/templates/products/product_list.html:23 templates/base.html:159
+msgid "All products"
+msgstr "সব পণ্য"
+
+#: products/templates/products/product_list.html:24
+#, python-format
+msgid "%(shown)s product"
+msgid_plural "%(shown)s products"
+msgstr[0] "%(shown)sটি পণ্য"
+msgstr[1] "%(shown)sটি পণ্য"
+
+#: products/templates/products/product_list.html:27
+#: products/templates/products/product_list.html:43
+msgid "Filters"
+msgstr "ফিল্টার"
+
+#: products/templates/products/product_list.html:30
+msgid "Sort by"
+msgstr "সাজান"
+
+#: products/templates/products/product_list.html:44 templates/base.html:146
+#: templates/base.html:279 templates/base.html:291 templates/base.html:314
+msgid "Close"
+msgstr "বন্ধ করুন"
+
+#: products/templates/products/product_list.html:53
+msgid "All categories"
+msgstr "সব ক্যাটাগরি"
+
+#: products/templates/products/product_list.html:59
+msgid "Price (৳)"
+msgstr "দাম (৳)"
+
+#: products/templates/products/product_list.html:61
+msgid "Min"
+msgstr "সর্বনিম্ন"
+
+#: products/templates/products/product_list.html:62
+msgid "Max"
+msgstr "সর্বোচ্চ"
+
+#: products/templates/products/product_list.html:68
+msgid "All brands"
+msgstr "সব ব্র্যান্ড"
+
+#: products/templates/products/product_list.html:75
+msgid "In stock only"
+msgstr "শুধু স্টকে আছে এমন"
+
+#: products/templates/products/product_list.html:78
+msgid "Apply filters"
+msgstr "ফিল্টার প্রয়োগ করুন"
+
+#: products/templatetags/shop_tags.py:126
+#, python-brace-format
+msgid "{low}-{high} days"
+msgstr "{low}-{high} দিন"
+
+#: products/templatetags/shop_tags.py:128
+#, python-brace-format
+msgid "{n} day"
+msgid_plural "{n} days"
+msgstr[0] "{n} দিন"
+msgstr[1] "{n} দিন"
+
+#: products/views.py:199
+#, python-brace-format
+msgid "You can compare up to {n} products, so the oldest one was removed."
+msgstr ""
+"সর্বোচ্চ {n}টি পণ্য তুলনা করা যায়, তাই সবচেয়ে পুরোনোটি সরানো হয়েছে।"
+
+#: products/views.py:237
+msgid "We'll let you know when the price drops."
+msgstr "দাম কমলে আমরা জানিয়ে দেব।"
+
+#: products/views.py:237
+msgid "Price alert removed."
+msgstr "প্রাইস অ্যালার্ট বন্ধ করা হয়েছে।"
+
+#: products/views.py:249
+msgid "You have asked a lot of questions recently. Please try again later."
+msgstr "সম্প্রতি অনেক প্রশ্ন করেছেন। পরে আবার চেষ্টা করুন।"
+
+#: products/views.py:254
+msgid "Thanks! Your question was sent. We usually answer within a day."
+msgstr "ধন্যবাদ! প্রশ্ন পাঠানো হয়েছে। সাধারণত এক দিনের মধ্যে উত্তর দিই।"
+
+#: products/views.py:271
+msgid "You can review a product after it has been delivered to you."
+msgstr "পণ্য ডেলিভারি পাওয়ার পর রিভিউ দিতে পারবেন।"
+
+#: products/views.py:280
+#, python-brace-format
+msgid "You can add up to {n} photos."
+msgstr "সর্বোচ্চ {n}টি ছবি দেওয়া যায়।"
+
+#: products/views.py:283
+msgid "Each photo must be smaller than 5 MB."
+msgstr "প্রতিটি ছবি ৫ MB-এর চেয়ে ছোট হতে হবে।"
+
+#: products/views.py:298
+msgid "Thanks! Your review has been saved."
+msgstr "ধন্যবাদ! আপনার রিভিউ সেভ হয়েছে।"
+
+#: products/views.py:300
+msgid "Please choose a rating between 1 and 5."
+msgstr "১ থেকে ৫-এর মধ্যে রেটিং দিন।"
+
+#: templates/400.html:4
+msgid "Bad request | SmartCart BD"
+msgstr "ভুল অনুরোধ | SmartCart BD"
+
+#: templates/403.html:4
+msgid "Access denied | SmartCart BD"
+msgstr "প্রবেশ নিষেধ | SmartCart BD"
+
+#: templates/404.html:4
+msgid "Page not found | SmartCart BD"
+msgstr "পেজ পাওয়া যায়নি | SmartCart BD"
+
+#: templates/500.html:4
+msgid "Something went wrong | SmartCart BD"
+msgstr "কিছু একটা সমস্যা হয়েছে | SmartCart BD"
+
+#: templates/account/_auth_field.html:8
+msgid "Show password"
+msgstr "পাসওয়ার্ড দেখুন"
+
+#: templates/account/_auth_side.html:4
+msgid "Why create an account?"
+msgstr "কেন অ্যাকাউন্ট খুলবেন?"
+
+#: templates/account/_auth_side.html:5
+msgid "Free, takes a minute, and you can still check out as a guest."
+msgstr "ফ্রি, এক মিনিট লাগে, আর অ্যাকাউন্ট ছাড়াও অর্ডার করা যায়।"
+
+#: templates/account/_auth_side.html:7
+msgid "Track every order"
+msgstr "প্রতিটি অর্ডার ট্র্যাক করুন"
+
+#: templates/account/_auth_side.html:7
+msgid "Live status, invoices and easy returns."
+msgstr "লাইভ স্ট্যাটাস, ইনভয়েস ও সহজ রিটার্ন।"
+
+#: templates/account/_auth_side.html:8
+msgid "Earn reward points"
+msgstr "রিওয়ার্ড পয়েন্ট পান"
+
+#: templates/account/_auth_side.html:8
+msgid "1 point per ৳100. Spend them on later orders."
+msgstr "প্রতি ৳১০০-তে ১ পয়েন্ট। পরের অর্ডারে খরচ করুন।"
+
+#: templates/account/_auth_side.html:9
+msgid "Faster checkout"
+msgstr "দ্রুত চেকআউট"
+
+#: templates/account/_auth_side.html:9
+msgid "Your addresses are saved."
+msgstr "আপনার ঠিকানা সেভ থাকে।"
+
+#: templates/account/_auth_side.html:10
+msgid "Wishlist &amp; price alerts"
+msgstr "উইশলিস্ট ও প্রাইস অ্যালার্ট"
+
+#: templates/account/_auth_side.html:10
+msgid "Get told when a price drops."
+msgstr "দাম কমলে খবর পান।"
+
+#: templates/account/_auth_side.html:12
+msgid "Your password is stored encrypted. We never share your number."
+msgstr ""
+"আপনার পাসওয়ার্ড এনক্রিপ্ট করে রাখা হয়। আমরা আপনার নম্বর কাউকে দিই না।"
+
+#: templates/account/_social.html:4
+msgid "or"
+msgstr "অথবা"
+
+#: templates/account/_social.html:6
+#, python-format
+msgid "Continue with %(name)s"
+msgstr "%(name)s দিয়ে চালিয়ে যান"
+
+#: templates/account/lockout.html:4
+msgid "Too many attempts | SmartCart BD"
+msgstr "অনেকবার চেষ্টা | SmartCart BD"
+
+#: templates/account/login.html:4
+msgid "Log in | SmartCart BD"
+msgstr "লগইন | SmartCart BD"
+
+#: templates/account/login.html:10
+msgid "Welcome back"
+msgstr "আবার স্বাগতম"
+
+#: templates/account/login.html:11
+msgid "Log in with your email or mobile number."
+msgstr "ইমেইল বা মোবাইল নম্বর দিয়ে লগইন করুন।"
+
+#: templates/account/login.html:15
+msgid "Just looking around?"
+msgstr "শুধু ঘুরে দেখছেন?"
+
+#: templates/account/login.html:15
+msgid "Try the demo account."
+msgstr "ডেমো অ্যাকাউন্ট দিয়ে দেখুন।"
+
+#: templates/account/login.html:16
+msgid "Fill demo login"
+msgstr "ডেমো লগইন বসান"
+
+#: templates/account/login.html:27
+msgid "Forgot password?"
+msgstr "পাসওয়ার্ড ভুলে গেছেন?"
+
+#: templates/account/login.html:33
+msgid "New to SmartCart BD?"
+msgstr "SmartCart BD-তে নতুন?"
+
+#: templates/account/login.html:33
+msgid "Create an account"
+msgstr "অ্যাকাউন্ট খুলুন"
+
+#: templates/account/signup.html:4
+msgid "Create account | SmartCart BD"
+msgstr "অ্যাকাউন্ট খুলুন | SmartCart BD"
+
+#: templates/account/signup.html:10
+msgid "Create your account"
+msgstr "আপনার অ্যাকাউন্ট খুলুন"
+
+#: templates/account/signup.html:11
+msgid "Already have one?"
+msgstr "আগে থেকেই অ্যাকাউন্ট আছে?"
+
+#: templates/account/signup.html:24
+msgid "Have a referral code?"
+msgstr "রেফারেল কোড আছে?"
+
+#: templates/account/signup.html:30 templates/base.html:152
+msgid "Create account"
+msgstr "অ্যাকাউন্ট খুলুন"
+
+#: templates/account/signup.html:31
+msgid "By creating an account you agree to our"
+msgstr "অ্যাকাউন্ট খুলে আপনি আমাদের"
+
+#: templates/account/signup.html:31 templates/base.html:246
+msgid "Terms"
+msgstr "শর্তাবলি"
+
+#: templates/account/signup.html:31
+msgid "and"
+msgstr "ও"
+
+#: templates/account/signup.html:31
+msgid "Privacy policy"
+msgstr "গোপনীয়তা নীতিতে সম্মত হচ্ছেন"
+
+#: templates/base.html:6
+msgid "SmartCart BD - Smart Online Shopping"
+msgstr "SmartCart BD - স্মার্ট অনলাইন শপিং"
+
+#: templates/base.html:31
+msgid "Skip to content"
+msgstr "মূল অংশে যান"
+
+#: templates/base.html:46
+msgid "Top"
+msgstr "উপরে"
+
+#: templates/base.html:48
+msgid "Open menu"
+msgstr "মেনু খুলুন"
+
+#: templates/base.html:55
+msgid "Search products, brands, categories..."
+msgstr "পণ্য, ব্র্যান্ড, ক্যাটাগরি খুঁজুন..."
+
+#: templates/base.html:55 templates/base.html:56 templates/base.html:132
+#: templates/base.html:133
+msgid "Search"
+msgstr "খুঁজুন"
+
+#: templates/base.html:63
+msgid "Toggle dark mode"
+msgstr "ডার্ক মোড চালু/বন্ধ"
+
+#: templates/base.html:63
+msgid "Dark mode"
+msgstr "ডার্ক মোড"
+
+#: templates/base.html:76
+msgid "Mark all read"
+msgstr "সব পড়া হয়েছে"
+
+#: templates/base.html:82
+#, python-format
+msgid "%(when)s ago"
+msgstr "%(when)s আগে"
+
+#: templates/base.html:85
+msgid "No notifications yet"
+msgstr "এখনো কোনো নোটিফিকেশন নেই"
+
+#: templates/base.html:94 templates/base.html:95 templates/base.html:167
+msgid "Cart"
+msgstr "কার্ট"
+
+#: templates/base.html:99 templates/base.html:113 templates/base.html:191
+msgid "Store panel"
+msgstr "স্টোর প্যানেল"
+
+#: templates/base.html:99 templates/base.html:112 templates/base.html:190
+msgid "Store"
+msgstr "স্টোর"
+
+#: templates/base.html:103
+msgid "Account"
+msgstr "অ্যাকাউন্ট"
+
+#: templates/base.html:114 templates/base.html:192
+msgid "Admin panel"
+msgstr "অ্যাডমিন প্যানেল"
+
+#: templates/base.html:120 templates/base.html:196
+msgid "Log out"
+msgstr "লগআউট"
+
+#: templates/base.html:132
+msgid "Search products..."
+msgstr "পণ্য খুঁজুন..."
+
+#: templates/base.html:156
+msgid "Main"
+msgstr "মূল"
+
+#: templates/base.html:161
+msgid "Top rated"
+msgstr "সেরা রেটিং"
+
+#: templates/base.html:172
+msgid "Categories"
+msgstr "ক্যাটাগরি"
+
+#: templates/base.html:182
+msgid "Profile &amp; rewards"
+msgstr "প্রোফাইল ও রিওয়ার্ড"
+
+#: templates/base.html:201
+msgid "Sign up"
+msgstr "সাইন আপ"
+
+#: templates/base.html:203
+msgid "Track an order"
+msgstr "অর্ডার ট্র্যাক করুন"
+
+#: templates/base.html:208
+msgid "All 64 districts"
+msgstr "৬৪ জেলায়"
+
+#: templates/base.html:211
+msgid "Dark / light mode"
+msgstr "ডার্ক / লাইট মোড"
+
+#: templates/base.html:229
+msgid ""
+"Smart online shopping for Bangladesh. Genuine products, fair prices and Cash"
+" on Delivery across all 64 districts."
+msgstr ""
+"বাংলাদেশের জন্য স্মার্ট অনলাইন শপিং। আসল পণ্য, ন্যায্য দাম এবং ৬৪ জেলায় "
+"ক্যাশ অন ডেলিভারি।"
+
+#: templates/base.html:232
+msgid "Help"
+msgstr "সাহায্য"
+
+#: templates/base.html:234
+msgid "Track my order"
+msgstr "আমার অর্ডার ট্র্যাক করুন"
+
+#: templates/base.html:236
+msgid "Image credits"
+msgstr "ছবির ক্রেডিট"
+
+#: templates/base.html:240
+msgid "Policies"
+msgstr "নীতিমালা"
+
+#: templates/base.html:242
+msgid "About us"
+msgstr "আমাদের সম্পর্কে"
+
+#: templates/base.html:243
+msgid "Delivery"
+msgstr "ডেলিভারি"
+
+#: templates/base.html:244
+msgid "Returns &amp; refunds"
+msgstr "রিটার্ন ও রিফান্ড"
+
+#: templates/base.html:245
+msgid "Privacy"
+msgstr "গোপনীয়তা"
+
+#: templates/base.html:250
+msgid "We accept"
+msgstr "আমরা নিই"
+
+#: templates/base.html:252
+msgid "bKash · Nagad · Card"
+msgstr "bKash · Nagad · কার্ড"
+
+#: templates/base.html:255
+msgid "Get deals in your inbox"
+msgstr "অফার পান ইমেইলে"
+
+#: templates/base.html:259
+msgid "Leave this field empty"
+msgstr "এই ঘর খালি রাখুন"
+
+#: templates/base.html:261
+msgid "your@email.com"
+msgstr "your@email.com"
+
+#: templates/base.html:261
+msgid "Email address"
+msgstr "ইমেইল ঠিকানা"
+
+#: templates/base.html:262
+msgid "Subscribe"
+msgstr "সাবস্ক্রাইব"
+
+#: templates/base.html:269
+msgid "SmartCart BD. All rights reserved."
+msgstr "SmartCart BD. সর্বস্বত্ব সংরক্ষিত।"
+
+#: templates/base.html:278
+msgid "Your cart"
+msgstr "আপনার কার্ট"
+
+#: templates/base.html:287
+msgid "Quick view"
+msgstr "এক নজরে দেখুন"
+
+#: templates/base.html:301
+msgid "Chat on Messenger"
+msgstr "Messenger-এ চ্যাট করুন"
+
+#: templates/base.html:304
+msgid "Chat on WhatsApp"
+msgstr "WhatsApp-এ চ্যাট করুন"
+
+#: templates/base.html:306
+msgid "Back to top"
+msgstr "উপরে যান"
+
+#: templates/partials/countdown.html:2
+msgid "Time left in the sale"
+msgstr "সেল শেষ হতে বাকি"
+
+#: templates/partials/error_page.html:10
+msgid "Go to home"
+msgstr "হোমে যান"
+
+#: templates/partials/error_page.html:11
+msgid "Browse products"
+msgstr "পণ্য দেখুন"
+
+#: templates/partials/pagination.html:3
+msgid "Pagination"
+msgstr "পেজ"
+
+#: templates/partials/product_card.html:43
+msgid "Choose options"
+msgstr "অপশন বেছে নিন"

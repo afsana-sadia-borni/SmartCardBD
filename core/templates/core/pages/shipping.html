@@ -1,35 +1,36 @@
 {% extends 'core/pages/_page.html' %}
+{% load i18n %}
 {% load shop_tags %}
 
 {% block page %}
-<p>We deliver to every district in Bangladesh through our courier partners. The charge and the expected time depend on where you live:</p>
+<p>{% translate "We deliver to every district in Bangladesh through our courier partners. The charge and the expected time depend on where you live:" %}</p>
 
 <div class="table-responsive">
     <table class="table align-middle">
-        <thead><tr><th>Area</th><th>Delivery charge</th><th>Delivery time</th></tr></thead>
+        <thead><tr><th>{% translate "Area" %}</th><th>{% translate "Delivery charge" %}</th><th>{% translate "Delivery time" %}</th></tr></thead>
         <tbody>
             {% for zone in zones %}
                 <tr>
-                    <td>{{ zone.name }}{% if zone.is_default %} <span class="text-body-secondary small">(all other districts)</span>{% elif zone.districts %}<br><span class="text-body-secondary small">{{ zone.districts|join:", " }}</span>{% endif %}</td>
+                    <td>{{ zone.name }}{% if zone.is_default %} <span class="text-body-secondary small">{% translate "(all other districts)" %}</span>{% elif zone.districts %}<br><span class="text-body-secondary small">{{ zone.districts|join:", " }}</span>{% endif %}</td>
                     <td>{{ zone.charge|taka }}</td>
-                    <td>{{ zone.delivery_time }}</td>
+                    <td>{{ zone.delivery_time|delivery_days }}</td>
                 </tr>
             {% empty %}
-                <tr><td>Inside Dhaka</td><td>{{ inside_dhaka|taka }}</td><td>1-2 days</td></tr>
-                <tr><td>Rest of Bangladesh</td><td>{{ outside_dhaka|taka }}</td><td>3-5 days</td></tr>
+                <tr><td>{% translate "Inside Dhaka" %}</td><td>{{ inside_dhaka|taka }}</td><td>{% translate "1-2 days" %}</td></tr>
+                <tr><td>{% translate "Rest of Bangladesh" %}</td><td>{{ outside_dhaka|taka }}</td><td>{% translate "3-5 days" %}</td></tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
 <ul>
-    <li><strong>Free delivery</strong> on orders of {{ free_shipping_min|taka }} or more (after discounts).</li>
-    <li>Times are working days from when we confirm your order. Hartals, floods and public holidays can add delays; we will let you know.</li>
-    <li>Checkout shows the exact charge and time for your district before you place the order.</li>
-    <li>Gift wrap is available for {{ gift_wrap_price|taka }}.</li>
-    <li>You get an email and a notification when your order ships. Guests can <a href="{% url 'track_order' %}">track an order</a> with the order number and phone number.</li>
+    <li>{% blocktranslate with amount=free_shipping_min|taka %}<strong>Free delivery</strong> on orders of {{ amount }} or more (after discounts).{% endblocktranslate %}</li>
+    <li>{% translate "Times are working days from when we confirm your order. Hartals, floods and public holidays can add delays; we will let you know." %}</li>
+    <li>{% translate "Checkout shows the exact charge and time for your district before you place the order." %}</li>
+    <li>{% blocktranslate with price=gift_wrap_price|taka %}Gift wrap is available for {{ price }}.{% endblocktranslate %}</li>
+    <li>{% translate "You get an email and a notification when your order ships. Guests can" %} <a href="{% url 'track_order' %}">{% translate "track an order" %}</a> {% translate "with the order number and phone number." %}</li>
 </ul>
 
-<h2 class="h5 fw-bold mt-4">Cash on Delivery</h2>
-<p>Please keep the exact amount ready. You may check the outside of the parcel in front of the delivery person. If the parcel is clearly damaged, you can refuse it and we will send a replacement.</p>
+<h2 class="h5 fw-bold mt-4">{% translate "Cash on Delivery" %}</h2>
+<p>{% translate "Please keep the exact amount ready. You may check the outside of the parcel in front of the delivery person. If the parcel is clearly damaged, you can refuse it and we will send a replacement." %}</p>
 {% endblock %}

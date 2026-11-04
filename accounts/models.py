@@ -3,10 +3,11 @@ import secrets
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models, transaction
+from django.utils.translation import gettext_lazy as _
 
 from .constants import BD_PHONE_REGEX, DISTRICT_CHOICES
 
-phone_validator = RegexValidator(BD_PHONE_REGEX, 'Enter a valid Bangladeshi mobile number, e.g. 01712345678.')
+phone_validator = RegexValidator(BD_PHONE_REGEX, _('Enter a valid Bangladeshi mobile number, e.g. 01712345678.'))
 
 
 class Address(models.Model):
@@ -89,7 +90,7 @@ class CustomerProfile(models.Model):
 
 
 def get_profile(user):
-    profile, _ = CustomerProfile.objects.get_or_create(user=user)
+    profile, _created = CustomerProfile.objects.get_or_create(user=user)
     return profile
 
 

@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Log in | SmartCart BD{% endblock %}
+{% block title %}{% translate "Log in | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 <div class="container auth-page">
     <div class="auth-shell row g-0 mx-auto">
         <div class="col-lg-6 p-4 p-md-5">
-            <h1 class="h3 fw-bold mb-1">Welcome back</h1>
-            <p class="text-body-secondary mb-4">Log in with your email or mobile number.</p>
+            <h1 class="h3 fw-bold mb-1">{% translate "Welcome back" %}</h1>
+            <p class="text-body-secondary mb-4">{% translate "Log in with your email or mobile number." %}</p>
 
             {% if demo_login %}
                 <div class="alert alert-warning small d-flex flex-wrap align-items-center justify-content-between gap-2">
-                    <span><i class="bi bi-person-badge"></i> <strong>Just looking around?</strong> Try the demo account.</span>
-                    <button type="button" class="btn btn-sm btn-dark js-demo-login" data-email="{{ demo_login.email }}" data-password="{{ demo_login.password }}">Fill demo login</button>
+                    <span><i class="bi bi-person-badge"></i> <strong>{% translate "Just looking around?" %}</strong> {% translate "Try the demo account." %}</span>
+                    <button type="button" class="btn btn-sm btn-dark js-demo-login" data-email="{{ demo_login.email }}" data-password="{{ demo_login.password }}">{% translate "Fill demo login" %}</button>
                 </div>
             {% endif %}
 
@@ -23,13 +24,13 @@
                 {% include 'account/_auth_field.html' with field=form.password icon='lock' password=True %}
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     {% if form.remember %}<div class="form-check">{{ form.remember }} <label class="form-check-label small" for="{{ form.remember.id_for_label }}">{{ form.remember.label }}</label></div>{% else %}<span></span>{% endif %}
-                    <a href="{% url 'account_reset_password' %}" class="small">Forgot password?</a>
+                    <a href="{% url 'account_reset_password' %}" class="small">{% translate "Forgot password?" %}</a>
                 </div>
                 {{ redirect_field }}
-                <button type="submit" class="btn btn-warning btn-lg w-100 fw-semibold">Log in</button>
+                <button type="submit" class="btn btn-warning btn-lg w-100 fw-semibold">{% translate "Log in" %}</button>
             </form>
             {% include 'account/_social.html' %}
-            <p class="text-center small mt-4 mb-0">New to SmartCart BD? <a href="{{ signup_url }}" class="fw-semibold">Create an account</a></p>
+            <p class="text-center small mt-4 mb-0">{% translate "New to SmartCart BD?" %} <a href="{{ signup_url }}" class="fw-semibold">{% translate "Create an account" %}</a></p>
         </div>
         <div class="col-lg-6 d-none d-lg-block">{% include 'account/_auth_side.html' %}</div>
     </div>

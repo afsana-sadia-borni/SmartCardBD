@@ -1,4 +1,4 @@
-{% load static shop_tags %}
+{% load i18n static shop_tags %}
 <div class="card product-card h-100 shadow-sm position-relative" data-aos="fade-up">
     <div class="badge-corner d-flex flex-column gap-1 align-items-start">
         {% if product.flash_sale %}
@@ -6,7 +6,7 @@
         {% elif product.has_discount %}
             <span class="badge text-bg-danger">-{{ product.discount_percent|num }}%</span>
         {% endif %}
-        {% if not product.in_stock %}<span class="badge text-bg-secondary">Out of stock</span>{% endif %}
+        {% if not product.in_stock %}<span class="badge text-bg-secondary">{% translate "Out of stock" %}</span>{% endif %}
     </div>
     <div class="card-actions">
         {% if user.is_authenticated %}
@@ -40,7 +40,7 @@
         </div>
         {% if product.has_variants %}
             <a href="{{ product.get_absolute_url }}" class="btn btn-sm btn-outline-dark w-100 mt-2 {% if not product.in_stock %}disabled{% endif %}">
-                <i class="bi bi-sliders"></i> Choose options
+                <i class="bi bi-sliders"></i> {% translate "Choose options" %}
             </a>
         {% else %}
             <form class="js-add-to-cart mt-2" action="{% url 'cart_add' %}" method="post">
@@ -49,7 +49,7 @@
                 <input type="hidden" name="quantity" value="1">
                 <input type="hidden" name="next" value="{{ request.get_full_path }}">
                 <button type="submit" class="btn btn-sm btn-dark w-100" {% if not product.in_stock %}disabled{% endif %}>
-                    <i class="bi bi-cart-plus"></i> {% if product.in_stock %}Add to cart{% else %}Out of stock{% endif %}
+                    <i class="bi bi-cart-plus"></i> {% if product.in_stock %}{% translate "Add to cart" %}{% else %}{% translate "Out of stock" %}{% endif %}
                 </button>
             </form>
         {% endif %}

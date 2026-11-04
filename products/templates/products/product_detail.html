@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static shop_tags %}
 
 {% block title %}{{ product.title }} | SmartCart BD{% endblock %}
@@ -6,9 +7,9 @@
 
 {% block content %}
 <div class="container">
-    <nav aria-label="breadcrumb">
+    <nav aria-label="{% translate "breadcrumb" %}">
         <ol class="breadcrumb small">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% translate "Home" %}</a></li>
             <li class="breadcrumb-item"><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
             <li class="breadcrumb-item active text-truncate" style="max-width: 50vw;" aria-current="page">{{ product.title }}</li>
         </ol>
@@ -19,7 +20,7 @@
             <div class="col-md-6">
                 {% with images=product.gallery %}
                     <div class="js-gallery">
-                        <div class="zoom-frame img-skeleton rounded-3 js-zoom" aria-label="Product image. Hover to zoom.">
+                        <div class="zoom-frame img-skeleton rounded-3 js-zoom" aria-label="{% translate "Product image. Hover to zoom." %}">
                             <img src="{% if images %}{{ images.0.url|webp:1600 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}"
                                  class="w-100 product-thumb js-gallery-main" alt="{% if images %}{{ images.0.alt }}{% else %}{{ product.title }}{% endif %}">
                         </div>
@@ -38,7 +39,7 @@
 
             <div class="col-md-6">
                 <a href="{{ product.category.get_absolute_url }}" class="badge text-bg-light text-decoration-none mb-2">{{ product.category.name }}</a>
-                {% if product.brand %}<span class="small text-body-secondary ms-1">Brand: <strong>{{ product.brand }}</strong></span>{% endif %}
+                {% if product.brand %}<span class="small text-body-secondary ms-1">{% translate "Brand:" %} <strong>{{ product.brand }}</strong></span>{% endif %}
                 <h1 class="h2 fw-bold mt-1">{{ product.title }}</h1>
 
                 <div class="mb-3">
@@ -46,7 +47,7 @@
                         <a href="#reviews" class="text-decoration-none">{% stars product.avg_rating product.review_count %}</a>
                         <span class="small text-body-secondary ms-1">{{ product.avg_rating|floatformat:1 }} / 5</span>
                     {% else %}
-                        <span class="small text-body-secondary">No reviews yet</span>
+                        <span class="small text-body-secondary">{% translate "No reviews yet" %}</span>
                     {% endif %}
                 </div>
 
@@ -56,33 +57,33 @@
                     {% if user.is_authenticated %}
                         <button type="button" class="btn btn-outline-danger btn-sm js-wishlist-toggle" data-url="{% url 'wishlist_toggle' product.id %}" aria-pressed="{{ in_wishlist|yesno:'true,false' }}">
                             <i class="bi bi-heart{% if in_wishlist %}-fill{% endif %}"></i>
-                            <span class="js-wishlist-label">{% if in_wishlist %}In wishlist{% else %}Add to wishlist{% endif %}</span>
+                            <span class="js-wishlist-label">{% if in_wishlist %}{% translate "In wishlist" %}{% else %}{% translate "Add to wishlist" %}{% endif %}</span>
                         </button>
                         <button type="button" class="btn btn-outline-dark btn-sm js-price-alert" data-url="{% url 'price_alert_toggle' product.id %}" aria-pressed="{{ has_price_alert|yesno:'true,false' }}">
                             <i class="bi bi-bell{% if has_price_alert %}-fill{% endif %}"></i>
-                            <span class="js-price-alert-label">{% if has_price_alert %}Price alert on{% else %}Notify me if price drops{% endif %}</span>
+                            <span class="js-price-alert-label">{% if has_price_alert %}{% translate "Price alert on" %}{% else %}{% translate "Notify me if price drops" %}{% endif %}</span>
                         </button>
                     {% else %}
-                        <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}" class="btn btn-outline-danger btn-sm"><i class="bi bi-heart"></i> Log in to save or get price alerts</a>
+                        <a href="{% url 'account_login' %}?next={{ request.path|urlencode }}" class="btn btn-outline-danger btn-sm"><i class="bi bi-heart"></i> {% translate "Log in to save or get price alerts" %}</a>
                     {% endif %}
                     <button type="button" class="btn btn-outline-dark btn-sm js-compare-toggle {% if in_compare %}active{% endif %}" data-url="{% url 'compare_toggle' product.id %}" aria-pressed="{{ in_compare|yesno:'true,false' }}">
-                        <i class="bi bi-arrow-left-right"></i> <span class="js-compare-label">{% if in_compare %}In compare{% else %}Compare{% endif %}</span>
+                        <i class="bi bi-arrow-left-right"></i> <span class="js-compare-label">{% if in_compare %}{% translate "In compare" %}{% else %}{% translate "Compare" %}{% endif %}</span>
                     </button>
                 </div>
 
                 <div class="d-flex align-items-center gap-2 mt-3 small">
-                    <span class="text-body-secondary">Share:</span>
+                    <span class="text-body-secondary">{% translate "Share:" %}</span>
                     {% with share_url=request.build_absolute_uri %}
-                        <a class="share-btn share-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}" target="_blank" rel="noopener" aria-label="Share on Facebook"><i class="bi bi-facebook"></i></a>
-                        <a class="share-btn share-whatsapp" href="https://wa.me/?text={{ product.title|urlencode }}%20{{ share_url|urlencode }}" target="_blank" rel="noopener" aria-label="Share on WhatsApp"><i class="bi bi-whatsapp"></i></a>
-                        <button type="button" class="share-btn js-copy-link" data-url="{{ share_url }}" aria-label="Copy link"><i class="bi bi-link-45deg"></i></button>
+                        <a class="share-btn share-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}" target="_blank" rel="noopener" aria-label="{% translate "Share on Facebook" %}"><i class="bi bi-facebook"></i></a>
+                        <a class="share-btn share-whatsapp" href="https://wa.me/?text={{ product.title|urlencode }}%20{{ share_url|urlencode }}" target="_blank" rel="noopener" aria-label="{% translate "Share on WhatsApp" %}"><i class="bi bi-whatsapp"></i></a>
+                        <button type="button" class="share-btn js-copy-link" data-url="{{ share_url }}" aria-label="{% translate "Copy link" %}"><i class="bi bi-link-45deg"></i></button>
                     {% endwith %}
                 </div>
 
                 <ul class="list-unstyled small text-body-secondary mt-4 mb-0">
-                    <li><i class="bi bi-truck me-2"></i>Delivery in 1-2 days inside Dhaka, 3-5 days elsewhere</li>
-                    <li><i class="bi bi-cash-coin me-2"></i>Cash on Delivery available</li>
-                    <li><i class="bi bi-arrow-repeat me-2"></i>Easy returns within 7 days of delivery</li>
+                    <li><i class="bi bi-truck me-2"></i>{% translate "Delivery in 1-2 days inside Dhaka, 3-5 days elsewhere" %}</li>
+                    <li><i class="bi bi-cash-coin me-2"></i>{% translate "Cash on Delivery available" %}</li>
+                    <li><i class="bi bi-arrow-repeat me-2"></i>{% translate "Easy returns within 7 days of delivery" %}</li>
                 </ul>
             </div>
         </div>
@@ -92,7 +93,7 @@
         <div class="bg-body rounded-4 shadow-sm p-3 p-md-4 mb-4 bundle-box">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                 <h2 class="h5 fw-bold mb-0"><i class="bi bi-boxes text-warning"></i> {{ bundle.title }}</h2>
-                <span class="badge text-bg-success fs-6">Save {{ bundle.savings|taka }}</span>
+                <span class="badge text-bg-success fs-6">{% blocktranslate with amount=bundle.savings|taka %}Save {{ amount }}{% endblocktranslate %}</span>
             </div>
             <div class="d-flex flex-wrap align-items-center gap-2">
                 {% for item in bundle.products.all %}
@@ -104,22 +105,22 @@
                     </a>
                 {% endfor %}
                 <div class="ms-md-auto text-md-end">
-                    <div class="small text-body-secondary">Bundle price <span class="price-old">{{ bundle.regular_total|taka }}</span></div>
+                    <div class="small text-body-secondary">{% translate "Bundle price" %} <span class="price-old">{{ bundle.regular_total|taka }}</span></div>
                     <div class="fs-4 fw-bold text-warning-emphasis">{{ bundle.bundle_price|taka }}</div>
-                    <p class="small text-body-secondary mb-0">Add all items to your cart and the discount applies automatically.</p>
+                    <p class="small text-body-secondary mb-0">{% translate "Add all items to your cart and the discount applies automatically." %}</p>
                 </div>
             </div>
         </div>
     {% endfor %}
 
     <div class="bg-body rounded-4 shadow-sm p-3 p-md-4 mb-4">
-        <h2 class="h4 fw-bold">Description</h2>
+        <h2 class="h4 fw-bold">{% translate "Description" %}</h2>
         <p class="mb-0" style="white-space: pre-line;">{{ product.description }}</p>
     </div>
 
     {% if bought_together %}
         <section class="mb-4">
-            <h2 class="h4 fw-bold mb-3">Frequently bought together</h2>
+            <h2 class="h4 fw-bold mb-3">{% translate "Frequently bought together" %}</h2>
             <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 row-cols-xl-4 g-3">
                 {% for product in bought_together %}<div class="col">{% include 'partials/product_card.html' %}</div>{% endfor %}
             </div>
@@ -127,16 +128,16 @@
     {% endif %}
 
     <div class="bg-body rounded-4 shadow-sm p-3 p-md-4 mb-4" id="questions">
-        <h2 class="h4 fw-bold mb-3">Questions &amp; answers</h2>
+        <h2 class="h4 fw-bold mb-3">{% translate "Questions &amp; answers" %}</h2>
         {% if user.is_authenticated %}
             <form method="post" action="{% url 'ask_question' product.slug %}" class="mb-4">
                 {% csrf_token %}
-                <label for="{{ question_form.question.id_for_label }}" class="form-label small fw-semibold">Have a question about this product?</label>
+                <label for="{{ question_form.question.id_for_label }}" class="form-label small fw-semibold">{% translate "Have a question about this product?" %}</label>
                 {{ question_form.question }}
-                <button class="btn btn-dark btn-sm mt-2" type="submit"><i class="bi bi-send"></i> Ask</button>
+                <button class="btn btn-dark btn-sm mt-2" type="submit"><i class="bi bi-send"></i> {% translate "Ask" %}</button>
             </form>
         {% else %}
-            <p class="small"><a href="{% url 'account_login' %}?next={{ request.path|urlencode }}%23questions">Log in</a> to ask a question.</p>
+            <p class="small"><a href="{% url 'account_login' %}?next={{ request.path|urlencode }}%23questions">{% translate "Log in" %}</a> {% translate "to ask a question." %}</p>
         {% endif %}
         {% for q in questions %}
             <div class="qa-item border-bottom py-3">
@@ -144,32 +145,32 @@
                 {% if q.answer %}
                     <div class="d-flex gap-2 mt-2"><span class="qa-badge qa-badge-answer">A</span><div>{{ q.answer }}<br><small class="text-body-secondary">SmartCart BD · {{ q.answered_at|date:"d M Y" }}</small></div></div>
                 {% else %}
-                    <div class="small text-body-secondary mt-2 ms-4"><i class="bi bi-hourglass-split"></i> Waiting for an answer. We'll notify you.</div>
+                    <div class="small text-body-secondary mt-2 ms-4"><i class="bi bi-hourglass-split"></i> {% translate "Waiting for an answer. We'll notify you." %}</div>
                 {% endif %}
             </div>
         {% empty %}
-            <p class="text-body-secondary mb-0">No questions yet. Be the first to ask!</p>
+            <p class="text-body-secondary mb-0">{% translate "No questions yet. Be the first to ask!" %}</p>
         {% endfor %}
     </div>
 
     <div class="bg-body rounded-4 shadow-sm p-3 p-md-4 mb-4" id="reviews">
-        <h2 class="h4 fw-bold mb-3">Ratings &amp; reviews</h2>
+        <h2 class="h4 fw-bold mb-3">{% translate "Ratings &amp; reviews" %}</h2>
         {% if can_review %}
             <form method="post" action="{% url 'add_review' product.slug %}" enctype="multipart/form-data" class="border rounded-3 p-3 mb-4">
                 {% csrf_token %}
-                <h3 class="h6 fw-semibold">{% if user_review %}Update your review{% else %}Write a review{% endif %}</h3>
+                <h3 class="h6 fw-semibold">{% if user_review %}{% translate "Update your review" %}{% else %}{% translate "Write a review" %}{% endif %}</h3>
                 <div class="row g-2">
-                    <div class="col-sm-3"><label class="visually-hidden" for="{{ review_form.rating.id_for_label }}">Rating</label>{{ review_form.rating }}</div>
-                    <div class="col-sm-9"><label class="visually-hidden" for="{{ review_form.comment.id_for_label }}">Review</label>{{ review_form.comment }}</div>
+                    <div class="col-sm-3"><label class="visually-hidden" for="{{ review_form.rating.id_for_label }}">{% translate "Rating" %}</label>{{ review_form.rating }}</div>
+                    <div class="col-sm-9"><label class="visually-hidden" for="{{ review_form.comment.id_for_label }}">{% translate "Review" %}</label>{{ review_form.comment }}</div>
                     <div class="col-12">
-                        <label for="review-photos" class="form-label small mb-1"><i class="bi bi-camera"></i> Add up to 3 photos (optional)</label>
+                        <label for="review-photos" class="form-label small mb-1"><i class="bi bi-camera"></i> {% translate "Add up to 3 photos (optional)" %}</label>
                         <input type="file" id="review-photos" name="photos" accept="image/*" multiple class="form-control form-control-sm">
                     </div>
                 </div>
-                <button class="btn btn-dark btn-sm mt-2" type="submit">Submit review</button>
+                <button class="btn btn-dark btn-sm mt-2" type="submit">{% translate "Submit review" %}</button>
             </form>
         {% elif user.is_authenticated %}
-            <p class="small text-body-secondary"><i class="bi bi-info-circle"></i> You can review this product once it's been delivered to you.</p>
+            <p class="small text-body-secondary"><i class="bi bi-info-circle"></i> {% translate "You can review this product once it's been delivered to you." %}</p>
         {% endif %}
 
         {% for review in reviews %}
@@ -186,16 +187,16 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                <small class="text-success"><i class="bi bi-patch-check-fill"></i> Verified purchase</small>
+                <small class="text-success"><i class="bi bi-patch-check-fill"></i> {% translate "Verified purchase" %}</small>
             </div>
         {% empty %}
-            <p class="text-body-secondary mb-0">No reviews yet.</p>
+            <p class="text-body-secondary mb-0">{% translate "No reviews yet." %}</p>
         {% endfor %}
     </div>
 
     {% if similar_products %}
         <section>
-            <h2 class="h4 fw-bold mb-3">You may also like</h2>
+            <h2 class="h4 fw-bold mb-3">{% translate "You may also like" %}</h2>
             <div class="row row-cols-2 row-cols-md-4 row-cols-lg-3 row-cols-xl-4 g-3">
                 {% for product in similar_products %}<div class="col">{% include 'partials/product_card.html' %}</div>{% endfor %}
             </div>

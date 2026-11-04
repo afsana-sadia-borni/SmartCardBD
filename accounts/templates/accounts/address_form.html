@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}{% if address %}Edit{% else %}New{% endif %} address | SmartCart BD{% endblock %}
+{% block title %}{% if address %}{% translate "Edit" %}{% else %}{% translate "New" %}{% endif %} {% translate "address | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 640px;">
-    <a href="{% url 'profile' %}" class="small"><i class="bi bi-arrow-left"></i> My account</a>
+    <a href="{% url 'profile' %}" class="small"><i class="bi bi-arrow-left"></i> {% translate "My account" %}</a>
     <div class="bg-body rounded-4 shadow-sm p-4 mt-2">
-        <h4 class="fw-bold mb-3">{% if address %}Edit address{% else %}New address{% endif %}</h4>
+        <h4 class="fw-bold mb-3">{% if address %}{% translate "Edit address" %}{% else %}{% translate "New address" %}{% endif %}</h4>
         <form method="post" novalidate>
             {% csrf_token %}
             <div class="row g-3">
@@ -25,7 +26,7 @@
                     {% endif %}
                 {% endfor %}
             </div>
-            <button type="submit" class="btn btn-warning fw-semibold mt-4">Save address</button>
+            <button type="submit" class="btn btn-warning fw-semibold mt-4">{% translate "Save address" %}</button>
         </form>
     </div>
 </div>

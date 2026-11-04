@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
 from accounts.constants import DISTRICT_CHOICES
@@ -48,17 +49,17 @@ class Coupon(models.Model):
         """Return (is_valid, reason)."""
         now = timezone.now()
         if self.user_id and (user is None or user.id != self.user_id):
-            return False, 'This coupon belongs to another account.'
+            return False, _('This coupon belongs to another account.')
         if not self.is_active:
-            return False, 'This coupon is no longer active.'
+            return False, _('This coupon is no longer active.')
         if now < self.valid_from:
-            return False, 'This coupon is not active yet.'
+            return False, _('This coupon is not active yet.')
         if now > self.valid_to:
-            return False, 'This coupon has expired.'
+            return False, _('This coupon has expired.')
         if self.usage_limit is not None and self.used_count >= self.usage_limit:
-            return False, 'This coupon has reached its usage limit.'
+            return False, _('This coupon has reached its usage limit.')
         if subtotal < self.min_order_amount:
-            return False, f'Minimum order amount for this coupon is ৳{self.min_order_amount:,.0f}.'
+            return False, _('Minimum order amount for this coupon is ৳{amount}.').format(amount=f'{self.min_order_amount:,.0f}')
         return True, ''
 
     def calculate_discount(self, subtotal):
@@ -98,6 +99,7 @@ class DeliveryZone(models.Model):
 
     @property
     def delivery_time(self):
+        """Stored on orders as English text ('1-2 days'); templates show it with the delivery_days filter."""
         if self.min_days == self.max_days:
             return f'{self.min_days} day{"s" if self.min_days != 1 else ""}'
         return f'{self.min_days}-{self.max_days} days'
@@ -108,28 +110,28 @@ class DeliveryZone(models.Model):
 
 class Order(models.Model):
     class Status(models.TextChoices):
-        PENDING = 'pending', 'Pending'
-        CONFIRMED = 'confirmed', 'Confirmed'
-        SHIPPED = 'shipped', 'Shipped'
-        DELIVERED = 'delivered', 'Delivered'
-        CANCELLED = 'cancelled', 'Cancelled'
+        PENDING = 'pending', _('Pending')
+        CONFIRMED = 'confirmed', _('Confirmed')
+        SHIPPED = 'shipped', _('Shipped')
+        DELIVERED = 'delivered', _('Delivered')
+        CANCELLED = 'cancelled', _('Cancelled')
 
     class PaymentMethod(models.TextChoices):
-        COD = 'cod', 'Cash on Delivery'
-        SSLCOMMERZ = 'sslcommerz', 'Online Payment (bKash, Nagad, Card)'
+        COD = 'cod', _('Cash on Delivery')
+        SSLCOMMERZ = 'sslcommerz', _('Online Payment (bKash, Nagad, Card)')
 
     class PaymentChannel(models.TextChoices):
         """Which method the customer picked for an online payment (all go through SSLCommerz)."""
         BKASH = 'bkash', 'bKash'
         NAGAD = 'nagad', 'Nagad'
         ROCKET = 'rocket', 'Rocket'
-        CARD = 'card', 'Card'
-        INTERNET_BANKING = 'internetbank', 'Internet banking'
+        CARD = 'card', _('Card')
+        INTERNET_BANKING = 'internetbank', _('Internet banking')
 
     class PaymentStatus(models.TextChoices):
-        UNPAID = 'unpaid', 'Unpaid'
-        PAID = 'paid', 'Paid'
-        FAILED = 'failed', 'Failed'
+        UNPAID = 'unpaid', _('Unpaid')
+        PAID = 'paid', _('Paid')
+        FAILED = 'failed', _('Failed')
 
     STATUS_FLOW = [Status.PENDING, Status.CONFIRMED, Status.SHIPPED, Status.DELIVERED]
 
@@ -166,6 +168,15 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100, blank=True, help_text='Gateway validation / bank transaction id')
 
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+
+    # Courier: booked through the Steadfast API, or typed in by staff for any other courier.
+    courier_name = models.CharField(max_length=40, blank=True)
+    courier_consignment_id = models.CharField(max_length=40, blank=True)
+    courier_tracking_code = models.CharField(max_length=60, blank=True)
+    courier_tracking_link = models.URLField(blank=True)
+    courier_status = models.CharField(max_length=40, blank=True)
+    risk_flags = models.JSONField(default=list, blank=True, help_text='Fake-order warnings found at checkout.')
+
     points_earned = models.PositiveIntegerField(default=0, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -192,11 +203,21 @@ class Order(models.Model):
         return reverse('order_detail', args=[self.order_number])
 
     @property
+    def courier_tracking_url(self):
+        if self.courier_tracking_link:
+            return self.courier_tracking_link
+        if self.courier_name == 'Steadfast' and self.courier_tracking_code:
+            return settings.STEADFAST_TRACKING_URL.format(code=self.courier_tracking_code)
+        return ''
+
+    @property
     def payment_label(self):
         """'Cash on Delivery', 'Online: bKash', ..."""
         if self.payment_method == self.PaymentMethod.COD:
             return self.get_payment_method_display()
-        return f'Online: {self.get_payment_channel_display()}' if self.payment_channel else 'Online payment'
+        if self.payment_channel:
+            return _('Online: {method}').format(method=self.get_payment_channel_display())
+        return _('Online payment')
 
     @property
     def can_cancel(self):
@@ -258,19 +279,32 @@ class OrderItem(models.Model):
         return f'{self.quantity} × {self.product_title}'
 
 
+class BlockedPhone(models.Model):
+    """A mobile number that can't use Cash on Delivery (e.g. parcels refused again and again)."""
+
+    phone = models.CharField(max_length=11, unique=True)
+    reason = models.CharField(max_length=200, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.phone
+
+
 class ReturnRequest(models.Model):
     class Reason(models.TextChoices):
-        DAMAGED = 'damaged', 'Item arrived damaged'
-        WRONG = 'wrong', 'Wrong item delivered'
-        NOT_AS_DESCRIBED = 'not_as_described', 'Not as described'
-        SIZE = 'size', 'Size or fit problem'
-        OTHER = 'other', 'Other'
+        DAMAGED = 'damaged', _('Item arrived damaged')
+        WRONG = 'wrong', _('Wrong item delivered')
+        NOT_AS_DESCRIBED = 'not_as_described', _('Not as described')
+        SIZE = 'size', _('Size or fit problem')
+        OTHER = 'other', _('Other')
 
     class Status(models.TextChoices):
-        PENDING = 'pending', 'Pending review'
-        APPROVED = 'approved', 'Approved'
-        REJECTED = 'rejected', 'Rejected'
-        REFUNDED = 'refunded', 'Refunded'
+        PENDING = 'pending', _('Pending review')
+        APPROVED = 'approved', _('Approved')
+        REJECTED = 'rejected', _('Rejected')
+        REFUNDED = 'refunded', _('Refunded')
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='return_request')
     reason = models.CharField(max_length=20, choices=Reason.choices)

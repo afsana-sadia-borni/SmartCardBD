@@ -1,11 +1,12 @@
 """Search, filters and sorting for the product list. Shared by the shop pages and the REST API."""
 from django.db.models import F, Q
+from django.utils.translation import gettext_lazy as _
 
 SORT_OPTIONS = {
-    'newest': ('Newest', ['-created_at']),
-    'price_asc': ('Price: Low to High', ['effective_price', '-created_at']),
-    'price_desc': ('Price: High to Low', ['-effective_price', '-created_at']),
-    'rating': ('Top Rated', [F('avg_rating').desc(nulls_last=True), '-review_count', '-created_at']),
+    'newest': (_('Newest'), ['-created_at']),
+    'price_asc': (_('Price: Low to High'), ['effective_price', '-created_at']),
+    'price_desc': (_('Price: High to Low'), ['-effective_price', '-created_at']),
+    'rating': (_('Top Rated'), [F('avg_rating').desc(nulls_last=True), '-review_count', '-created_at']),
 }
 
 

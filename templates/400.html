@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Bad request | SmartCart BD{% endblock %}
+{% block title %}{% translate "Bad request | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 {% include 'partials/error_page.html' with code='400' heading='Bad request' icon='exclamation-triangle' message="Something was wrong with that request. Please try again." %}

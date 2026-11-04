@@ -1,0 +1,138 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-04 21:57+0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: bn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: static/js/script.js:141
+msgid "Choose"
+msgstr "বেছে নিন"
+
+#: static/js/script.js:171
+msgid "Add to cart"
+msgstr "কার্টে যোগ করুন"
+
+#: static/js/script.js:171
+msgid "Out of stock"
+msgstr "স্টকে নেই"
+
+#: static/js/script.js:176
+msgid "Choose an option"
+msgstr "একটি অপশন বেছে নিন"
+
+#: static/js/script.js:253
+#, javascript-format
+msgid "Only %s in stock."
+msgstr "স্টকে মাত্র %sটি আছে।"
+
+#: static/js/script.js:295
+msgid "In wishlist"
+msgstr "উইশলিস্টে আছে"
+
+#: static/js/script.js:295
+msgid "Add to wishlist"
+msgstr "উইশলিস্টে যোগ করুন"
+
+#: static/js/script.js:296
+msgid "Added to wishlist."
+msgstr "উইশলিস্টে যোগ হয়েছে।"
+
+#: static/js/script.js:296
+msgid "Removed from wishlist."
+msgstr "উইশলিস্ট থেকে সরানো হয়েছে।"
+
+#: static/js/script.js:312
+msgid "In compare"
+msgstr "তুলনায় আছে"
+
+#: static/js/script.js:312
+msgid "Compare"
+msgstr "তুলনা করুন"
+
+#: static/js/script.js:318
+msgid "Added to compare."
+msgstr "তুলনায় যোগ হয়েছে।"
+
+#: static/js/script.js:318
+msgid "Removed from compare."
+msgstr "তুলনা থেকে সরানো হয়েছে।"
+
+#: static/js/script.js:330
+msgid "Price alert on"
+msgstr "প্রাইস অ্যালার্ট চালু"
+
+#: static/js/script.js:330
+msgid "Notify me if price drops"
+msgstr "দাম কমলে জানাবেন"
+
+#: static/js/script.js:578
+msgid "Select upazila / thana"
+msgstr "উপজেলা / থানা বেছে নিন"
+
+#: static/js/script.js:578
+msgid "Select district first"
+msgstr "আগে জেলা বেছে নিন"
+
+#: static/js/script.js:622
+msgid "Free"
+msgstr "ফ্রি"
+
+#: static/js/script.js:622
+msgid "Select district"
+msgstr "জেলা বেছে নিন"
+
+#: static/js/script.js:629
+msgid "Delivery to %(district)s in %(time)s"
+msgstr "%(district)s-এ %(time)s-এ ডেলিভারি"
+
+#: static/js/script.js:629
+msgid "free delivery"
+msgstr "ফ্রি ডেলিভারি"
+
+#: static/js/script.js:668
+msgid "Could not subscribe right now."
+msgstr "এখন সাবস্ক্রাইব করা গেল না।"
+
+#: static/js/script.js:695
+msgid "Hide password"
+msgstr "পাসওয়ার্ড লুকান"
+
+#: static/js/script.js:695
+msgid "Show password"
+msgstr "পাসওয়ার্ড দেখুন"
+
+#: static/js/script.js:720
+msgid "Turn off"
+msgstr "বন্ধ করুন"
+
+#: static/js/script.js:720
+msgid "Turn on"
+msgstr "চালু করুন"
+
+#: static/js/script.js:722
+msgid "Notifications are on for this device."
+msgstr "এই ডিভাইসে নোটিফিকেশন চালু আছে।"
+
+#: static/js/script.js:723
+msgid "Notifications are blocked in your browser settings for this site."
+msgstr "ব্রাউজারের সেটিংসে এই সাইটের নোটিফিকেশন বন্ধ করা আছে।"
+
+#: static/js/script.js:724
+msgid ""
+"Get order updates and price drops on this device, even when the site is "
+"closed."
+msgstr "সাইট বন্ধ থাকলেও এই ডিভাইসে অর্ডারের আপডেট ও দাম কমার খবর পান।"

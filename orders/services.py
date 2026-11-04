@@ -2,16 +2,19 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.db.models import F
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from accounts.constants import INSIDE_DHAKA_DISTRICT
 from accounts.models import CustomerProfile
 from accounts.services import change_points, redeemable, refund_order_points
 from products.bundles import bundle_discount
+from products.templatetags.shop_tags import delivery_days
 from products.models import Product, ProductVariant
 
 from .models import Coupon, DeliveryZone, Order, OrderItem
@@ -46,13 +49,13 @@ def delivery_zone_table():
     table = {}
     for district in BD_DISTRICTS:
         charge, time = delivery_info(district)
-        table[district] = {'charge': float(charge), 'time': time}
+        table[district] = {'charge': float(charge), 'time': delivery_days(time)}
     return table
 
 
 @transaction.atomic
 def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.COD, gift_wrap=False,
-                 use_points=False, payment_channel=''):
+                 use_points=False, payment_channel='', risk_flags=()):
     """Turn the cart into an Order.
 
     Product and variant rows are locked with SELECT ... FOR UPDATE so two customers buying
@@ -63,10 +66,10 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
 
     lines_in = [(parse_key(key), data['quantity']) for key, data in cart.cart.items()]
     if not lines_in:
-        raise CheckoutError('Your cart is empty.')
+        raise CheckoutError(_('Your cart is empty.'))
 
-    product_ids = sorted({pid for (pid, _), _ in lines_in})
-    variant_ids = sorted({vid for (_, vid), _ in lines_in if vid})
+    product_ids = sorted({pid for (pid, _vid), _qty in lines_in})
+    variant_ids = sorted({vid for (_pid, vid), _qty in lines_in if vid})
     products = {
         p.id: p for p in Product.objects.select_for_update().filter(id__in=product_ids, is_active=True).order_by('id')
     }
@@ -81,24 +84,24 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
         product = products.get(pid)
         variant = variants.get(vid) if vid else None
         if product is None or (vid and (variant is None or variant.product_id != pid)):
-            raise CheckoutError('A product in your cart is no longer available. Please review your cart.')
+            raise CheckoutError(_('A product in your cart is no longer available. Please review your cart.'))
         if variant is None and product.variants.filter(is_active=True).exists():
-            raise CheckoutError(f'Please choose an option for "{product.title}" in your cart.')
+            raise CheckoutError(_('Please choose an option for "{name}" in your cart.').format(name=product.title))
         if variant is not None:
             variant.product = product
         stock = variant.stock if variant else product.stock
         name = f'{product.title} ({variant.label})' if variant else product.title
         if stock < qty:
-            raise CheckoutError(f'Only {stock} of "{name}" left in stock. Please update your cart.')
+            raise CheckoutError(_('Only {stock} of "{name}" left in stock. Please update your cart.').format(stock=stock, name=name))
         price = variant.final_price if variant else product.final_price
         subtotal += price * qty
         lines.append((product, variant, qty, price))
 
     qty_by_product, price_by_product = {}, {}
-    for product, _, qty, price in lines:
+    for product, _variant, qty, price in lines:
         qty_by_product[product.id] = qty_by_product.get(product.id, 0) + qty
         price_by_product[product.id] = min(price_by_product.get(product.id, price), price)
-    bundle_saving, _ = bundle_discount(qty_by_product, price_by_product)
+    bundle_saving, _bundles = bundle_discount(qty_by_product, price_by_product)
 
     coupon = None
     discount = Decimal('0.00')
@@ -108,7 +111,7 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
         if coupon is not None:
             ok, reason = coupon.is_valid_for(subtotal, user)
             if not ok:
-                raise CheckoutError(f'Coupon "{coupon.code}" can no longer be used: {reason}')
+                raise CheckoutError(_('Coupon "{code}" can no longer be used: {reason}').format(code=coupon.code, reason=reason))
             discount = coupon.calculate_discount(subtotal)
 
     goods_total = max(subtotal - discount - bundle_saving, Decimal('0.00'))
@@ -137,6 +140,7 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
         total=goods_total + shipping_cost + gift_wrap_cost,
         payment_method=payment_method,
         payment_channel=payment_channel if payment_method == Order.PaymentMethod.SSLCOMMERZ else '',
+        risk_flags=list(risk_flags),
         **shipping,
     )
     OrderItem.objects.bulk_create([
@@ -144,7 +148,7 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
                   variant_label=variant.label if variant else '', price=price, quantity=qty)
         for product, variant, qty, price in lines
     ])
-    for product, variant, qty, _ in lines:
+    for product, variant, qty, _price in lines:
         # A product with variants keeps the total of its variants' stock.
         Product.objects.filter(pk=product.pk).update(stock=F('stock') - qty)
         if variant is not None:
@@ -155,6 +159,7 @@ def create_order(cart, shipping, user=None, payment_method=Order.PaymentMethod.C
         change_points(user, -points_used, f'Used on order {order.order_number}', order)
 
     queue_order_email(order, 'confirmation')
+    queue_order_sms(order, 'placed')
     return order
 
 
@@ -167,7 +172,7 @@ def cancel_order(order, by_staff=False):
     order = Order.objects.select_for_update().get(pk=order.pk)
     staff_allowed = order.status not in (Order.Status.DELIVERED, Order.Status.CANCELLED)
     if not (order.can_cancel or (by_staff and staff_allowed)):
-        raise CheckoutError('This order can no longer be cancelled.')
+        raise CheckoutError(_('This order can no longer be cancelled.'))
     for item in order.items.all():
         if item.product_id:
             Product.objects.filter(pk=item.product_id).update(stock=F('stock') + item.quantity)
@@ -263,13 +268,35 @@ def order_email(order, kind):
     from .invoice import render_invoice
 
     subject = EMAIL_SUBJECTS[kind].format(number=order.order_number, status=order.get_status_display())
-    body = render_to_string(f'orders/emails/order_{kind}.txt', {
-        'order': order, 'site_name': settings.SITE_NAME, 'site_url': settings.SITE_URL,
-    })
-    message = EmailMessage(subject, body, None, [order.email])
+    path = order.get_absolute_url() if order.user_id else reverse('track_order')
+    context = {'order': order, 'site_name': settings.SITE_NAME, 'site_url': settings.SITE_URL,
+               'order_url': settings.SITE_URL + path, 'subject': subject}
+    body = render_to_string(f'orders/emails/order_{kind}.txt', context)
+    message = EmailMultiAlternatives(subject, body, None, [order.email])
+    message.attach_alternative(render_to_string(f'orders/emails/order_{kind}.html', context), 'text/html')
     if kind == 'confirmation':
         message.attach(f'invoice-{order.order_number}.pdf', render_invoice(order), 'application/pdf')
     return message
+
+
+ORDER_SMS = {
+    'placed': 'Order {n} received. Total Tk {total}. We will call you to confirm. - {site}',
+    Order.Status.CONFIRMED: 'Order {n} is confirmed and being packed. - {site}',
+    Order.Status.SHIPPED: 'Order {n} is on the way.{tracking} - {site}',
+    Order.Status.DELIVERED: 'Order {n} delivered. Thank you for shopping with {site}!',
+    Order.Status.CANCELLED: 'Order {n} was cancelled. Questions? Reply to our email or call us. - {site}',
+}
+
+
+def queue_order_sms(order, kind):
+    """Text the customer about their order (plain English: Bangla SMS cost more per message)."""
+    from core.tasks import queue_sms
+
+    if not settings.SMS_ORDER_UPDATES or kind not in ORDER_SMS:
+        return
+    tracking = f' Track: {order.courier_tracking_url}' if getattr(order, 'courier_tracking_url', '') else ''
+    queue_sms(order.phone, ORDER_SMS[kind].format(n=order.order_number, total=f'{order.total:,.0f}',
+                                                  tracking=tracking, site=settings.SITE_NAME))
 
 
 def queue_order_email(order, kind):

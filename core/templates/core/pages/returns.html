@@ -1,29 +1,30 @@
 {% extends 'core/pages/_page.html' %}
+{% load i18n %}
 
 {% block page %}
-<p>If something is wrong with your order, or you changed your mind, you can ask for a return within <strong>{{ return_days }} days of delivery</strong>.</p>
+<p>{% blocktranslate %}If something is wrong with your order, or you changed your mind, you can ask for a return within <strong>{{ return_days }} days of delivery</strong>.{% endblocktranslate %}</p>
 
-<h2 class="h5 fw-bold mt-4">How to return</h2>
+<h2 class="h5 fw-bold mt-4">{% translate "How to return" %}</h2>
 <ol>
-    <li>Open the order in <a href="{% url 'order_list' %}">My orders</a> and choose <em>Request a return</em> (shown for {{ return_days }} days after delivery).</li>
-    <li>Tell us the reason and add any details. We reply within 2 working days.</li>
-    <li>Once approved, we arrange pickup or tell you where to send the item.</li>
+    <li>{% url 'order_list' as orders_url %}{% blocktranslate %}Open the order in <a href="{{ orders_url }}">My orders</a> and choose <em>Request a return</em> (shown for {{ return_days }} days after delivery).{% endblocktranslate %}</li>
+    <li>{% translate "Tell us the reason and add any details. We reply within 2 working days." %}</li>
+    <li>{% translate "Once approved, we arrange pickup or tell you where to send the item." %}</li>
 </ol>
 
-<h2 class="h5 fw-bold mt-4">What can be returned</h2>
+<h2 class="h5 fw-bold mt-4">{% translate "What can be returned" %}</h2>
 <ul>
-    <li>Wrong, damaged or defective items: always, and we pay the return delivery.</li>
-    <li>Change of mind: unused items in the original packaging with all tags and accessories. The return delivery charge is deducted from the refund.</li>
-    <li>Not returnable for hygiene reasons: opened personal care items, innerwear and earphones with a broken seal (unless faulty).</li>
+    <li>{% translate "Wrong, damaged or defective items: always, and we pay the return delivery." %}</li>
+    <li>{% translate "Change of mind: unused items in the original packaging with all tags and accessories. The return delivery charge is deducted from the refund." %}</li>
+    <li>{% translate "Not returnable for hygiene reasons: opened personal care items, innerwear and earphones with a broken seal (unless faulty)." %}</li>
 </ul>
 
-<h2 class="h5 fw-bold mt-4">Refunds</h2>
+<h2 class="h5 fw-bold mt-4">{% translate "Refunds" %}</h2>
 <ul>
-    <li>Online payments are refunded to the same bKash, Nagad or card account within 7-10 working days after we receive the item.</li>
-    <li>Cash on Delivery orders are refunded to your bKash or Nagad number, or a bank account.</li>
-    <li>Reward points used on the order are returned to your account.</li>
+    <li>{% translate "Online payments are refunded to the same bKash, Nagad or card account within 7-10 working days after we receive the item." %}</li>
+    <li>{% translate "Cash on Delivery orders are refunded to your bKash or Nagad number, or a bank account." %}</li>
+    <li>{% translate "Reward points used on the order are returned to your account." %}</li>
 </ul>
 
-<h2 class="h5 fw-bold mt-4">Cancelling an order</h2>
-<p>You can cancel an order yourself from the order page until it is shipped. The items go back on sale and any points you used are returned.</p>
+<h2 class="h5 fw-bold mt-4">{% translate "Cancelling an order" %}</h2>
+<p>{% translate "You can cancel an order yourself from the order page until it is shipped. The items go back on sale and any points you used are returned." %}</p>
 {% endblock %}

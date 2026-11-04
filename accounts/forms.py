@@ -4,6 +4,8 @@ from allauth.account.forms import SignupForm as AllauthSignupForm
 from django import forms
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _l
 
 from core.forms import HoneypotMixin
 from core.middleware import REFERRAL_SESSION_KEY
@@ -19,7 +21,7 @@ class UpazilaMixin:
         cleaned = super().clean()
         district, upazila = cleaned.get('district'), cleaned.get('upazila')
         if district and upazila and not is_valid_upazila(district, upazila):
-            self.add_error('upazila', 'Please choose an upazila / thana in the selected district.')
+            self.add_error('upazila', _('Please choose an upazila / thana in the selected district.'))
         return cleaned
 
 
@@ -27,14 +29,16 @@ class AddressForm(UpazilaMixin, forms.ModelForm):
     class Meta:
         model = Address
         fields = ['full_name', 'phone', 'district', 'upazila', 'area', 'address_line', 'is_default']
-        labels = {'is_default': 'Make this my default address', 'upazila': 'Upazila / Thana', 'area': 'Area'}
+        labels = {'full_name': _l('Full name'), 'phone': _l('Phone'), 'district': _l('District'),
+                  'address_line': _l('Address'), 'is_default': _l('Make this my default address'),
+                  'upazila': _l('Upazila / Thana'), 'area': _l('Area')}
         widgets = {
             'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '01XXXXXXXXX'}),
             'district': forms.Select(attrs={'class': 'form-select js-district'}),
             'upazila': forms.TextInput(attrs={'class': 'form-select js-upazila'}),
-            'area': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Road 5, Block C'}),
-            'address_line': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'House, road, village'}),
+            'area': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _l('e.g. Road 5, Block C')}),
+            'address_line': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _l('House, road, village')}),
             'is_default': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
@@ -59,32 +63,35 @@ def form_honeypot_name(form):
 class LoginForm(AllauthLoginForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['login'].label = 'Email or mobile number'
-        self.fields['login'].widget.attrs.update({'placeholder': 'you@example.com or 01XXXXXXXXX',
+        self.fields['login'].label = _('Email or mobile number')
+        self.fields['login'].widget.attrs.update({'placeholder': _('you@example.com or 01XXXXXXXXX'),
                                                   'autocomplete': 'username'})
         self.fields['password'].help_text = ''  # the template has its own "Forgot password?" link
         if 'remember' in self.fields:
-            self.fields['remember'].label = 'Keep me logged in'
+            self.fields['remember'].label = _('Keep me logged in')
+        self.fields['password'].label = _('Password')
         style_auth_fields(self)
 
 
 class SignupForm(HoneypotMixin, AllauthSignupForm):
-    full_name = forms.CharField(max_length=150, label='Full name',
-                                widget=forms.TextInput(attrs={'placeholder': 'Your name', 'autocomplete': 'name'}))
+    full_name = forms.CharField(max_length=150, label=_l('Full name'),
+                                widget=forms.TextInput(attrs={'placeholder': _l('Your name'), 'autocomplete': 'name'}))
     referral_code = forms.CharField(
-        max_length=20, required=False, label='Referral code (optional)',
-        widget=forms.TextInput(attrs={'placeholder': 'e.g. SCB1A2B3C'}),
+        max_length=20, required=False, label=_l('Referral code (optional)'),
+        widget=forms.TextInput(attrs={'placeholder': _l('e.g. SCB1A2B3C')}),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.order_fields(['full_name', 'phone', 'email', 'password1', 'password2', 'referral_code'])
         self.fields['phone'].required = True
-        self.fields['phone'].label = 'Mobile number'
+        self.fields['phone'].label = _('Mobile number')
         self.fields['email'].widget.attrs['placeholder'] = 'you@example.com'
-        self.fields['password1'].help_text = 'At least 8 characters, not only numbers.'
-        self.fields['password2'].label = 'Confirm password'
-        self.fields['password2'].widget.attrs['placeholder'] = 'Repeat it'
+        self.fields['password1'].help_text = _('At least 8 characters, not only numbers.')
+        self.fields['password1'].label = _('Password')
+        self.fields['password2'].label = _('Confirm password')
+        self.fields['password2'].widget.attrs['placeholder'] = _('Repeat it')
+        self.fields['email'].label = _('Email')
         style_auth_fields(self)
 
     def _clean_phone(self):
@@ -93,18 +100,18 @@ class SignupForm(HoneypotMixin, AllauthSignupForm):
         phone = self.cleaned_data.get('phone')
         if phone and get_adapter().get_user_by_phone(phone):
             self.add_error('phone', mark_safe(
-                f'This mobile number already has an account. <a href="{reverse("account_login")}">Log in</a> '
-                'instead, or use a different number.'))
+                _('This mobile number already has an account. <a href="{url}">Log in</a> instead, '
+                  'or use a different number.').format(url=reverse('account_login'))))
 
     def clean_referral_code(self):
         code = self.cleaned_data['referral_code'].strip().upper()
         if code and not CustomerProfile.objects.filter(referral_code=code).exists():
-            raise forms.ValidationError('This referral code is not valid.')
+            raise forms.ValidationError(_('This referral code is not valid.'))
         return code
 
     def save(self, request):
         user = super().save(request)
-        first, _, last = self.cleaned_data['full_name'].strip().partition(' ')
+        first, _space, last = self.cleaned_data['full_name'].strip().partition(' ')
         user.first_name, user.last_name = first[:150], last[:150]
         user.save(update_fields=['first_name', 'last_name'])
         code = self.cleaned_data.get('referral_code') or request.session.pop(REFERRAL_SESSION_KEY, '')

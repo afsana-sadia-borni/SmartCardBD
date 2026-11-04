@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Access denied | SmartCart BD{% endblock %}
+{% block title %}{% translate "Access denied | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 {% include 'partials/error_page.html' with code='403' heading='Access denied' icon='shield-lock' message="You don't have permission to view this page." %}

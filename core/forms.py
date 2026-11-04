@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 
 class HoneypotMixin:
@@ -17,5 +18,5 @@ class HoneypotMixin:
     def clean(self):
         cleaned = super().clean()
         if cleaned.get(self.honeypot_field):
-            raise ValidationError('Your submission looks automated. Please try again.')
+            raise ValidationError(_('Your submission looks automated. Please try again.'))
         return cleaned

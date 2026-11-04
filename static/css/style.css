@@ -393,3 +393,6 @@ p:has(> .hp-field) { position: absolute !important; left: -10000px !important; w
     .app-brand { font-size: 1rem; }
     .topbar-actions .btn-link { padding-left: .35rem !important; padding-right: .35rem !important; }
 }
+
+/* Bangla pages: a font made for Bangla script (Latin text falls back to the normal font). */
+html[lang="bn"] body { font-family: 'Hind Siliguri', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }

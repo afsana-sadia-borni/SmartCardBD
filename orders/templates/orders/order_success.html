@@ -1,38 +1,39 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load shop_tags %}
 
-{% block title %}Order placed | SmartCart BD{% endblock %}
+{% block title %}{% translate "Order placed | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 760px;">
     <div class="bg-body rounded-4 shadow-sm p-4 p-md-5 text-center mb-4">
         <i class="bi bi-check-circle-fill text-success display-3"></i>
-        <h2 class="fw-bold mt-3">Thank you, {{ order.full_name }}!</h2>
-        <p class="text-body-secondary">Your order has been placed. A confirmation has been sent to <strong>{{ order.email }}</strong>.</p>
+        <h2 class="fw-bold mt-3">{% blocktranslate with name=order.full_name %}Thank you, {{ name }}!{% endblocktranslate %}</h2>
+        <p class="text-body-secondary">{% translate "Your order has been placed. A confirmation has been sent to" %} <strong>{{ order.email }}</strong>.</p>
         <div class="d-inline-block bg-body-tertiary rounded-3 px-4 py-2 mb-3">
-            <small class="text-body-secondary">Order number</small>
+            <small class="text-body-secondary">{% translate "Order number" %}</small>
             <div class="fs-4 fw-bold font-monospace">{{ order.order_number }}</div>
         </div>
         <p class="mb-0">
             {% if order.payment_status == 'paid' %}
-                <span class="badge text-bg-success fs-6"><i class="bi bi-credit-card"></i> Paid online</span>
+                <span class="badge text-bg-success fs-6"><i class="bi bi-credit-card"></i> {% translate "Paid online" %}</span>
             {% else %}
-                <span class="badge text-bg-warning fs-6"><i class="bi bi-cash"></i> Pay {{ order.total|taka }} on delivery</span>
+                <span class="badge text-bg-warning fs-6"><i class="bi bi-cash"></i> {% blocktranslate with amount=order.total|taka %}Pay {{ amount }} on delivery{% endblocktranslate %}</span>
             {% endif %}
         </p>
     </div>
 
     <div class="bg-body rounded-4 shadow-sm p-4 mb-4">
-        <h5 class="fw-bold mb-3">Order details</h5>
+        <h5 class="fw-bold mb-3">{% translate "Order details" %}</h5>
         {% include 'orders/_order_items.html' %}
         <hr>
-        <h6 class="fw-semibold">Delivering to</h6>
+        <h6 class="fw-semibold">{% translate "Delivering to" %}</h6>
         <p class="mb-0 small">{{ order.full_name }} · {{ order.phone }}<br>{{ order.address_line }}, {{ order.area }}, {{ order.district }}</p>
     </div>
 
     <div class="d-flex flex-wrap gap-2 justify-content-center">
-        <a href="{{ order.get_absolute_url }}" class="btn btn-dark">Track this order</a>
-        <a href="{% url 'product_list' %}" class="btn btn-outline-dark">Continue shopping</a>
+        <a href="{{ order.get_absolute_url }}" class="btn btn-dark">{% translate "Track this order" %}</a>
+        <a href="{% url 'product_list' %}" class="btn btn-outline-dark">{% translate "Continue shopping" %}</a>
     </div>
 </div>
 {% endblock %}

@@ -72,6 +72,19 @@ Staff run the shop from a mobile-friendly **store panel** (`/store/`), and a doc
 - Dark mode, phone-friendly layout; Django admin (`/manage-scb/`) stays as "Advanced settings" for the owner
 - Change history for products, variants, orders, coupons and returns (django-simple-history), CSV sales reports
 
+**Bangladesh-ready operations**
+- **English / বাংলা**: the whole shop (pages, forms, messages, JavaScript) switches language with one button;
+  Bangla also shows Bangla digits and uses a Bangla font. The store panel stays in English.
+- **SMS** (BulkSMSBD): order placed / confirmed / shipped / delivered texts, and sign-up phone verification codes
+- **Courier** (Steadfast): book a parcel from the order page or for many orders at once; the tracking link goes to
+  the customer, and delivered parcels mark the order delivered automatically. Other couriers: tracking by hand
+- **Fake Cash on Delivery orders**: warnings for staff (past cancellations, many orders in 24 hours, a big first
+  order), an SMS code before risky COD orders, and a per-number COD block list
+- **Store panel extras**: bulk confirm / ship / deliver / book courier, printable packing slips, product CSV import
+  and export (all-or-nothing, with a check-only mode), reports with date ranges and charts, an Integrations page
+  showing which services are set up (with test email / SMS buttons)
+- **Operations**: HTML order emails, Sentry error monitoring, `/healthz/` for uptime checks, `backup_db` command
+
 **REST API** (`/api/`, docs at `/api/docs/`)
 - Products (search, filters, sorting, pagination), product detail with variants and reviews, categories
 - JWT login with email and password, profile with reward points, your orders, and placing Cash on Delivery
@@ -107,8 +120,10 @@ Staff run the shop from a mobile-friendly **store panel** (`/store/`), and a doc
 | Charts | Chart.js |
 | Payments | SSLCommerz v4 API |
 | PDF / push | ReportLab (invoices), pywebpush (Web Push / VAPID) |
+| Integrations | SSLCommerz, BulkSMSBD, Steadfast, Sentry |
+| i18n | Django translations (English, Bangla), JavaScript catalog |
 | ML | scikit-learn (TF-IDF + cosine similarity) |
-| Tests | Django test framework (168 tests) |
+| Tests | Django test framework (206 tests) |
 
 ## Getting started
 
@@ -192,6 +207,29 @@ python manage.py release_unpaid_orders
 python manage.py send_price_alerts
 python manage.py send_abandoned_cart_emails
 python manage.py make_webp_images     # one-off: WebP copies for images uploaded before this feature
+```
+
+### SMS, courier, monitoring (optional)
+
+Put the keys in `.env` (see `.env.example`), restart, and check **Store panel → Integrations**:
+
+```bash
+python manage.py send_test_email you@example.com   # check SMTP
+python manage.py send_test_sms 01712345678         # check SMS
+python manage.py backup_db                         # gzip backup into BACKUP_DIR, keeps the newest 7
+```
+
+Steadfast statuses are checked every 30 minutes by Celery beat. Uptime monitors can call `/healthz/`.
+
+### Translations
+
+Text is in English in the code and translated in `locale/bn/LC_MESSAGES/django.po` (and `djangojs.po` for
+JavaScript). After changing text:
+
+```bash
+python manage.py makemessages -l bn --ignore=venv --ignore=store && python manage.py makemessages -d djangojs -l bn --ignore=venv
+# translate the new entries in the .po files, then
+python manage.py compilemessages -l bn --ignore=venv
 ```
 
 ### Push notifications (optional)

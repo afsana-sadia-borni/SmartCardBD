@@ -1,9 +1,9 @@
-{% load static shop_tags %}<!DOCTYPE html>
-<html lang="{% if bn_digits %}bn{% else %}en{% endif %}" data-bs-theme="light">
+{% load i18n static shop_tags %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}<html lang="{{ LANGUAGE_CODE }}" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SmartCart BD - Smart Online Shopping{% endblock %}</title>
+    <title>{% block title %}{% translate "SmartCart BD - Smart Online Shopping" %}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Shop electronics, fashion and more at the best prices in Bangladesh. Cash on Delivery all over the country.{% endblock %}">
     {# Apply the saved theme before anything paints, so dark mode doesn't flash white. #}
     <script>
@@ -23,11 +23,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    {% if LANGUAGE_CODE == 'bn' %}<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">{% endif %}
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="d-flex flex-column min-vh-100 bg-body-tertiary">
-<a class="skip-link" href="#main-content">Skip to content</a>
+<a class="skip-link" href="#main-content">{% translate "Skip to content" %}</a>
 
 {% url 'home' as home_url %}
 {% url 'product_list' as shop_url %}
@@ -42,26 +43,24 @@
 
 {# ---------- Top bar ---------- #}
 <header class="app-topbar sticky-top shadow-sm">
-    <nav class="navbar navbar-dark bg-dark" aria-label="Top">
+    <nav class="navbar navbar-dark bg-dark" aria-label="{% translate "Top" %}">
         <div class="container-fluid px-3 px-lg-4 flex-nowrap gap-2">
-            <button class="btn btn-link text-white d-lg-none px-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar" aria-label="Open menu">
+            <button class="btn btn-link text-white d-lg-none px-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar" aria-label="{% translate "Open menu" %}">
                 <i class="bi bi-list fs-3"></i>
             </button>
             <a class="navbar-brand fw-bold me-0 me-md-3 app-brand" href="{{ home_url }}"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</a>
 
             <form class="d-none d-md-flex flex-grow-1 mx-lg-3 position-relative js-search-form" action="{{ shop_url }}" method="get" role="search">
                 <div class="input-group">
-                    <input class="form-control js-search-input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search products, brands, categories..." aria-label="Search" autocomplete="off" aria-autocomplete="list" aria-controls="search-suggest-desktop">
-                    <button class="btn btn-warning" type="submit" aria-label="Search"><i class="bi bi-search"></i></button>
+                    <input class="form-control js-search-input" type="search" name="q" value="{{ request.GET.q }}" placeholder="{% translate "Search products, brands, categories..." %}" aria-label="{% translate "Search" %}" autocomplete="off" aria-autocomplete="list" aria-controls="search-suggest-desktop">
+                    <button class="btn btn-warning" type="submit" aria-label="{% translate "Search" %}"><i class="bi bi-search"></i></button>
                 </div>
                 <div class="search-suggest shadow js-search-suggest" id="search-suggest-desktop" role="listbox" hidden></div>
             </form>
 
             <div class="d-flex align-items-center gap-0 gap-sm-1 ms-auto topbar-actions">
-                <button type="button" class="btn btn-link text-white px-2 js-digits-toggle d-none d-sm-inline-block" aria-label="{% if bn_digits %}Show English numbers{% else %}Show Bangla numbers{% endif %}" title="{% if bn_digits %}English numbers{% else %}বাংলা সংখ্যা{% endif %}">
-                    <span class="small fw-semibold">{% if bn_digits %}123{% else %}১২৩{% endif %}</span>
-                </button>
-                <button type="button" class="btn btn-link text-white px-2 js-theme-toggle d-none d-sm-inline-block" aria-label="Toggle dark mode" title="Dark mode">
+                {% include 'partials/language_switch.html' with css='btn btn-link text-white px-2 d-none d-sm-inline-block fw-semibold' %}
+                <button type="button" class="btn btn-link text-white px-2 js-theme-toggle d-none d-sm-inline-block" aria-label="{% translate "Toggle dark mode" %}" title="{% translate "Dark mode" %}">
                     <i class="bi bi-moon-stars js-theme-icon"></i>
                 </button>
                 {% if user.is_authenticated %}
@@ -72,66 +71,66 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-end notif-menu p-0">
                             <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
-                                <strong>Notifications</strong>
+                                <strong>{% translate "Notifications" %}</strong>
                                 {% if unread_notifications %}
-                                    <form method="post" action="{% url 'notifications_mark_read' %}" class="js-mark-read">{% csrf_token %}<button class="btn btn-link btn-sm p-0" type="submit">Mark all read</button></form>
+                                    <form method="post" action="{% url 'notifications_mark_read' %}" class="js-mark-read">{% csrf_token %}<button class="btn btn-link btn-sm p-0" type="submit">{% translate "Mark all read" %}</button></form>
                                 {% endif %}
                             </div>
                             {% for note in latest_notifications %}
                                 <a class="dropdown-item d-flex gap-2 py-2 {% if not note.is_read %}notif-unread{% endif %}" href="{% url 'notification_open' note.pk %}">
                                     <i class="bi bi-{{ note.icon }} text-warning mt-1"></i>
-                                    <span class="small text-wrap">{{ note.message }}<br><span class="text-body-secondary">{{ note.created_at|timesince }} ago</span></span>
+                                    <span class="small text-wrap">{{ note.message }}<br><span class="text-body-secondary">{% blocktranslate with when=note.created_at|timesince %}{{ when }} ago{% endblocktranslate %}</span></span>
                                 </a>
                             {% empty %}
-                                <div class="text-center text-body-secondary small py-4"><i class="bi bi-bell-slash fs-4 d-block mb-1"></i>No notifications yet</div>
+                                <div class="text-center text-body-secondary small py-4"><i class="bi bi-bell-slash fs-4 d-block mb-1"></i>{% translate "No notifications yet" %}</div>
                             {% endfor %}
-                            <a class="d-block text-center small py-2 border-top" href="{{ notifications_url }}">See all</a>
+                            <a class="d-block text-center small py-2 border-top" href="{{ notifications_url }}">{% translate "See all" %}</a>
                         </div>
                     </div>
-                    <a href="{{ wishlist_url }}" class="btn btn-link text-white px-2 d-none d-sm-inline-block" aria-label="Wishlist">
+                    <a href="{{ wishlist_url }}" class="btn btn-link text-white px-2 d-none d-sm-inline-block" aria-label="{% translate "Wishlist" %}">
                         <i class="bi bi-heart fs-5"></i>
                     </a>
                 {% endif %}
-                <a href="{{ cart_url }}" class="btn btn-warning btn-sm fw-semibold" data-bs-toggle="offcanvas" data-bs-target="#miniCart" aria-controls="miniCart" aria-label="Cart">
-                    <i class="bi bi-cart3"></i> <span class="d-none d-sm-inline">Cart</span>
+                <a href="{{ cart_url }}" class="btn btn-warning btn-sm fw-semibold" data-bs-toggle="offcanvas" data-bs-target="#miniCart" aria-controls="miniCart" aria-label="{% translate "Cart" %}">
+                    <i class="bi bi-cart3"></i> <span class="d-none d-sm-inline">{% translate "Cart" %}</span>
                     <span class="badge rounded-pill bg-danger js-cart-count">{{ cart|length|num }}</span>
                 </a>
                 {% if user.is_staff %}
-                    <a href="{{ dashboard_url }}" class="btn btn-warning btn-sm fw-semibold" title="Store panel"><i class="bi bi-shop"></i> <span class="d-none d-lg-inline">Store</span></a>
+                    <a href="{{ dashboard_url }}" class="btn btn-warning btn-sm fw-semibold" title="{% translate "Store panel" %}"><i class="bi bi-shop"></i> <span class="d-none d-lg-inline">{% translate "Store" %}</span></a>
                 {% endif %}
                 {% if user.is_authenticated %}
                     <div class="dropdown">
-                        <button class="btn btn-link text-white px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account">
+                        <button class="btn btn-link text-white px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{% translate "Account" %}">
                             <i class="bi bi-person-circle fs-5"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><span class="dropdown-item-text small text-body-secondary">{{ user.email }}</span></li>
-                            <li><a class="dropdown-item" href="{{ profile_url }}"><i class="bi bi-person me-2"></i>My account</a></li>
-                            <li><a class="dropdown-item" href="{{ orders_url }}"><i class="bi bi-box-seam me-2"></i>My orders</a></li>
+                            <li><a class="dropdown-item" href="{{ profile_url }}"><i class="bi bi-person me-2"></i>{% translate "My account" %}</a></li>
+                            <li><a class="dropdown-item" href="{{ orders_url }}"><i class="bi bi-box-seam me-2"></i>{% translate "My orders" %}</a></li>
                             {% if user.is_staff %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><h6 class="dropdown-header">Store</h6></li>
-                                <li><a class="dropdown-item" href="{{ dashboard_url }}"><i class="bi bi-shop me-2"></i>Store panel</a></li>
-                                <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>Admin panel</a></li>
+                                <li><h6 class="dropdown-header">{% translate "Store" %}</h6></li>
+                                <li><a class="dropdown-item" href="{{ dashboard_url }}"><i class="bi bi-shop me-2"></i>{% translate "Store panel" %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>{% translate "Admin panel" %}</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="post" action="{% url 'account_logout' %}">
                                     {% csrf_token %}
-                                    <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Log out</button>
+                                    <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>{% translate "Log out" %}</button>
                                 </form>
                             </li>
                         </ul>
                     </div>
                 {% else %}
-                    <a href="{% url 'account_login' %}" class="btn btn-outline-light btn-sm d-none d-sm-inline-block">Log in</a>
+                    <a href="{% url 'account_login' %}" class="btn btn-outline-light btn-sm d-none d-sm-inline-block">{% translate "Log in" %}</a>
                 {% endif %}
             </div>
         </div>
         <form class="d-md-none w-100 px-3 pb-2 position-relative js-search-form" action="{{ shop_url }}" method="get" role="search">
             <div class="input-group input-group-sm">
-                <input class="form-control js-search-input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search products..." aria-label="Search" autocomplete="off" aria-autocomplete="list" aria-controls="search-suggest-mobile">
-                <button class="btn btn-warning" type="submit" aria-label="Search"><i class="bi bi-search"></i></button>
+                <input class="form-control js-search-input" type="search" name="q" value="{{ request.GET.q }}" placeholder="{% translate "Search products..." %}" aria-label="{% translate "Search" %}" autocomplete="off" aria-autocomplete="list" aria-controls="search-suggest-mobile">
+                <button class="btn btn-warning" type="submit" aria-label="{% translate "Search" %}"><i class="bi bi-search"></i></button>
             </div>
             <div class="search-suggest shadow js-search-suggest" id="search-suggest-mobile" role="listbox" hidden></div>
         </form>
@@ -144,33 +143,33 @@
     <aside class="app-sidebar offcanvas-lg offcanvas-start bg-body border-end" tabindex="-1" id="appSidebar" aria-labelledby="appSidebarLabel">
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title fw-bold" id="appSidebarLabel"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#appSidebar" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#appSidebar" aria-label="{% translate "Close" %}"></button>
         </div>
         <div class="offcanvas-body flex-column p-3">
             {% if not user.is_authenticated %}
                 <div class="d-grid gap-2 mb-3 d-lg-none">
-                    <a href="{% url 'account_login' %}" class="btn btn-dark btn-sm">Log in</a>
-                    <a href="{% url 'account_signup' %}" class="btn btn-outline-dark btn-sm">Create account</a>
+                    <a href="{% url 'account_login' %}" class="btn btn-dark btn-sm">{% translate "Log in" %}</a>
+                    <a href="{% url 'account_signup' %}" class="btn btn-outline-dark btn-sm">{% translate "Create account" %}</a>
                 </div>
             {% endif %}
 
-            <nav class="sidebar-nav" aria-label="Main">
-                <div class="sidebar-heading">Shop</div>
-                <a class="sidebar-link {% nav_active home_url exact=True %}" href="{{ home_url }}"><i class="bi bi-house"></i> Home</a>
-                <a class="sidebar-link {% nav_active shop_url exact=True %}" href="{{ shop_url }}"><i class="bi bi-grid"></i> All products</a>
-                <a class="sidebar-link" href="{{ home_url }}#flash-sale"><i class="bi bi-lightning-charge"></i> Flash sale</a>
-                <a class="sidebar-link" href="{{ shop_url }}?sort=rating"><i class="bi bi-star"></i> Top rated</a>
+            <nav class="sidebar-nav" aria-label="{% translate "Main" %}">
+                <div class="sidebar-heading">{% translate "Shop" %}</div>
+                <a class="sidebar-link {% nav_active home_url exact=True %}" href="{{ home_url }}"><i class="bi bi-house"></i> {% translate "Home" %}</a>
+                <a class="sidebar-link {% nav_active shop_url exact=True %}" href="{{ shop_url }}"><i class="bi bi-grid"></i> {% translate "All products" %}</a>
+                <a class="sidebar-link" href="{{ home_url }}#flash-sale"><i class="bi bi-lightning-charge"></i> {% translate "Flash sale" %}</a>
+                <a class="sidebar-link" href="{{ shop_url }}?sort=rating"><i class="bi bi-star"></i> {% translate "Top rated" %}</a>
                 <a class="sidebar-link {% nav_active compare_url %}" href="{{ compare_url }}">
-                    <i class="bi bi-arrow-left-right"></i> Compare
+                    <i class="bi bi-arrow-left-right"></i> {% translate "Compare" %}
                     <span class="badge rounded-pill text-bg-secondary ms-auto js-compare-count {% if not compare_ids %}d-none{% endif %}">{{ compare_ids|length|num }}</span>
                 </a>
                 <a class="sidebar-link {% nav_active cart_url %}" href="{{ cart_url }}">
-                    <i class="bi bi-cart3"></i> Cart
+                    <i class="bi bi-cart3"></i> {% translate "Cart" %}
                     <span class="badge rounded-pill text-bg-warning ms-auto js-cart-count">{{ cart|length|num }}</span>
                 </a>
 
                 {% if nav_categories %}
-                    <div class="sidebar-heading">Categories</div>
+                    <div class="sidebar-heading">{% translate "Categories" %}</div>
                     {% for c in nav_categories %}
                         {% with c_url=c.get_absolute_url %}
                             <a class="sidebar-link {% nav_active c_url %}" href="{{ c_url }}"><i class="bi bi-tag"></i> {{ c.name }}</a>
@@ -178,38 +177,38 @@
                     {% endfor %}
                 {% endif %}
 
-                <div class="sidebar-heading">My account</div>
+                <div class="sidebar-heading">{% translate "My account" %}</div>
                 {% if user.is_authenticated %}
-                    <a class="sidebar-link {% nav_active profile_url exact=True %}" href="{{ profile_url }}"><i class="bi bi-person"></i> Profile &amp; rewards</a>
-                    <a class="sidebar-link {% nav_active orders_url %}" href="{{ orders_url }}"><i class="bi bi-box-seam"></i> My orders</a>
+                    <a class="sidebar-link {% nav_active profile_url exact=True %}" href="{{ profile_url }}"><i class="bi bi-person"></i> {% translate "Profile &amp; rewards" %}</a>
+                    <a class="sidebar-link {% nav_active orders_url %}" href="{{ orders_url }}"><i class="bi bi-box-seam"></i> {% translate "My orders" %}</a>
                     <a class="sidebar-link {% nav_active notifications_url %}" href="{{ notifications_url }}">
-                        <i class="bi bi-bell"></i> Notifications
+                        <i class="bi bi-bell"></i> {% translate "Notifications" %}
                         {% if unread_notifications %}<span class="badge rounded-pill text-bg-danger ms-auto">{{ unread_notifications|num }}</span>{% endif %}
                     </a>
-                    <a class="sidebar-link {% nav_active wishlist_url %}" href="{{ wishlist_url }}"><i class="bi bi-heart"></i> Wishlist</a>
+                    <a class="sidebar-link {% nav_active wishlist_url %}" href="{{ wishlist_url }}"><i class="bi bi-heart"></i> {% translate "Wishlist" %}</a>
                     {% if user.is_staff %}
-                        <div class="sidebar-heading">Store</div>
-                        <a class="sidebar-link" href="{{ dashboard_url }}"><i class="bi bi-shop"></i> Store panel</a>
-                        <a class="sidebar-link" href="{% url 'admin:index' %}"><i class="bi bi-gear"></i> Admin panel</a>
+                        <div class="sidebar-heading">{% translate "Store" %}</div>
+                        <a class="sidebar-link" href="{{ dashboard_url }}"><i class="bi bi-shop"></i> {% translate "Store panel" %}</a>
+                        <a class="sidebar-link" href="{% url 'admin:index' %}"><i class="bi bi-gear"></i> {% translate "Admin panel" %}</a>
                     {% endif %}
                     <form method="post" action="{% url 'account_logout' %}">
                         {% csrf_token %}
-                        <button class="sidebar-link text-danger w-100" type="submit"><i class="bi bi-box-arrow-right"></i> Log out</button>
+                        <button class="sidebar-link text-danger w-100" type="submit"><i class="bi bi-box-arrow-right"></i> {% translate "Log out" %}</button>
                     </form>
                 {% else %}
-                    <a class="sidebar-link" href="{% url 'account_login' %}?next={{ orders_url }}"><i class="bi bi-box-seam"></i> My orders</a>
-                    <a class="sidebar-link" href="{% url 'account_login' %}"><i class="bi bi-box-arrow-in-right"></i> Log in</a>
-                    <a class="sidebar-link" href="{% url 'account_signup' %}"><i class="bi bi-person-plus"></i> Sign up</a>
+                    <a class="sidebar-link" href="{% url 'account_login' %}?next={{ orders_url }}"><i class="bi bi-box-seam"></i> {% translate "My orders" %}</a>
+                    <a class="sidebar-link" href="{% url 'account_login' %}"><i class="bi bi-box-arrow-in-right"></i> {% translate "Log in" %}</a>
+                    <a class="sidebar-link" href="{% url 'account_signup' %}"><i class="bi bi-person-plus"></i> {% translate "Sign up" %}</a>
                 {% endif %}
-                <a class="sidebar-link {% nav_active track_url %}" href="{{ track_url }}"><i class="bi bi-geo"></i> Track an order</a>
+                <a class="sidebar-link {% nav_active track_url %}" href="{{ track_url }}"><i class="bi bi-geo"></i> {% translate "Track an order" %}</a>
             </nav>
 
             <div class="sidebar-note small text-body-secondary mt-4 pt-3 border-top">
-                <div><i class="bi bi-cash-coin text-warning"></i> Cash on Delivery</div>
-                <div><i class="bi bi-truck text-warning"></i> All 64 districts</div>
+                <div><i class="bi bi-cash-coin text-warning"></i> {% translate "Cash on Delivery" %}</div>
+                <div><i class="bi bi-truck text-warning"></i> {% translate "All 64 districts" %}</div>
                 <div class="d-flex flex-column align-items-start d-sm-none mt-2">
-                    <button type="button" class="btn btn-link btn-sm px-0 js-digits-toggle">{% if bn_digits %}Show English numbers{% else %}বাংলা সংখ্যা দেখান{% endif %}</button>
-                    <button type="button" class="btn btn-link btn-sm px-0 js-theme-toggle"><i class="bi bi-moon-stars js-theme-icon"></i> Dark / light mode</button>
+                    {% include 'partials/language_switch.html' with css='btn btn-link btn-sm px-0' long=True %}
+                    <button type="button" class="btn btn-link btn-sm px-0 js-theme-toggle"><i class="bi bi-moon-stars js-theme-icon"></i> {% translate "Dark / light mode" %}</button>
                 </div>
             </div>
         </div>
@@ -227,47 +226,47 @@
                 <div class="row g-4">
                     <div class="col-lg-3">
                         <h6 class="text-white fw-bold"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</h6>
-                        <p class="small mb-0">Smart online shopping for Bangladesh. Genuine products, fair prices and Cash on Delivery across all 64 districts.</p>
+                        <p class="small mb-0">{% translate "Smart online shopping for Bangladesh. Genuine products, fair prices and Cash on Delivery across all 64 districts." %}</p>
                     </div>
                     <div class="col-6 col-lg-2">
-                        <h6 class="text-white">Help</h6>
+                        <h6 class="text-white">{% translate "Help" %}</h6>
                         <ul class="list-unstyled small mb-0">
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ track_url }}">Track my order</a></li>
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ compare_url }}">Compare products</a></li>
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'image_credits' %}">Image credits</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ track_url }}">{% translate "Track my order" %}</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{{ compare_url }}">{% translate "Compare products" %}</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'image_credits' %}">{% translate "Image credits" %}</a></li>
                         </ul>
                     </div>
                     <div class="col-6 col-lg-2">
-                        <h6 class="text-white">Policies</h6>
+                        <h6 class="text-white">{% translate "Policies" %}</h6>
                         <ul class="list-unstyled small mb-0">
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'about' %}">About us</a></li>
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'shipping' %}">Delivery</a></li>
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'returns' %}">Returns &amp; refunds</a></li>
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'privacy' %}">Privacy</a></li>
-                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'terms' %}">Terms</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'about' %}">{% translate "About us" %}</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'shipping' %}">{% translate "Delivery" %}</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'returns' %}">{% translate "Returns &amp; refunds" %}</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'privacy' %}">{% translate "Privacy" %}</a></li>
+                            <li><a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'terms' %}">{% translate "Terms" %}</a></li>
                         </ul>
                     </div>
                     <div class="col-6 col-lg-2">
-                        <h6 class="text-white">We accept</h6>
-                        <p class="small mb-1"><i class="bi bi-cash-coin"></i> Cash on Delivery</p>
-                        <p class="small mb-0"><i class="bi bi-phone"></i> bKash · Nagad · Card</p>
+                        <h6 class="text-white">{% translate "We accept" %}</h6>
+                        <p class="small mb-1"><i class="bi bi-cash-coin"></i> {% translate "Cash on Delivery" %}</p>
+                        <p class="small mb-0"><i class="bi bi-phone"></i> {% translate "bKash · Nagad · Card" %}</p>
                     </div>
                     <div class="col-lg-3">
-                        <h6 class="text-white">Get deals in your inbox</h6>
+                        <h6 class="text-white">{% translate "Get deals in your inbox" %}</h6>
                         <form method="post" action="{% url 'newsletter_subscribe' %}" class="js-newsletter" novalidate>
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                            <div class="hp-wrap" aria-hidden="true"><label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+                            <div class="hp-wrap" aria-hidden="true"><label>{% translate "Leave this field empty" %} <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
                             <div class="input-group input-group-sm">
-                                <input type="email" name="email" class="form-control" placeholder="your@email.com" aria-label="Email address" required>
-                                <button class="btn btn-warning fw-semibold" type="submit">Subscribe</button>
+                                <input type="email" name="email" class="form-control" placeholder="{% translate "your@email.com" %}" aria-label="{% translate "Email address" %}" required>
+                                <button class="btn btn-warning fw-semibold" type="submit">{% translate "Subscribe" %}</button>
                             </div>
                             <div class="small mt-1 js-newsletter-msg" role="status"></div>
                         </form>
                     </div>
                 </div>
                 <hr class="border-secondary">
-                <p class="small text-center mb-0">&copy; {% now "Y" %} SmartCart BD. All rights reserved.</p>
+                <p class="small text-center mb-0">&copy; {% now "Y" %} {% translate "SmartCart BD. All rights reserved." %}</p>
             </div>
         </footer>
     </div>
@@ -276,8 +275,8 @@
 {# ---------- Slide-out mini cart ---------- #}
 <div class="offcanvas offcanvas-end mini-cart" tabindex="-1" id="miniCart" aria-labelledby="miniCartLabel">
     <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title fw-bold" id="miniCartLabel"><i class="bi bi-cart3"></i> Your cart</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <h5 class="offcanvas-title fw-bold" id="miniCartLabel"><i class="bi bi-cart3"></i> {% translate "Your cart" %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{% translate "Close" %}"></button>
     </div>
     <div class="offcanvas-body d-flex flex-column p-0 js-mini-cart-body" data-url="{% url 'mini_cart' %}">
         {% include 'cart/_mini_cart.html' %}
@@ -285,11 +284,11 @@
 </div>
 
 {# ---------- Quick view ---------- #}
-<div class="modal fade" id="quickViewModal" tabindex="-1" aria-label="Quick view" aria-hidden="true">
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-label="{% translate "Quick view" %}" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content rounded-4">
             <div class="modal-header border-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate "Close" %}"></button>
             </div>
             <div class="modal-body pt-0 js-quick-view-body"></div>
         </div>
@@ -299,12 +298,12 @@
 {# ---------- Floating buttons ---------- #}
 <div class="floating-actions">
     {% if messenger_url %}
-        <a href="{{ messenger_url }}" class="fab fab-messenger" target="_blank" rel="noopener" aria-label="Chat on Messenger"><i class="bi bi-messenger"></i></a>
+        <a href="{{ messenger_url }}" class="fab fab-messenger" target="_blank" rel="noopener" aria-label="{% translate "Chat on Messenger" %}"><i class="bi bi-messenger"></i></a>
     {% endif %}
     {% if whatsapp_number %}
-        <a href="https://wa.me/{{ whatsapp_number }}?text={{ 'Hi SmartCart BD, I have a question.'|urlencode }}" class="fab fab-whatsapp" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><i class="bi bi-whatsapp"></i></a>
+        <a href="https://wa.me/{{ whatsapp_number }}?text={{ 'Hi SmartCart BD, I have a question.'|urlencode }}" class="fab fab-whatsapp" target="_blank" rel="noopener" aria-label="{% translate "Chat on WhatsApp" %}"><i class="bi bi-whatsapp"></i></a>
     {% endif %}
-    <button type="button" class="fab fab-top js-back-to-top" aria-label="Back to top" hidden><i class="bi bi-arrow-up"></i></button>
+    <button type="button" class="fab fab-top js-back-to-top" aria-label="{% translate "Back to top" %}" hidden><i class="bi bi-arrow-up"></i></button>
 </div>
 
 <div class="toast-container position-fixed bottom-0 start-0 p-3" id="toast-container">
@@ -312,7 +311,7 @@
         <div class="toast align-items-center border-0 text-bg-{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}secondary{% endif %}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
             <div class="d-flex">
                 <div class="toast-body">{{ message }}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{% translate "Close" %}"></button>
             </div>
         </div>
     {% endfor %}
@@ -320,6 +319,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static 'js/script.js' %}" data-suggest-url="{% url 'search_suggest' %}" data-geo-url="{% static 'data/bd-geo.json' %}" data-sw-url="{% url 'service_worker' %}" id="app-script"></script>
 {% block extra_js %}{% endblock %}
 </body>

@@ -9,5 +9,6 @@ urlpatterns = [
     path('image-credits/', views.image_credits, name='image_credits'),
     path('robots.txt', views.robots_txt, name='robots_txt'),
     path('favicon.ico', views.favicon, name='favicon'),
+    path('healthz/', views.healthz, name='healthz'),
     path('pages/<slug:slug>/', views.policy_page, name='policy_page'),
 ]

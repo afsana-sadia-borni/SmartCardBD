@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import translation
 
 from .numerals import use_bn_digits
 
@@ -10,7 +11,8 @@ REFERRAL_SESSION_KEY = 'referral_code'
 
 
 class ShopPreferencesMiddleware:
-    """Per-request shop preferences: Bangla digits (cookie) and referral links (?ref=CODE)."""
+    """Per-request shop preferences: Bangla digits (with the Bangla language, or the digits cookie),
+    English for staff pages, and referral links (?ref=CODE)."""
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -20,7 +22,11 @@ class ShopPreferencesMiddleware:
         if ref and len(ref) <= 20:
             request.session[REFERRAL_SESSION_KEY] = ref
 
-        request.bn_digits = request.COOKIES.get(DIGITS_COOKIE) == 'bn'
+        # The store panel and the Django admin stay in English for staff.
+        if request.path.startswith(('/store/', '/' + settings.ADMIN_URL)):
+            translation.activate('en')
+            request.LANGUAGE_CODE = 'en'
+        request.bn_digits = translation.get_language() == 'bn' or request.COOKIES.get(DIGITS_COOKIE) == 'bn'
         token = use_bn_digits.set(request.bn_digits)
         try:
             return self.get_response(request)

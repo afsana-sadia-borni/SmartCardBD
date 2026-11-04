@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from accounts.services import award_order_points, notify, reward_referral
 
 from .models import Order, ReturnRequest
-from .services import queue_order_email
+from .services import queue_order_email, queue_order_sms
 
 STATUS_MESSAGES = {
     Order.Status.CONFIRMED: ('Your order {n} is confirmed.', 'check2-circle'),
@@ -27,6 +27,7 @@ def on_status_change(sender, instance, created, **kwargs):
     if created or not previous or previous == instance.status:
         return
     queue_order_email(instance, 'status')
+    queue_order_sms(instance, instance.status)
     if instance.status in STATUS_MESSAGES:
         text, icon = STATUS_MESSAGES[instance.status]
         notify(instance.user, text.format(n=instance.order_number), url=instance.get_absolute_url(), icon=icon)

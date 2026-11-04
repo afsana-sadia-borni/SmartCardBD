@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Something went wrong | SmartCart BD{% endblock %}
+{% block title %}{% translate "Something went wrong | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 {% include 'partials/error_page.html' with code='500' heading='Something went wrong' icon='tools' message="We're having a problem on our side. Please try again in a few minutes." %}
