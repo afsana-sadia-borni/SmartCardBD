@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.templatetags.static import static
 from django.views.decorators.http import require_POST
+from django.utils.translation import gettext as _
 
 from accounts.models import Wishlist
 from core.ratelimit import hit_limit
@@ -195,7 +196,7 @@ def compare_toggle(request, product_id):
     if added:
         if len(ids) >= COMPARE_MAX:
             ids = ids[1:]
-            message = f'You can compare up to {COMPARE_MAX} products, so the oldest one was removed.'
+            message = _('You can compare up to {n} products, so the oldest one was removed.').format(n=COMPARE_MAX)
         ids.append(product.id)
     request.session[COMPARE_SESSION_KEY] = ids
     if _is_ajax(request):
@@ -233,7 +234,7 @@ def price_alert_toggle(request, product_id):
             defaults={'price_when_set': product.final_price, 'notified_at': None},
         )
         active = True
-    msg = "We'll let you know when the price drops." if active else 'Price alert removed.'
+    msg = _("We'll let you know when the price drops.") if active else _('Price alert removed.')
     if _is_ajax(request):
         return JsonResponse({'active': active, 'message': msg})
     messages.success(request, msg)
@@ -245,12 +246,12 @@ def price_alert_toggle(request, product_id):
 def ask_question(request, slug):
     product = get_object_or_404(Product.objects.active(), slug=slug)
     if hit_limit(request, f'question:{request.user.id}', limit=5, window_seconds=3600):
-        messages.error(request, 'You have asked a lot of questions recently. Please try again later.')
+        messages.error(request, _('You have asked a lot of questions recently. Please try again later.'))
         return redirect(f'{product.get_absolute_url()}#questions')
     form = QuestionForm(request.POST)
     if form.is_valid():
         Question.objects.create(product=product, user=request.user, question=form.cleaned_data['question'])
-        messages.success(request, 'Thanks! Your question was sent. We usually answer within a day.')
+        messages.success(request, _('Thanks! Your question was sent. We usually answer within a day.'))
     else:
         messages.error(request, ' '.join(e for errors in form.errors.values() for e in errors))
     return redirect(f'{product.get_absolute_url()}#questions')
@@ -267,7 +268,7 @@ def product_detail_by_id(request, pk):
 def add_review(request, slug):
     product = get_object_or_404(Product.objects.active(), slug=slug)
     if not _can_review(request.user, product):
-        messages.error(request, 'You can review a product after it has been delivered to you.')
+        messages.error(request, _('You can review a product after it has been delivered to you.'))
         return redirect(product)
 
     existing = product.reviews.filter(user=request.user).first()
@@ -276,10 +277,10 @@ def add_review(request, slug):
     image_field = forms.ImageField()
     try:
         if len(photos) > MAX_REVIEW_PHOTOS:
-            raise forms.ValidationError(f'You can add up to {MAX_REVIEW_PHOTOS} photos.')
+            raise forms.ValidationError(_('You can add up to {n} photos.').format(n=MAX_REVIEW_PHOTOS))
         for photo in photos:
             if photo.size > MAX_PHOTO_BYTES:
-                raise forms.ValidationError('Each photo must be smaller than 5 MB.')
+                raise forms.ValidationError(_('Each photo must be smaller than 5 MB.'))
             image_field.clean(photo)
     except forms.ValidationError as exc:
         messages.error(request, ' '.join(exc.messages))
@@ -294,7 +295,7 @@ def add_review(request, slug):
             for photo in photos:
                 photo.seek(0)
                 ReviewImage.objects.create(review=review, image=photo)
-        messages.success(request, 'Thanks! Your review has been saved.')
+        messages.success(request, _('Thanks! Your review has been saved.'))
     else:
-        messages.error(request, 'Please choose a rating between 1 and 5.')
+        messages.error(request, _('Please choose a rating between 1 and 5.'))
     return redirect(f'{product.get_absolute_url()}#reviews')

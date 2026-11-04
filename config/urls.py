@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
+from django.views.i18n import JavaScriptCatalog
 
 from accounts.urls import newsletter_urlpatterns
 
@@ -12,6 +13,8 @@ admin.site.index_title = 'Store management'
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     path('accounts/', include('allauth.urls')),
     path('profile/', include('accounts.urls')),
     path('newsletter/', include(newsletter_urlpatterns)),

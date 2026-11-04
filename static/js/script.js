@@ -138,7 +138,7 @@
             const sel = selected();
             attrs.forEach((a) => {
                 const label = form.querySelector('.js-opt-label[data-attr="' + a + '"]');
-                if (label) label.textContent = sel[a] || 'Choose';
+                if (label) label.textContent = sel[a] || gettext('Choose');
                 // Grey out values that have no stock with the other current choices.
                 form.querySelectorAll('.js-option[data-attr="' + a + '"]').forEach((opt) => {
                     const ok = variants.some((v) => v[a] === opt.value && v.stock > 0 &&
@@ -168,12 +168,12 @@
                     stockMsg.innerHTML = '<i class="bi bi-check-circle"></i> In stock';
                 }
                 button.disabled = match.stock <= 0;
-                label.textContent = match.stock > 0 ? 'Add to cart' : 'Out of stock';
+                label.textContent = match.stock > 0 ? gettext('Add to cart') : gettext('Out of stock');
                 qty.max = match.stock;
                 qty.disabled = match.stock <= 0;
             } else {
                 button.disabled = true;
-                label.textContent = 'Choose an option';
+                label.textContent = gettext('Choose an option');
             }
             // Show the photo for the chosen colour, if there is one.
             if (sel.color) {
@@ -250,7 +250,7 @@
         } else {
             row.querySelector('.js-qty-input').value = data.quantity;
             row.querySelector('.js-item-subtotal').textContent = formatTaka(data.item_subtotal);
-            if (data.quantity < quantity) showToast('Only ' + localizeDigits(data.max_quantity) + ' in stock.', 'warning');
+            if (data.quantity < quantity) showToast(interpolate(gettext('Only %s in stock.'), [localizeDigits(data.max_quantity)]), 'warning');
         }
         updateCartTotals(data);
     }
@@ -292,8 +292,8 @@
                 wishBtn.querySelector('i').className = data.in_wishlist ? 'bi bi-heart-fill' : 'bi bi-heart';
                 wishBtn.setAttribute('aria-pressed', data.in_wishlist);
                 const label = wishBtn.querySelector('.js-wishlist-label');
-                if (label) label.textContent = data.in_wishlist ? 'In wishlist' : 'Add to wishlist';
-                showToast(data.in_wishlist ? 'Added to wishlist.' : 'Removed from wishlist.', 'success');
+                if (label) label.textContent = data.in_wishlist ? gettext('In wishlist') : gettext('Add to wishlist');
+                showToast(data.in_wishlist ? gettext('Added to wishlist.') : gettext('Removed from wishlist.'), 'success');
                 if (!data.in_wishlist && wishBtn.dataset.removeCard) wishBtn.closest('.js-wishlist-item').remove();
             } catch (err) {
                 if (err.message !== 'login required') showToast('Could not update wishlist.', 'error');
@@ -309,13 +309,13 @@
                 compareBtn.classList.toggle('active', data.in_compare);
                 compareBtn.setAttribute('aria-pressed', data.in_compare);
                 const label = compareBtn.querySelector('.js-compare-label');
-                if (label) label.textContent = data.in_compare ? 'In compare' : 'Compare';
+                if (label) label.textContent = data.in_compare ? gettext('In compare') : gettext('Compare');
                 document.querySelectorAll('.js-compare-count').forEach((el) => {
                     el.textContent = localizeDigits(data.count);
                     el.classList.toggle('d-none', data.count === 0);
                 });
                 if (compareBtn.dataset.removeCol) { window.location.reload(); return; }
-                showToast(data.message || (data.in_compare ? 'Added to compare.' : 'Removed from compare.'), data.message ? 'warning' : 'success');
+                showToast(data.message || (data.in_compare ? gettext('Added to compare.') : gettext('Removed from compare.')), data.message ? 'warning' : 'success');
             } catch (err) {
                 showToast('Could not update compare list.', 'error');
             }
@@ -327,7 +327,7 @@
             try {
                 const data = await postData(alertBtn.dataset.url, {});
                 alertBtn.querySelector('i').className = data.active ? 'bi bi-bell-fill' : 'bi bi-bell';
-                alertBtn.querySelector('.js-price-alert-label').textContent = data.active ? 'Price alert on' : 'Notify me if price drops';
+                alertBtn.querySelector('.js-price-alert-label').textContent = data.active ? gettext('Price alert on') : gettext('Notify me if price drops');
                 alertBtn.setAttribute('aria-pressed', data.active);
                 showToast(data.message, 'success');
             } catch (err) {
@@ -575,7 +575,7 @@
         function fillUpazilas() {
             const info = byDistrict[district.value];
             const keep = upazila.value || upazila.dataset.initial || '';
-            upazila.innerHTML = '<option value="">' + (info ? 'Select upazila / thana' : 'Select district first') + '</option>';
+            upazila.innerHTML = '<option value="">' + (info ? gettext('Select upazila / thana') : gettext('Select district first')) + '</option>';
             (info ? info.upazilas : []).forEach((u) => {
                 const opt = new Option(u, u, false, u === keep);
                 upazila.add(opt);
@@ -619,14 +619,14 @@
             let shipping = 0;
             if (zone && amount < Number(cfg.freeMin)) shipping = zone.charge;
             const giftCost = gift && gift.checked ? Number(cfg.giftWrap) : 0;
-            document.querySelector('.js-shipping').textContent = zone ? (shipping === 0 ? 'Free' : formatTaka(shipping)) : 'Select district';
+            document.querySelector('.js-shipping').textContent = zone ? (shipping === 0 ? gettext('Free') : formatTaka(shipping)) : gettext('Select district');
             document.querySelector('.js-grand-total').textContent = formatTaka(amount + shipping + giftCost);
             // These rows use d-flex, which beats the hidden attribute, so toggle d-none instead.
             checkout.querySelector('.js-gift-row').classList.toggle('d-none', !giftCost);
             checkout.querySelector('.js-points-row').classList.toggle('d-none', !usePoints);
             const estimate = checkout.querySelector('.js-delivery-estimate');
             estimate.hidden = !zone;
-            if (zone) checkout.querySelector('.js-delivery-text').textContent = 'Delivery to ' + district.value + ' in ' + zone.time + (shipping === 0 ? ' · free delivery' : ' · ' + formatTaka(shipping));
+            if (zone) checkout.querySelector('.js-delivery-text').textContent = interpolate(gettext('Delivery to %(district)s in %(time)s'), { district: district.value, time: localizeDigits(zone.time) }, true) + ' · ' + (shipping === 0 ? gettext('free delivery') : formatTaka(shipping));
         };
         [district, gift, points].forEach((el) => el && el.addEventListener('change', recalc));
         recalc();
@@ -665,7 +665,7 @@
             msg.className = 'small mt-1 js-newsletter-msg ' + (data.ok ? 'text-success' : 'text-warning');
             if (data.ok) form.reset();
         } catch (err) {
-            msg.textContent = 'Could not subscribe right now.';
+            msg.textContent = gettext('Could not subscribe right now.');
         }
     });
 
@@ -692,7 +692,7 @@
         const input = btn.parentElement.querySelector('input');
         const show = input.type === 'password';
         input.type = show ? 'text' : 'password';
-        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        btn.setAttribute('aria-label', show ? gettext('Hide password') : gettext('Show password'));
         btn.querySelector('i').className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
     }));
 
@@ -717,11 +717,11 @@
             return Uint8Array.from(raw, (c) => c.charCodeAt(0));
         };
         const show = (sub) => {
-            btn.textContent = sub ? 'Turn off' : 'Turn on';
+            btn.textContent = sub ? gettext('Turn off') : gettext('Turn on');
             btn.className = 'btn btn-sm js-push-toggle ' + (sub ? 'btn-outline-secondary' : 'btn-dark');
-            if (sub) text.textContent = 'Notifications are on for this device.';
-            else if (Notification.permission === 'denied') text.textContent = 'Notifications are blocked in your browser settings for this site.';
-            else text.textContent = 'Get order updates and price drops on this device, even when the site is closed.';
+            if (sub) text.textContent = gettext('Notifications are on for this device.');
+            else if (Notification.permission === 'denied') text.textContent = gettext('Notifications are blocked in your browser settings for this site.');
+            else text.textContent = gettext('Get order updates and price drops on this device, even when the site is closed.');
             btn.disabled = !sub && Notification.permission === 'denied';
         };
         navigator.serviceWorker.ready.then(async (reg) => {

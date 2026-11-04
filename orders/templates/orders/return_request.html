@@ -1,23 +1,24 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Request a return | SmartCart BD{% endblock %}
+{% block title %}{% translate "Request a return | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 640px;">
-    <a href="{{ order.get_absolute_url }}" class="small"><i class="bi bi-arrow-left"></i> Order {{ order.order_number }}</a>
+    <a href="{{ order.get_absolute_url }}" class="small"><i class="bi bi-arrow-left"></i> {% blocktranslate with number=order.order_number %}Order {{ number }}{% endblocktranslate %}</a>
     <div class="bg-body rounded-4 shadow-sm p-4 mt-2">
-        <h1 class="h4 fw-bold">Request a return</h1>
-        <p class="small text-body-secondary">Tell us what went wrong. A photo helps us decide faster.</p>
+        <h1 class="h4 fw-bold">{% translate "Request a return" %}</h1>
+        <p class="small text-body-secondary">{% translate "Tell us what went wrong. A photo helps us decide faster." %}</p>
         <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             {% for field in form %}
                 <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.name == 'photo' %} (optional){% endif %}</label>
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.name == 'photo' %} {% translate "(optional)" %}{% endif %}</label>
                     {{ field }}
                     {% for e in field.errors %}<div class="small text-danger">{{ e }}</div>{% endfor %}
                 </div>
             {% endfor %}
-            <button type="submit" class="btn btn-warning fw-semibold">Send request</button>
+            <button type="submit" class="btn btn-warning fw-semibold">{% translate "Send request" %}</button>
         </form>
     </div>
 </div>

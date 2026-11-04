@@ -1,6 +1,8 @@
 import json
 
 from django.conf import settings
+from django.core.cache import cache
+from django.db import DatabaseError, connection
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.templatetags.static import static
@@ -67,6 +69,25 @@ def image_credits(request):
     except (OSError, ValueError):
         credits = {}
     return render(request, 'core/credits.html', {'credits': sorted(credits.items())})
+
+
+@cache_control(no_store=True)
+def healthz(request):
+    """For uptime monitors and the host's health check: is the database (and cache) reachable?"""
+    checks = {}
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT 1')
+        checks['database'] = 'ok'
+    except DatabaseError:
+        checks['database'] = 'down'
+    try:
+        cache.set('healthz', 1, 10)
+        checks['cache'] = 'ok' if cache.get('healthz') == 1 else 'down'
+    except Exception:  # noqa: BLE001 - a broken cache backend can raise anything
+        checks['cache'] = 'down'
+    ok = all(value == 'ok' for value in checks.values())
+    return JsonResponse({'status': 'ok' if ok else 'error', **checks}, status=200 if ok else 503)
 
 
 def robots_txt(request):

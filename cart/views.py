@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from django.utils.translation import gettext as _
 
 from core.numerals import localize_digits
 from core.ratelimit import hit_limit
@@ -71,7 +72,7 @@ def cart_add(request):
     requested = _parse_quantity(request.POST.get('quantity'))
 
     if product.has_variants and variant is None:
-        msg, level = f'Please choose an option for "{product.title}".', 'warning'
+        msg, level = _('Please choose an option for "{name}".').format(name=product.title), 'warning'
         if _is_ajax(request):
             return _cart_json(request, cart, message=msg, level=level, added=False, needs_options=True,
                               product_url=product.get_absolute_url())
@@ -83,11 +84,11 @@ def cart_add(request):
     before = cart.quantity_of(product.id, variant.id if variant else None)
     new_qty = cart.add(product, requested, variant=variant)
     if stock <= 0:
-        msg, level = f'Sorry, "{name}" is out of stock.', 'error'
+        msg, level = _('Sorry, "{name}" is out of stock.').format(name=name), 'error'
     elif new_qty - before < requested:
-        msg, level = f'Only {stock} of "{name}" available. Your cart has {new_qty}.', 'warning'
+        msg, level = _('Only {stock} of "{name}" available. Your cart has {qty}.').format(stock=stock, name=name, qty=new_qty), 'warning'
     else:
-        msg, level = f'"{name}" added to your cart.', 'success'
+        msg, level = _('"{name}" added to your cart.').format(name=name), 'success'
 
     if _is_ajax(request):
         return _cart_json(request, cart, message=msg, level=level, added=new_qty > before)
@@ -132,12 +133,12 @@ def coupon_apply(request):
     code = request.POST.get('code', '').strip()
     coupon = Coupon.objects.filter(code__iexact=code).first()
     if coupon is None:
-        messages.error(request, 'Invalid coupon code.')
+        messages.error(request, _('Invalid coupon code.'))
     else:
         ok, reason = coupon.is_valid_for(cart.get_subtotal(), request.user)
         if ok:
             cart.apply_coupon(coupon)
-            messages.success(request, f'Coupon "{coupon.code}" applied.')
+            messages.success(request, _('Coupon "{code}" applied.').format(code=coupon.code))
         else:
             messages.error(request, reason)
     return _redirect_back(request)
@@ -146,7 +147,7 @@ def coupon_apply(request):
 @require_POST
 def coupon_remove(request):
     Cart(request).remove_coupon()
-    messages.info(request, 'Coupon removed.')
+    messages.info(request, _('Coupon removed.'))
     return _redirect_back(request)
 
 

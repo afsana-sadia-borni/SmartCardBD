@@ -1,25 +1,26 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load shop_tags %}
 
-{% block title %}My account | SmartCart BD{% endblock %}
+{% block title %}{% translate "My account | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 1000px;">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <div>
-            <h2 class="fw-bold mb-0">My account</h2>
+            <h2 class="fw-bold mb-0">{% translate "My account" %}</h2>
             <small class="text-body-secondary">{{ user.email }}</small>
         </div>
         <div class="d-flex gap-2">
-            <a href="{% url 'account_change_password' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-key"></i> Change password</a>
-            <a href="{% url 'account_email' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-envelope"></i> Email</a>
+            <a href="{% url 'account_change_password' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-key"></i> {% translate "Change password" %}</a>
+            <a href="{% url 'account_email' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-envelope"></i> {% translate "Email" %}</a>
         </div>
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-4"><a href="{% url 'order_list' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-box-seam fs-3 text-warning"></i><div class="fw-semibold">My orders</div><small class="text-body-secondary">Track &amp; manage</small></a></div>
-        <div class="col-md-4"><a href="{% url 'wishlist' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-heart fs-3 text-danger"></i><div class="fw-semibold">Wishlist</div><small class="text-body-secondary">{{ wishlist_count }} saved item{{ wishlist_count|pluralize }}</small></a></div>
-        <div class="col-md-4"><a href="{% url 'address_add' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-geo-alt fs-3 text-primary"></i><div class="fw-semibold">Add address</div><small class="text-body-secondary">For faster checkout</small></a></div>
+        <div class="col-md-4"><a href="{% url 'order_list' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-box-seam fs-3 text-warning"></i><div class="fw-semibold">{% translate "My orders" %}</div><small class="text-body-secondary">{% translate "Track &amp; manage" %}</small></a></div>
+        <div class="col-md-4"><a href="{% url 'wishlist' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-heart fs-3 text-danger"></i><div class="fw-semibold">{% translate "Wishlist" %}</div><small class="text-body-secondary">{% blocktranslate count n=wishlist_count %}{{ n }} saved item{% plural %}{{ n }} saved items{% endblocktranslate %}</small></a></div>
+        <div class="col-md-4"><a href="{% url 'address_add' %}" class="d-block stat-card bg-body shadow-sm p-3 text-decoration-none text-body"><i class="bi bi-geo-alt fs-3 text-primary"></i><div class="fw-semibold">{% translate "Add address" %}</div><small class="text-body-secondary">{% translate "For faster checkout" %}</small></a></div>
     </div>
 
     <div class="row g-4 mb-4">
@@ -27,15 +28,15 @@
             <div class="loyalty-card rounded-4 shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="small text-white-50">Reward points</div>
+                        <div class="small text-white-50">{% translate "Reward points" %}</div>
                         <div class="display-6 fw-bold">{{ loyalty.points|num }}</div>
-                        <div class="small">Worth {{ loyalty.points_value|taka }} off your next order</div>
+                        <div class="small">{% blocktranslate with amount=loyalty.points_value|taka %}Worth {{ amount }} off your next order{% endblocktranslate %}</div>
                     </div>
                     <i class="bi bi-star-fill fs-1 text-warning"></i>
                 </div>
-                <p class="small text-white-50 mt-3 mb-0">Earn 1 point for every ৳100 you spend (added when your order is delivered). Every 100 points = ৳50 off at checkout.</p>
+                <p class="small text-white-50 mt-3 mb-0">{% translate "Earn 1 point for every ৳100 you spend (added when your order is delivered). Every 100 points = ৳50 off at checkout." %}</p>
                 {% if point_history %}
-                    <details class="mt-2 small"><summary>Points history</summary>
+                    <details class="mt-2 small"><summary>{% translate "Points history" %}</summary>
                         <ul class="list-unstyled mt-2 mb-0">
                             {% for t in point_history %}<li class="d-flex justify-content-between"><span>{{ t.reason }}</span><span class="{% if t.points > 0 %}text-warning{% endif %}">{% if t.points > 0 %}+{% endif %}{{ t.points|num }}</span></li>{% endfor %}
                         </ul>
@@ -45,20 +46,20 @@
         </div>
         <div class="col-lg-6">
             <div class="bg-body rounded-4 shadow-sm p-4 h-100">
-                <h5 class="fw-bold"><i class="bi bi-people text-warning"></i> Invite friends, get {{ 100|taka }}</h5>
-                <p class="small text-body-secondary">When a friend signs up with your code and their first order is delivered, you both get a {{ 100|taka }} coupon.</p>
+                <h5 class="fw-bold"><i class="bi bi-people text-warning"></i> {% blocktranslate with amount=100|taka %}Invite friends, get {{ amount }}{% endblocktranslate %}</h5>
+                <p class="small text-body-secondary">{% blocktranslate with amount=100|taka %}When a friend signs up with your code and their first order is delivered, you both get a {{ amount }} coupon.{% endblocktranslate %}</p>
                 <div class="input-group input-group-sm mb-2">
-                    <span class="input-group-text">Your code</span>
-                    <input type="text" class="form-control fw-bold font-monospace" value="{{ loyalty.referral_code }}" readonly aria-label="Your referral code">
-                    <button class="btn btn-dark js-copy-link" type="button" data-url="{{ referral_link }}"><i class="bi bi-link-45deg"></i> Copy link</button>
+                    <span class="input-group-text">{% translate "Your code" %}</span>
+                    <input type="text" class="form-control fw-bold font-monospace" value="{{ loyalty.referral_code }}" readonly aria-label="{% translate "Your referral code" %}">
+                    <button class="btn btn-dark js-copy-link" type="button" data-url="{{ referral_link }}"><i class="bi bi-link-45deg"></i> {% translate "Copy link" %}</button>
                 </div>
                 <div class="d-flex gap-2">
-                    <a class="btn btn-sm btn-success" href="https://wa.me/?text={{ 'Join SmartCart BD with my link and get ৳100 off: '|urlencode }}{{ referral_link|urlencode }}" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> Share</a>
-                    <a class="btn btn-sm btn-primary" href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link|urlencode }}" target="_blank" rel="noopener"><i class="bi bi-facebook"></i> Share</a>
+                    <a class="btn btn-sm btn-success" href="https://wa.me/?text={{ 'Join SmartCart BD with my link and get ৳100 off: '|urlencode }}{{ referral_link|urlencode }}" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> {% translate "Share" %}</a>
+                    <a class="btn btn-sm btn-primary" href="https://www.facebook.com/sharer/sharer.php?u={{ referral_link|urlencode }}" target="_blank" rel="noopener"><i class="bi bi-facebook"></i> {% translate "Share" %}</a>
                 </div>
-                <p class="small text-body-secondary mt-2 mb-0">{{ referral_count|num }} friend{{ referral_count|pluralize }} joined with your code.</p>
+                <p class="small text-body-secondary mt-2 mb-0">{% blocktranslate count n=referral_count with shown=referral_count|num %}{{ shown }} friend joined with your code.{% plural %}{{ shown }} friends joined with your code.{% endblocktranslate %}</p>
                 {% if coupons %}
-                    <hr><div class="small fw-semibold mb-1">Your coupons</div>
+                    <hr><div class="small fw-semibold mb-1">{% translate "Your coupons" %}</div>
                     {% for c in coupons %}<span class="badge text-bg-success me-1 font-monospace">{{ c.code }} · {{ c.value|taka }}</span>{% endfor %}
                 {% endif %}
             </div>
@@ -69,34 +70,34 @@
         <div class="col-lg-6">
             <div class="bg-body rounded-4 shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Addresses</h5>
-                    <a href="{% url 'address_add' %}" class="btn btn-sm btn-dark"><i class="bi bi-plus"></i> New</a>
+                    <h5 class="fw-bold mb-0">{% translate "Addresses" %}</h5>
+                    <a href="{% url 'address_add' %}" class="btn btn-sm btn-dark"><i class="bi bi-plus"></i> {% translate "New" %}</a>
                 </div>
                 {% for address in addresses %}
                     <div class="border rounded-3 p-3 mb-2 {% if address.is_default %}border-warning{% endif %}">
                         <div class="d-flex justify-content-between">
                             <strong>{{ address.full_name }}</strong>
-                            {% if address.is_default %}<span class="badge text-bg-warning">Default</span>{% endif %}
+                            {% if address.is_default %}<span class="badge text-bg-warning">{% translate "Default" %}</span>{% endif %}
                         </div>
                         <div class="small text-body-secondary">{{ address.phone }}<br>{{ address.address_line }}, {{ address.area }}{% if address.upazila %}, {{ address.upazila }}{% endif %}, {{ address.district }}</div>
                         <div class="d-flex gap-2 mt-2">
-                            <a href="{% url 'address_edit' address.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'address_edit' address.pk %}" class="btn btn-sm btn-outline-secondary">{% translate "Edit" %}</a>
                             {% if not address.is_default %}
-                                <form method="post" action="{% url 'address_make_default' address.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Make default</button></form>
+                                <form method="post" action="{% url 'address_make_default' address.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">{% translate "Make default" %}</button></form>
                             {% endif %}
-                            <form method="post" action="{% url 'address_delete' address.pk %}" onsubmit="return confirm('Delete this address?');">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit">Delete</button></form>
+                            <form method="post" action="{% url 'address_delete' address.pk %}" onsubmit="return confirm('Delete this address?');">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit">{% translate "Delete" %}</button></form>
                         </div>
                     </div>
                 {% empty %}
-                    <p class="text-body-secondary small mb-0">No saved addresses yet. Addresses you use at checkout can be saved here.</p>
+                    <p class="text-body-secondary small mb-0">{% translate "No saved addresses yet. Addresses you use at checkout can be saved here." %}</p>
                 {% endfor %}
             </div>
         </div>
         <div class="col-lg-6">
             <div class="bg-body rounded-4 shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Recent orders</h5>
-                    <a href="{% url 'order_list' %}" class="small">View all</a>
+                    <h5 class="fw-bold mb-0">{% translate "Recent orders" %}</h5>
+                    <a href="{% url 'order_list' %}" class="small">{% translate "View all" %}</a>
                 </div>
                 {% for order in recent_orders %}
                     <a href="{{ order.get_absolute_url }}" class="d-flex justify-content-between align-items-center border-bottom py-2 text-decoration-none text-body small">
@@ -104,7 +105,7 @@
                         <span class="text-end">{{ order.total|taka }}<br>{% include 'orders/_status_badge.html' %}</span>
                     </a>
                 {% empty %}
-                    <p class="text-body-secondary small mb-0">You haven't placed any orders yet.</p>
+                    <p class="text-body-secondary small mb-0">{% translate "You haven't placed any orders yet." %}</p>
                 {% endfor %}
             </div>
         </div>

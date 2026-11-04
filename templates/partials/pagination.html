@@ -1,9 +1,9 @@
-{% load shop_tags %}
+{% load i18n shop_tags %}
 {% if page_obj.has_other_pages %}
-<nav aria-label="Pagination" class="mt-4">
+<nav aria-label="{% translate "Pagination" %}" class="mt-4">
     <ul class="pagination justify-content-center flex-wrap">
         {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?{% query_transform page=page_obj.previous_page_number %}" aria-label="Previous">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?{% query_transform page=page_obj.previous_page_number %}" aria-label="{% translate "Previous" %}">&laquo;</a></li>
         {% else %}
             <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
         {% endif %}
@@ -17,7 +17,7 @@
             {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?{% query_transform page=page_obj.next_page_number %}" aria-label="Next">&raquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?{% query_transform page=page_obj.next_page_number %}" aria-label="{% translate "Next" %}">&raquo;</a></li>
         {% else %}
             <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
         {% endif %}

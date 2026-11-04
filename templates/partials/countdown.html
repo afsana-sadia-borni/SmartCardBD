@@ -1,5 +1,5 @@
-{% load shop_tags %}
-<span class="countdown js-countdown" data-end="{{ ends_at|date:'c' }}" role="timer" aria-label="Time left in the sale">
+{% load i18n shop_tags %}
+<span class="countdown js-countdown" data-end="{{ ends_at|date:'c' }}" role="timer" aria-label="{% translate "Time left in the sale" %}">
     <span class="countdown-label">{{ label|default:'Ends in' }}</span>
     <span class="countdown-box js-cd-h">00</span><span class="countdown-sep">:</span><span class="countdown-box js-cd-m">00</span><span class="countdown-sep">:</span><span class="countdown-box js-cd-s">00</span>
 </span>

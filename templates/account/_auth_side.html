@@ -1,12 +1,13 @@
+{% load i18n %}
 {# Why have an account: shown next to the login and sign-up forms. #}
 <div class="auth-side h-100 d-flex flex-column justify-content-center">
-    <h2 class="h4 fw-bold mb-1">Why create an account?</h2>
-    <p class="opacity-75 mb-4">Free, takes a minute, and you can still check out as a guest.</p>
+    <h2 class="h4 fw-bold mb-1">{% translate "Why create an account?" %}</h2>
+    <p class="opacity-75 mb-4">{% translate "Free, takes a minute, and you can still check out as a guest." %}</p>
     <ul class="list-unstyled auth-benefits mb-4">
-        <li><i class="bi bi-truck"></i><span><strong>Track every order</strong><br><small>Live status, invoices and easy returns.</small></span></li>
-        <li><i class="bi bi-star"></i><span><strong>Earn reward points</strong><br><small>1 point per ৳100. Spend them on later orders.</small></span></li>
-        <li><i class="bi bi-lightning-charge"></i><span><strong>Faster checkout</strong><br><small>Your addresses are saved.</small></span></li>
-        <li><i class="bi bi-heart"></i><span><strong>Wishlist &amp; price alerts</strong><br><small>Get told when a price drops.</small></span></li>
+        <li><i class="bi bi-truck"></i><span><strong>{% translate "Track every order" %}</strong><br><small>{% translate "Live status, invoices and easy returns." %}</small></span></li>
+        <li><i class="bi bi-star"></i><span><strong>{% translate "Earn reward points" %}</strong><br><small>{% translate "1 point per ৳100. Spend them on later orders." %}</small></span></li>
+        <li><i class="bi bi-lightning-charge"></i><span><strong>{% translate "Faster checkout" %}</strong><br><small>{% translate "Your addresses are saved." %}</small></span></li>
+        <li><i class="bi bi-heart"></i><span><strong>{% translate "Wishlist &amp; price alerts" %}</strong><br><small>{% translate "Get told when a price drops." %}</small></span></li>
     </ul>
-    <p class="small opacity-75 mb-0"><i class="bi bi-shield-lock"></i> Your password is stored encrypted. We never share your number.</p>
+    <p class="small opacity-75 mb-0"><i class="bi bi-shield-lock"></i> {% translate "Your password is stored encrypted. We never share your number." %}</p>
 </div>

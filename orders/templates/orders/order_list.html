@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load shop_tags %}
 
-{% block title %}My orders | SmartCart BD{% endblock %}
+{% block title %}{% translate "My orders | SmartCart BD" %}{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 960px;">
-    <h2 class="fw-bold mb-4"><i class="bi bi-box-seam"></i> My orders</h2>
+    <h2 class="fw-bold mb-4"><i class="bi bi-box-seam"></i> {% translate "My orders" %}</h2>
     {% for order in orders %}
         <a href="{{ order.get_absolute_url }}" class="d-block bg-body rounded-4 shadow-sm p-3 p-md-4 mb-3 text-decoration-none text-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div>
                     <div class="fw-bold font-monospace">{{ order.order_number }}</div>
-                    <small class="text-body-secondary">{{ order.created_at|date:"d M Y, h:i A" }} · {{ order.item_count }} item{{ order.item_count|pluralize }}</small>
+                    <small class="text-body-secondary">{{ order.created_at|date:"d M Y, h:i A" }} · {% blocktranslate count n=order.item_count %}{{ n }} item{% plural %}{{ n }} items{% endblocktranslate %}</small>
                 </div>
                 <div class="text-end">
                     {% include 'orders/_status_badge.html' %}

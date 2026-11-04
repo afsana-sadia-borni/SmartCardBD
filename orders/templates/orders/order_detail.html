@@ -1,23 +1,24 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load shop_tags %}
 
-{% block title %}Order {{ order.order_number }} | SmartCart BD{% endblock %}
+{% block title %}{% blocktranslate with number=order.order_number %}Order {{ number }}{% endblocktranslate %} | SmartCart BD{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 960px;">
-    {% if user.is_authenticated %}<a href="{% url 'order_list' %}" class="small"><i class="bi bi-arrow-left"></i> My orders</a>{% endif %}
+    {% if user.is_authenticated %}<a href="{% url 'order_list' %}" class="small"><i class="bi bi-arrow-left"></i> {% translate "My orders" %}</a>{% endif %}
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2 mb-4">
         <div>
-            <h2 class="fw-bold mb-0">Order <span class="font-monospace">{{ order.order_number }}</span></h2>
-            <small class="text-body-secondary">Placed on {{ order.created_at|date:"d M Y, h:i A" }}</small>
+            <h2 class="fw-bold mb-0">{% translate "Order" %} <span class="font-monospace">{{ order.order_number }}</span></h2>
+            <small class="text-body-secondary">{% blocktranslate with when=order.created_at|date:"d M Y, h:i A" %}Placed on {{ when }}{% endblocktranslate %}</small>
         </div>
         <div>{% include 'orders/_status_badge.html' %}</div>
     </div>
 
     <div class="bg-body rounded-4 shadow-sm p-4 mb-4">
         {% if order.status == 'cancelled' %}
-            <div class="text-center text-danger"><i class="bi bi-x-circle fs-2"></i><p class="mb-0 fw-semibold">This order was cancelled.</p>
-                {% if order.payment_status == 'paid' %}<p class="small text-body-secondary mb-0 mt-1">Your payment was received after the order was cancelled. We will refund {{ order.total|taka }} to you.</p>{% endif %}
+            <div class="text-center text-danger"><i class="bi bi-x-circle fs-2"></i><p class="mb-0 fw-semibold">{% translate "This order was cancelled." %}</p>
+                {% if order.payment_status == 'paid' %}<p class="small text-body-secondary mb-0 mt-1">{% blocktranslate with amount=order.total|taka %}Your payment was received after the order was cancelled. We will refund {{ amount }} to you.{% endblocktranslate %}</p>{% endif %}
             </div>
         {% else %}
             <div class="order-steps">
@@ -34,41 +35,42 @@
     <div class="row g-4">
         <div class="col-md-8">
             <div class="bg-body rounded-4 shadow-sm p-4 h-100">
-                <h5 class="fw-bold mb-3">Items</h5>
+                <h5 class="fw-bold mb-3">{% translate "Items" %}</h5>
                 {% include 'orders/_order_items.html' %}
             </div>
         </div>
         <div class="col-md-4">
             <div class="bg-body rounded-4 shadow-sm p-4 mb-4">
-                <h6 class="fw-bold">Delivery address</h6>
+                <h6 class="fw-bold">{% translate "Delivery address" %}</h6>
                 <p class="small mb-0">{{ order.full_name }}<br>{{ order.phone }}<br>{{ order.address_line }}<br>{{ order.area }}{% if order.upazila %}, {{ order.upazila }}{% endif %}, {{ order.district }}</p>
-                {% if order.delivery_estimate and order.status != 'delivered' and order.status != 'cancelled' %}<p class="small text-body-secondary mt-2 mb-0"><i class="bi bi-truck"></i> Delivery in {{ order.delivery_estimate }}</p>{% endif %}
-                {% if order.gift_wrap %}<p class="small mt-2 mb-0"><i class="bi bi-gift text-danger"></i> Gift wrapped</p>{% endif %}
-                {% if order.note %}<hr><h6 class="fw-bold">Note</h6><p class="small mb-0">{{ order.note }}</p>{% endif %}
+                {% if order.delivery_estimate and order.status != 'delivered' and order.status != 'cancelled' %}<p class="small text-body-secondary mt-2 mb-0"><i class="bi bi-truck"></i> {% blocktranslate with time=order.delivery_estimate|delivery_days %}Delivery in {{ time }}{% endblocktranslate %}</p>{% endif %}
+                {% if order.courier_tracking_url and order.status == 'shipped' %}<a href="{{ order.courier_tracking_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success mt-2"><i class="bi bi-geo-alt"></i> {% blocktranslate with courier=order.courier_name|default:_("the courier") %}Track with {{ courier }}{% endblocktranslate %}{% if order.courier_tracking_code %} ({{ order.courier_tracking_code }}){% endif %}</a>{% endif %}
+                {% if order.gift_wrap %}<p class="small mt-2 mb-0"><i class="bi bi-gift text-danger"></i> {% translate "Gift wrapped" %}</p>{% endif %}
+                {% if order.note %}<hr><h6 class="fw-bold">{% translate "Note" %}</h6><p class="small mb-0">{{ order.note }}</p>{% endif %}
             </div>
             <div class="bg-body rounded-4 shadow-sm p-4">
-                <h6 class="fw-bold">Payment</h6>
-                <p class="small mb-3">{{ order.payment_label }}<br>Status: <strong>{{ order.get_payment_status_display }}</strong></p>
+                <h6 class="fw-bold">{% translate "Payment" %}</h6>
+                <p class="small mb-3">{{ order.payment_label }}<br>{% translate "Status:" %} <strong>{{ order.get_payment_status_display }}</strong></p>
                 {% if order.can_pay_online %}
                     <form method="post" action="{% url 'order_pay' order.order_number %}" class="mb-2">
                         {% csrf_token %}
-                        <button class="btn btn-warning w-100 fw-semibold" type="submit"><i class="bi bi-credit-card"></i> Pay {{ order.total|taka }} now</button>
+                        <button class="btn btn-warning w-100 fw-semibold" type="submit"><i class="bi bi-credit-card"></i> {% blocktranslate with amount=order.total|taka %}Pay {{ amount }} now{% endblocktranslate %}</button>
                     </form>
                 {% endif %}
-                <a href="{% url 'order_invoice' order.order_number %}" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-file-earmark-pdf"></i> Download invoice (PDF)</a>
-                {% if order.points_earned %}<p class="small text-success"><i class="bi bi-star-fill"></i> You earned {{ order.points_earned|num }} reward points.</p>{% endif %}
+                <a href="{% url 'order_invoice' order.order_number %}" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-file-earmark-pdf"></i> {% translate "Download invoice (PDF)" %}</a>
+                {% if order.points_earned %}<p class="small text-success"><i class="bi bi-star-fill"></i> {% blocktranslate with points=order.points_earned|num %}You earned {{ points }} reward points.{% endblocktranslate %}</p>{% endif %}
                 {% if order.return_request %}
                     <div class="border rounded-3 p-2 small mb-2">
-                        <strong>Return request:</strong> {{ order.return_request.get_status_display }}
+                        <strong>{% translate "Return request:" %}</strong> {{ order.return_request.get_status_display }}
                         {% if order.return_request.admin_note %}<br><span class="text-body-secondary">{{ order.return_request.admin_note }}</span>{% endif %}
                     </div>
                 {% elif order.can_request_return and order.user_id == user.id %}
-                    <a href="{% url 'return_request' order.order_number %}" class="btn btn-outline-dark w-100 mb-2"><i class="bi bi-arrow-return-left"></i> Request a return</a>
+                    <a href="{% url 'return_request' order.order_number %}" class="btn btn-outline-dark w-100 mb-2"><i class="bi bi-arrow-return-left"></i> {% translate "Request a return" %}</a>
                 {% endif %}
                 {% if order.can_cancel %}
                     <form method="post" action="{% url 'order_cancel' order.order_number %}" onsubmit="return confirm('Cancel this order?');">
                         {% csrf_token %}
-                        <button class="btn btn-outline-danger w-100" type="submit">Cancel order</button>
+                        <button class="btn btn-outline-danger w-100" type="submit">{% translate "Cancel order" %}</button>
                     </form>
                 {% endif %}
             </div>

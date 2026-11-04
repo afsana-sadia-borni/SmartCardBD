@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load shop_tags %}
 
-{% block title %}Checkout | SmartCart BD{% endblock %}
+{% block title %}{% translate "Checkout" %} | SmartCart BD{% endblock %}
 
 {% block content %}
 {{ zones|json_script:"delivery-zones" }}
@@ -11,12 +12,12 @@
      data-gift-wrap="{{ gift_wrap_price }}"
      data-points-discount="{{ points_discount }}"{% if not user.is_authenticated %}
      data-remember-email-url="{% url 'cart_remember_email' %}"{% endif %}>
-    <h1 class="h2 fw-bold mb-4">Checkout</h1>
+    <h1 class="h2 fw-bold mb-4">{% translate "Checkout" %}</h1>
 
     {% if not user.is_authenticated %}
         <div class="alert alert-light border d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <span><i class="bi bi-person"></i> Have an account? Log in to earn reward points and save addresses.</span>
-            <a href="{% url 'account_login' %}?next={% url 'checkout' %}" class="btn btn-sm btn-dark">Log in</a>
+            <span><i class="bi bi-person"></i> {% translate "Have an account? Log in to earn reward points and save addresses." %}</span>
+            <a href="{% url 'account_login' %}?next={% url 'checkout' %}" class="btn btn-sm btn-dark">{% translate "Log in" %}</a>
         </div>
     {% endif %}
 
@@ -25,18 +26,18 @@
         <div class="row g-4">
             <div class="col-lg-7">
                 <div class="bg-body rounded-4 shadow-sm p-4 mb-4">
-                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-geo-alt"></i> Delivery address</h2>
+                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-geo-alt"></i> {% translate "Delivery address" %}</h2>
                     {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
                     <div class="row g-3">
                         {% with field=form.full_name %}{% include 'orders/_field.html' with col='col-md-6' %}{% endwith %}
                         {% with field=form.phone %}{% include 'orders/_field.html' with col='col-md-6' %}{% endwith %}
                         {% with field=form.email %}{% include 'orders/_field.html' with col='col-12' %}{% endwith %}
                         <div class="col-md-6">
-                            <label for="id_division" class="form-label">Division</label>
+                            <label for="id_division" class="form-label">{% translate "Division" %}</label>
                             <select id="id_division" class="form-select js-division" aria-describedby="division-help">
-                                <option value="">All divisions</option>
+                                <option value="">{% translate "All divisions" %}</option>
                             </select>
-                            <div id="division-help" class="form-text">Narrows down the districts.</div>
+                            <div id="division-help" class="form-text">{% translate "Narrows down the districts." %}</div>
                         </div>
                         {% with field=form.district %}{% include 'orders/_field.html' with col='col-md-6' %}{% endwith %}
                         {% with field=form.upazila %}{% include 'orders/_field.html' with col='col-md-6' %}{% endwith %}
@@ -58,26 +59,26 @@
                 </div>
 
                 <div class="bg-body rounded-4 shadow-sm p-4 mb-4">
-                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-gift"></i> Extras</h2>
+                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-gift"></i> {% translate "Extras" %}</h2>
                     <div class="form-check mb-2">
                         <input type="checkbox" name="gift_wrap" id="id_gift_wrap" class="form-check-input js-gift-wrap" {% if form.gift_wrap.value %}checked{% endif %}>
-                        <label class="form-check-label" for="id_gift_wrap">Gift wrap this order <span class="text-body-secondary">(+{{ gift_wrap_price|taka }}, wrapped with a card)</span></label>
+                        <label class="form-check-label" for="id_gift_wrap">{% translate "Gift wrap this order" %} <span class="text-body-secondary">{% blocktranslate with price=gift_wrap_price|taka %}(+{{ price }}, wrapped with a card){% endblocktranslate %}</span></label>
                     </div>
                     {% if form.use_points %}
                         <div class="form-check">
                             <input type="checkbox" name="use_points" id="id_use_points" class="form-check-input js-use-points" {% if form.use_points.value %}checked{% endif %}>
                             <label class="form-check-label" for="id_use_points">
-                                Use {{ points_usable|num }} reward points for <strong>{{ points_discount|taka }}</strong> off
-                                <span class="text-body-secondary">(you have {{ points_available|num }})</span>
+                                {% blocktranslate with points=points_usable|num amount=points_discount|taka %}Use {{ points }} reward points for <strong>{{ amount }}</strong> off{% endblocktranslate %}
+                                <span class="text-body-secondary">{% blocktranslate with points=points_available|num %}(you have {{ points }}){% endblocktranslate %}</span>
                             </label>
                         </div>
                     {% elif user.is_authenticated %}
-                        <p class="small text-body-secondary mb-0"><i class="bi bi-star"></i> You have {{ points_available|num }} reward points. Collect 100 to get ৳50 off.</p>
+                        <p class="small text-body-secondary mb-0"><i class="bi bi-star"></i> {% blocktranslate with points=points_available|num %}You have {{ points }} reward points. Collect 100 to get ৳50 off.{% endblocktranslate %}</p>
                     {% endif %}
                 </div>
 
                 <div class="bg-body rounded-4 shadow-sm p-4">
-                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-credit-card"></i> Payment method</h2>
+                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-credit-card"></i> {% translate "Payment method" %}</h2>
                     <div class="row g-2">
                         {% for radio in form.payment_method %}
                             {% with v=radio.data.value %}
@@ -90,11 +91,11 @@
                                     <span>
                                         <strong>{{ radio.choice_label }}</strong><br>
                                         <small class="text-body-secondary">
-                                            {% if v == 'cod' %}Pay in cash when your order arrives.
+                                            {% if v == 'cod' %}{% translate "Pay in cash when your order arrives." %}
                                             {% elif v == 'card' %}Visa, Mastercard, Amex
-                                            {% elif v == 'internetbank' %}Pay from your bank account
-                                            {% elif v == 'sslcommerz' %}Upay, Tap and more
-                                            {% else %}Pay from your {{ radio.choice_label }} account{% endif %}
+                                            {% elif v == 'internetbank' %}{% translate "Pay from your bank account" %}
+                                            {% elif v == 'sslcommerz' %}{% translate "Upay, Tap and more" %}
+                                            {% else %}{% blocktranslate with method=radio.choice_label %}Pay from your {{ method }} account{% endblocktranslate %}{% endif %}
                                         </small>
                                     </span>
                                 </label>
@@ -102,14 +103,14 @@
                             {% endwith %}
                         {% endfor %}
                     </div>
-                    {% if form.payment_method|length > 1 %}<p class="small text-body-secondary mt-2 mb-0"><i class="bi bi-shield-lock"></i> Online payments are processed securely by SSLCommerz. We never see your PIN or card number.</p>{% endif %}
+                    {% if form.payment_method|length > 1 %}<p class="small text-body-secondary mt-2 mb-0"><i class="bi bi-shield-lock"></i> {% translate "Online payments are processed securely by SSLCommerz. We never see your PIN or card number." %}</p>{% endif %}
                     {% for error in form.payment_method.errors %}<div class="small text-danger">{{ error }}</div>{% endfor %}
                 </div>
             </div>
 
             <div class="col-lg-5">
                 <div class="bg-body rounded-4 shadow-sm p-4 position-sticky" style="top: 90px;">
-                    <h2 class="h5 fw-bold mb-3">Your order</h2>
+                    <h2 class="h5 fw-bold mb-3">{% translate "Your order" %}</h2>
                     {% for item in cart %}
                         <div class="d-flex justify-content-between small mb-2">
                             <span class="me-2">{{ item.product.title }}{% if item.variant %} <span class="text-body-secondary">({{ item.variant.label }})</span>{% endif %} <span class="text-body-secondary">× {{ item.quantity|num }}</span></span>
@@ -117,24 +118,24 @@
                         </div>
                     {% endfor %}
                     <hr>
-                    <div class="d-flex justify-content-between mb-2"><span class="text-body-secondary">Subtotal</span><span>{{ cart.get_subtotal|taka }}</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span class="text-body-secondary">{% translate "Subtotal" %}</span><span>{{ cart.get_subtotal|taka }}</span></div>
                     {% if cart.get_bundle_discount %}
-                        <div class="d-flex justify-content-between mb-2 text-success"><span>Bundle savings</span><span>-{{ cart.get_bundle_discount|taka }}</span></div>
+                        <div class="d-flex justify-content-between mb-2 text-success"><span>{% translate "Bundle savings" %}</span><span>-{{ cart.get_bundle_discount|taka }}</span></div>
                     {% endif %}
                     {% if cart.get_discount %}
-                        <div class="d-flex justify-content-between mb-2 text-success"><span>Discount ({{ cart.coupon.code }})</span><span>-{{ cart.get_discount|taka }}</span></div>
+                        <div class="d-flex justify-content-between mb-2 text-success"><span>{% blocktranslate with code=cart.coupon.code %}Discount ({{ code }}){% endblocktranslate %}</span><span>-{{ cart.get_discount|taka }}</span></div>
                     {% endif %}
-                    <div class="d-flex justify-content-between mb-2 text-success js-points-row d-none"><span>Reward points</span><span>-{{ points_discount|taka }}</span></div>
-                    <div class="d-flex justify-content-between mb-2 js-gift-row d-none"><span class="text-body-secondary">Gift wrap</span><span>{{ gift_wrap_price|taka }}</span></div>
-                    <div class="d-flex justify-content-between mb-2"><span class="text-body-secondary">Shipping</span><span class="js-shipping">Select district</span></div>
+                    <div class="d-flex justify-content-between mb-2 text-success js-points-row d-none"><span>{% translate "Reward points" %}</span><span>-{{ points_discount|taka }}</span></div>
+                    <div class="d-flex justify-content-between mb-2 js-gift-row d-none"><span class="text-body-secondary">{% translate "Gift wrap" %}</span><span>{{ gift_wrap_price|taka }}</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span class="text-body-secondary">{% translate "Shipping" %}</span><span class="js-shipping">{% translate "Select district" %}</span></div>
                     <hr>
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="fw-semibold">Total</span>
+                        <span class="fw-semibold">{% translate "Total" %}</span>
                         <span class="fs-4 fw-bold js-grand-total">{{ cart.get_total|taka }}</span>
                     </div>
-                    <p class="small text-body-secondary">Free delivery on orders over {{ free_shipping_min|taka }}.</p>
-                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold"><i class="bi bi-lock"></i> Place order</button>
-                    <a href="{% url 'cart_summary' %}" class="btn btn-link w-100 mt-1">Back to cart</a>
+                    <p class="small text-body-secondary">{% blocktranslate with amount=free_shipping_min|taka %}Free delivery on orders over {{ amount }}.{% endblocktranslate %}</p>
+                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold"><i class="bi bi-lock"></i> {% translate "Place order" %}</button>
+                    <a href="{% url 'cart_summary' %}" class="btn btn-link w-100 mt-1">{% translate "Back to cart" %}</a>
                 </div>
             </div>
         </div>

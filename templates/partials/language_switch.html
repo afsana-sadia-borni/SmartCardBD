@@ -1,0 +1,11 @@
+{% load i18n %}{% get_current_language as lang %}
+{# Switches between English and Bangla (Bangla also shows Bangla digits), then comes back to this page. #}
+<form method="post" action="{% url 'set_language' %}" class="d-inline">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input type="hidden" name="language" value="{% if lang == 'bn' %}en{% else %}bn{% endif %}">
+    <button type="submit" class="{{ css }}" lang="{% if lang == 'bn' %}en{% else %}bn{% endif %}"
+            aria-label="{% if lang == 'bn' %}Switch to English{% else %}বাংলায় দেখুন{% endif %}" title="{% if lang == 'bn' %}English{% else %}বাংলা{% endif %}">
+        {% if lang == 'bn' %}{% if long %}<i class="bi bi-translate"></i> English{% else %}EN{% endif %}{% else %}{% if long %}<i class="bi bi-translate"></i> বাংলায় দেখুন{% else %}বাংলা{% endif %}{% endif %}
+    </button>
+</form>

@@ -1,9 +1,10 @@
-<h2 class="h5 fw-bold mt-4">Contact us</h2>
+{% load i18n %}
+<h2 class="h5 fw-bold mt-4">{% translate "Contact us" %}</h2>
 <ul class="list-unstyled mb-0">
     {% if support_email %}<li><i class="bi bi-envelope"></i> <a href="mailto:{{ support_email }}">{{ support_email }}</a></li>{% endif %}
     {% if support_phone %}<li><i class="bi bi-telephone"></i> <a href="tel:{{ support_phone }}">{{ support_phone }}</a></li>{% endif %}
     {% if whatsapp_number %}<li><i class="bi bi-whatsapp"></i> <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener">WhatsApp</a></li>{% endif %}
     {% if business_address %}<li><i class="bi bi-geo-alt"></i> {{ business_address }}</li>{% endif %}
-    {% if trade_license %}<li><i class="bi bi-patch-check"></i> Trade licence: {{ trade_license }}</li>{% endif %}
-    <li><i class="bi bi-truck"></i> Order questions: <a href="{% url 'track_order' %}">track your order</a> with your order number and phone.</li>
+    {% if trade_license %}<li><i class="bi bi-patch-check"></i> {% blocktranslate %}Trade licence: {{ trade_license }}{% endblocktranslate %}</li>{% endif %}
+    <li><i class="bi bi-truck"></i> {% translate "Order questions:" %} <a href="{% url 'track_order' %}">{% translate "track your order" %}</a> {% translate "with your order number and phone." %}</li>
 </ul>

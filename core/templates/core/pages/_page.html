@@ -1,22 +1,23 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block title %}{{ page_title }} | SmartCart BD{% endblock %}
 {% block meta_description %}{{ page_title }} - SmartCart BD{% endblock %}
 
 {% block content %}
 <div class="container" style="max-width: 860px;">
-    <nav aria-label="breadcrumb">
+    <nav aria-label="{% translate "breadcrumb" %}">
         <ol class="breadcrumb small">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% translate "Home" %}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
         </ol>
     </nav>
     <article class="bg-body rounded-4 shadow-sm p-4 p-md-5 policy-page">
         <h1 class="h3 fw-bold mb-1">{{ page_title }}</h1>
-        {% if updated %}<p class="small text-body-secondary mb-4">Last updated: {{ updated }}</p>{% endif %}
+        {% if updated %}<p class="small text-body-secondary mb-4">{% blocktranslate %}Last updated: {{ updated }}{% endblocktranslate %}</p>{% endif %}
         {% block page %}{% endblock %}
     </article>
-    <nav class="d-flex flex-wrap gap-2 mt-3 small" aria-label="Store policies">
+    <nav class="d-flex flex-wrap gap-2 mt-3 small" aria-label="{% translate "Store policies" %}">
         {% for slug, title in policy_links %}
             <a href="{% url 'policy_page' slug %}" class="btn btn-sm {% if slug == current_slug %}btn-dark{% else %}btn-outline-secondary{% endif %}">{{ title }}</a>
         {% endfor %}

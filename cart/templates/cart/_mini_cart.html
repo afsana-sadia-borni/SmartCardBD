@@ -1,4 +1,4 @@
-{% load static shop_tags %}
+{% load i18n static shop_tags %}
 {% if cart|length %}
     <div class="flex-grow-1 overflow-auto px-3">
         {% for item in cart %}
@@ -19,15 +19,15 @@
     </div>
     <div class="border-top p-3 bg-body-tertiary">
         {% with bundle=cart.get_bundle_discount %}
-            {% if bundle %}<div class="d-flex justify-content-between small text-success mb-1"><span><i class="bi bi-boxes"></i> Bundle savings</span><span>-{{ bundle|taka }}</span></div>{% endif %}
+            {% if bundle %}<div class="d-flex justify-content-between small text-success mb-1"><span><i class="bi bi-boxes"></i> {% translate "Bundle savings" %}</span><span>-{{ bundle|taka }}</span></div>{% endif %}
         {% endwith %}
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="fw-semibold">Subtotal</span>
+            <span class="fw-semibold">{% translate "Subtotal" %}</span>
             <span class="fs-5 fw-bold">{{ cart.get_total|taka }}</span>
         </div>
         <div class="d-grid gap-2">
-            <a href="{% url 'checkout' %}" class="btn btn-warning fw-bold">Checkout <i class="bi bi-arrow-right"></i></a>
-            <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark">View cart</a>
+            <a href="{% url 'checkout' %}" class="btn btn-warning fw-bold">{% translate "Checkout" %} <i class="bi bi-arrow-right"></i></a>
+            <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark">{% translate "View cart" %}</a>
         </div>
     </div>
 {% else %}

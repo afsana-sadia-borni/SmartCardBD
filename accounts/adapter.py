@@ -1,14 +1,18 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.fields import PhoneField
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+
+from core.sms import send_sms
 
 from .constants import BD_PHONE_REGEX, normalize_bd_phone
 from .models import CustomerProfile, get_profile
 
-bd_mobile_validator = RegexValidator(BD_PHONE_REGEX, 'Enter a Bangladeshi mobile number, e.g. 01712345678.')
+bd_mobile_validator = RegexValidator(BD_PHONE_REGEX, _('Enter a Bangladeshi mobile number, e.g. 01712345678.'))
 
 
 class BDPhoneField(PhoneField):
@@ -29,7 +33,7 @@ class AccountAdapter(DefaultAccountAdapter):
     # ---- Log in / sign up with a Bangladeshi mobile number (allauth's phone support) ----
 
     def phone_form_field(self, **kwargs):
-        kwargs.setdefault('label', 'Mobile number')
+        kwargs.setdefault('label', _('Mobile number'))
         kwargs['validators'] = [bd_mobile_validator]  # instead of the international +... format
         kwargs.setdefault('widget', forms.TextInput(attrs={
             'placeholder': '01XXXXXXXXX', 'autocomplete': 'tel', 'type': 'tel', 'inputmode': 'tel',
@@ -57,5 +61,5 @@ class AccountAdapter(DefaultAccountAdapter):
         return get_user_model().objects.filter(profile__phone=phone).first() if phone else None
 
     def send_verification_code_sms(self, user, phone, code, **kwargs):
-        # Needs an SMS gateway (e.g. SSL Wireless, BulkSMSBD). Phone verification is off until then.
-        raise NotImplementedError('No SMS gateway configured.')
+        """Only used when an SMS provider is configured (ACCOUNT_PHONE_VERIFICATION_ENABLED follows it)."""
+        send_sms(phone, f'Your {settings.SITE_NAME} code is {code}. It expires in 15 minutes. Do not share it.')

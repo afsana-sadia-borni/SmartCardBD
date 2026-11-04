@@ -1,9 +1,11 @@
 import json
+import re
 from decimal import Decimal, InvalidOperation
 
 from django import template
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext, ngettext
 
 from core.numerals import localize_digits, use_bn_digits
 from products import images
@@ -108,3 +110,20 @@ def nav_active(context, url, exact=False):
 def webp(url, width=400):
     """{{ product.image.url|webp:400 }}: the small WebP copy of an uploaded image (or the original)."""
     return images.webp_url(url, int(width))
+
+
+DAYS_RE = re.compile(r'^\s*(\d+)(?:\s*-\s*(\d+))?\s+days?\s*$')
+
+
+@register.filter
+def delivery_days(text):
+    """'1-2 days' (stored on orders in English) in the current language, with Bangla digits if chosen."""
+    match = DAYS_RE.match(str(text or ''))
+    if not match:
+        return text
+    low, high = match.group(1), match.group(2)
+    if high:
+        value = gettext('{low}-{high} days').format(low=low, high=high)
+    else:
+        value = ngettext('{n} day', '{n} days', int(low)).format(n=low)
+    return localize_digits(value)
