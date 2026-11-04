@@ -1,0 +1,33 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Integrations{% endblock %}
+{% block page_title %}Integrations{% endblock %}
+{% block page_subtitle %}Outside services the shop uses. Keys go in the server's .env file, never here.{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    {% for s in services %}
+        <div class="col-md-6 col-xl-4">
+            <div class="store-card p-3 h-100 d-flex flex-column">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-{{ s.icon }} fs-4"></i>
+                    <h2 class="h6 fw-bold mb-0 me-auto">{{ s.name }}</h2>
+                    {% if s.on and s.warn %}<span class="badge text-bg-warning">Sandbox</span>
+                    {% elif s.on %}<span class="badge text-bg-success">On</span>
+                    {% else %}<span class="badge text-bg-secondary">Not set up</span>{% endif %}
+                </div>
+                <p class="small mb-2">{{ s.detail }}</p>
+                <p class="small text-body-secondary mb-3">Settings: <code>{{ s.env }}</code></p>
+                {% if s.test == 'email' %}
+                    <form method="post" class="mt-auto">{% csrf_token %}<button name="test" value="email" class="btn btn-sm btn-outline-primary">Send me a test email</button></form>
+                {% elif s.test == 'sms' %}
+                    <form method="post" class="mt-auto d-flex gap-2">{% csrf_token %}
+                        <input type="tel" name="phone" class="form-control form-control-sm" placeholder="01XXXXXXXXX" aria-label="Phone for the test SMS" required>
+                        <button name="test" value="sms" class="btn btn-sm btn-outline-primary text-nowrap">Send test SMS</button></form>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<p class="small text-body-secondary mt-3 mb-0">After changing .env, restart the server (Docker: <code>docker compose up -d --force-recreate web worker beat</code>).</p>
+{% endblock %}

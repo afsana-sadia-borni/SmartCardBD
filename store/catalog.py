@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Count, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -12,6 +13,7 @@ from orders.models import Coupon, DeliveryZone
 from products.models import Banner, Category, FlashSale, Product
 
 from .access import store_view
+from .catalog_io import COLUMNS, export_products_csv, import_products_csv
 from .forms import BannerForm, CouponForm, FlashSaleForm, GalleryFormSet, ProductForm, VariantFormSet
 from .views import paginate, redirect_back, render_store
 
@@ -86,6 +88,33 @@ def product_quick_update(request, pk):
             product.save(update_fields=['stock', 'updated_at'])
             messages.success(request, f'Stock of "{product.title}" set to {stock}.')
     return redirect_back(request, 'store:products')
+
+
+@store_view('products.change_product')
+def products_export(request):
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="products-{timezone.localdate():%Y%m%d}.csv"'
+    return export_products_csv(response)
+
+
+@store_view('products.change_product')
+def products_import(request):
+    result = None
+    if request.method == 'POST':
+        upload = request.FILES.get('file')
+        if not upload or not upload.name.lower().endswith('.csv'):
+            messages.error(request, 'Choose a .csv file.')
+        elif upload.size > 5 * 1024 * 1024:
+            messages.error(request, 'The file is too big (5 MB max).')
+        else:
+            dry_run = bool(request.POST.get('dry_run'))
+            created, updated, errors = import_products_csv(upload, dry_run=dry_run)
+            result = {'created': created, 'updated': updated, 'errors': errors, 'dry_run': dry_run}
+            if not errors and not dry_run:
+                messages.success(request, f'Imported: {created} new, {updated} updated.')
+                return redirect('store:products')
+    return render_store(request, 'store/products/import.html', {'result': result, 'columns': COLUMNS},
+                        section='store:products')
 
 
 # ---------- Simple sections: flash sales, coupons, banners, delivery ----------

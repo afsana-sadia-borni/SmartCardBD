@@ -1,0 +1,48 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Import products{% endblock %}
+{% block page_title %}Import products from CSV{% endblock %}
+{% block page_subtitle %}Add or update many products at once from Excel or Google Sheets.{% endblock %}
+
+{% block content %}
+<a href="{% url 'store:products' %}" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> All products</a>
+<div class="row g-4 mt-1">
+    <div class="col-lg-6">
+        <form method="post" enctype="multipart/form-data" class="store-card p-3 p-md-4">
+            {% csrf_token %}
+            <h2 class="h6 fw-bold">Upload a CSV file</h2>
+            <input type="file" name="file" accept=".csv,text/csv" class="form-control mb-3" required aria-label="CSV file">
+            <div class="form-check mb-3"><input class="form-check-input" type="checkbox" name="dry_run" value="1" id="dryRun" checked>
+                <label class="form-check-label" for="dryRun">Check only (don't save yet)</label></div>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-upload"></i> Upload</button>
+        </form>
+        {% if result %}
+            <div class="store-card p-3 p-md-4 mt-4">
+                {% if result.errors %}
+                    <h2 class="h6 fw-bold text-danger"><i class="bi bi-x-circle"></i> Nothing was saved. Fix these rows and upload again:</h2>
+                    <table class="table table-sm small mb-0"><thead><tr><th>Row</th><th>Problem</th></tr></thead><tbody>
+                        {% for row, message in result.errors %}<tr><td>{{ row }}</td><td>{{ message }}</td></tr>{% endfor %}
+                    </tbody></table>
+                {% elif result.dry_run %}
+                    <h2 class="h6 fw-bold text-success"><i class="bi bi-check-circle"></i> The file looks good</h2>
+                    <p class="mb-0">It would add <strong>{{ result.created }}</strong> new and update <strong>{{ result.updated }}</strong> products. Untick "Check only" and upload again to save.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="col-lg-6">
+        <div class="store-card p-3 p-md-4">
+            <h2 class="h6 fw-bold">How the file should look</h2>
+            <p class="small">First row: column names. Required: <code>title</code>, <code>category</code>, <code>price</code>. The easiest start is to <a href="{% url 'store:products_export' %}">export your products</a>, edit the file and upload it back.</p>
+            <ul class="small mb-2">
+                <li><code>slug</code>: leave empty for a new product; keep it to update an existing one.</li>
+                <li><code>sale_price</code>: optional, lower than <code>price</code>.</li>
+                <li><code>is_active</code>, <code>is_featured</code>: yes / no.</li>
+                <li>New categories are created automatically.</li>
+                <li>Photos and options (size, colour) are added on the product page.</li>
+            </ul>
+            <p class="small text-body-secondary mb-0">Columns: {% for c in columns %}<code>{{ c }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}. In Excel: File → Save As → <em>CSV UTF-8</em>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

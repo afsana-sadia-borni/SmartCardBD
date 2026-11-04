@@ -250,3 +250,75 @@ class TeamTests(StoreTestCase):
         self.client.force_login(self.owner)
         response = self.client.post(reverse('store:team'), {'email': 'nobody@example.com', 'role': 'Order manager'})
         self.assertContains(response, 'No account with this email')
+
+
+class CatalogCsvTests(StoreTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(self.owner)
+
+    def upload(self, text, dry_run=False):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        data = {'file': SimpleUploadedFile('p.csv', text.encode('utf-8-sig'), content_type='text/csv')}
+        if dry_run:
+            data['dry_run'] = '1'
+        return self.client.post(reverse('store:products_import'), data, follow=True)
+
+    def test_export_then_import_updates_and_creates(self):
+        exported = self.client.get(reverse('store:products_export')).content.decode('utf-8-sig')
+        self.assertIn('speaker', exported)
+        csv_text = ('slug,title,category,brand,price,sale_price,stock,is_active\n'
+                    f'{self.product.slug},Speaker Pro,Audio,JBL,"1,800",1600,7,yes\n'
+                    ',Earbuds,Earphones,QCY,2200,,30,yes\n')
+        self.upload(csv_text, dry_run=True)
+        self.assertFalse(Product.objects.filter(title='Earbuds').exists())  # check-only saves nothing
+        self.upload(csv_text)
+        self.product.refresh_from_db()
+        self.assertEqual((self.product.title, self.product.price, self.product.discount_price, self.product.stock),
+                         ('Speaker Pro', Decimal('1800'), Decimal('1600'), 7))
+        self.assertEqual(Product.objects.get(title='Earbuds').category.name, 'Earphones')
+
+    def test_one_bad_row_saves_nothing(self):
+        response = self.upload('title,category,price,stock\nGood,Audio,100,1\nBad,Audio,abc,1\nWorse,Audio,50,-2\n')
+        self.assertContains(response, 'Nothing was saved')
+        self.assertContains(response, 'is not a number')
+        self.assertFalse(Product.objects.filter(title='Good').exists())
+
+    def test_missing_columns(self):
+        self.assertContains(self.upload('name,cost\nA,1\n'), 'Missing column')
+
+
+class ReportTests(StoreTestCase):
+    def test_reports_for_ranges(self):
+        self.make_order()
+        self.make_order(status=Order.Status.CANCELLED)
+        self.client.force_login(self.owner)
+        page = self.client.get(reverse('store:reports'), {'days': '7'})
+        self.assertEqual(page.context['order_count'], 1)
+        self.assertEqual(page.context['cancel_rate'], 50.0)
+        self.assertIn('Cash on Delivery', page.context['charts'])
+        custom = self.client.get(reverse('store:reports'), {'from': '2020-01-01', 'to': '2020-01-31'})
+        self.assertEqual(custom.context['order_count'], 0)
+        self.assertEqual(self.client.get(reverse('store:reports'), {'from': 'bad'}).status_code, 200)
+
+    def test_catalog_manager_cannot_see_reports(self):
+        self.client.force_login(self.staff_with_role('Catalog manager'))
+        self.assertEqual(self.client.get(reverse('store:reports')).status_code, 403)
+
+
+class IntegrationsTests(StoreTestCase):
+    def test_owner_sees_status_and_can_send_tests(self):
+        from django.core import mail
+
+        self.client.force_login(self.owner)
+        page = self.client.get(reverse('store:integrations'))
+        self.assertContains(page, 'Courier (Steadfast)')
+        self.assertContains(page, 'Not set up')
+        self.client.post(reverse('store:integrations'), {'test': 'email'})
+        self.assertEqual(mail.outbox[-1].to, ['owner@example.com'])
+        response = self.client.post(reverse('store:integrations'), {'test': 'sms', 'phone': '01712345678'}, follow=True)
+        self.assertContains(response, 'written to the log')
+
+    def test_staff_cannot_open_it(self):
+        self.client.force_login(self.staff_with_role('Order manager'))
+        self.assertEqual(self.client.get(reverse('store:integrations')).status_code, 403)
