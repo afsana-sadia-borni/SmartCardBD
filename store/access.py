@@ -7,6 +7,7 @@ from django.http import Http404
 NAV = [
     ('Overview', [
         ('store:dashboard', 'Dashboard', 'speedometer2', None),
+        ('store:reports', 'Reports', 'bar-chart-line', 'orders.change_order'),
     ]),
     ('Sales', [
         ('store:orders', 'Orders', 'bag-check', 'orders.change_order'),
@@ -23,6 +24,7 @@ NAV = [
     ('Settings', [
         ('store:delivery', 'Delivery charges', 'truck', 'orders.change_deliveryzone'),
         ('store:team', 'Team', 'person-badge', 'superuser'),
+        ('store:integrations', 'Integrations', 'plug', 'superuser'),
     ]),
 ]
 

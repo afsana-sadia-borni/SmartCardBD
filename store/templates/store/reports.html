@@ -1,0 +1,66 @@
+{% extends 'store/base.html' %}
+{% load shop_tags %}
+
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}{{ start|date:"d M Y" }} – {{ end|date:"d M Y" }}{% endblock %}
+
+{% block content %}
+<div class="store-card p-3 mb-4 d-flex flex-wrap align-items-center gap-2">
+    <ul class="nav store-tabs gap-1">
+        {% for key, label in ranges.items %}<li class="nav-item"><a class="nav-link {% if key == chosen %}active{% endif %}" href="?days={{ key }}">{{ label }}</a></li>{% endfor %}
+    </ul>
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-center ms-lg-auto">
+        <input type="date" name="from" value="{{ start|date:'Y-m-d' }}" class="form-control form-control-sm" style="width: 150px;" aria-label="From">
+        <span class="small">to</span>
+        <input type="date" name="to" value="{{ end|date:'Y-m-d' }}" class="form-control form-control-sm" style="width: 150px;" aria-label="To">
+        <button class="btn btn-sm btn-primary" type="submit">Show</button>
+        <a href="{% url 'sales_report_csv' %}?days={{ csv_days }}" class="btn btn-sm btn-outline-success"><i class="bi bi-download"></i> CSV</a>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><div class="stat-tile stat-green"><div class="label">Sales</div><div class="value">{{ revenue|taka }}</div><i class="bi bi-cash-stack"></i></div></div>
+    <div class="col-6 col-xl-3"><div class="stat-tile stat-blue"><div class="label">Orders</div><div class="value">{{ order_count|num }}</div><i class="bi bi-bag"></i></div></div>
+    <div class="col-6 col-xl-3"><div class="stat-tile stat-amber"><div class="label">Average order</div><div class="value">{{ average|taka }}</div><i class="bi bi-calculator"></i></div></div>
+    <div class="col-6 col-xl-3"><div class="stat-tile stat-purple"><div class="label">Units sold</div><div class="value">{{ units|num }}</div><i class="bi bi-box-seam"></i></div></div>
+</div>
+<div class="row g-3 mb-4 small">
+    <div class="col-6 col-lg-3"><div class="store-card p-3 h-100"><div class="text-body-secondary">New customers</div><div class="fs-4 fw-bold">{{ new_customers }}</div></div></div>
+    <div class="col-6 col-lg-3"><div class="store-card p-3 h-100"><div class="text-body-secondary">Discounts given</div><div class="fs-4 fw-bold">{{ discounts|taka }}</div></div></div>
+    <div class="col-6 col-lg-3"><div class="store-card p-3 h-100"><div class="text-body-secondary">Cancelled</div><div class="fs-4 fw-bold {% if cancel_rate > 15 %}text-danger{% endif %}">{{ cancel_rate }}%</div></div></div>
+    <div class="col-6 col-lg-3"><div class="store-card p-3 h-100"><div class="text-body-secondary">Returned</div><div class="fs-4 fw-bold {% if return_rate > 10 %}text-danger{% endif %}">{{ return_rate }}%</div></div></div>
+</div>
+
+<div class="store-card mb-4"><div class="store-card-header"><h2>Sales by day</h2></div><div class="p-3"><canvas id="dailyChart" height="90"></canvas></div></div>
+<div class="row g-4 mb-4">
+    <div class="col-lg-4"><div class="store-card h-100"><div class="store-card-header"><h2>By category</h2></div><div class="p-3"><canvas id="categoryChart"></canvas></div></div></div>
+    <div class="col-lg-4"><div class="store-card h-100"><div class="store-card-header"><h2>Top districts (orders)</h2></div><div class="p-3"><canvas id="districtChart"></canvas></div></div></div>
+    <div class="col-lg-4"><div class="store-card h-100"><div class="store-card-header"><h2>How customers pay</h2></div><div class="p-3"><canvas id="paymentChart"></canvas></div></div></div>
+</div>
+<div class="row g-4">
+    <div class="col-lg-6"><div class="store-card h-100"><div class="store-card-header"><h2>Top products</h2></div>
+        <div class="table-responsive"><table class="table store-table small"><thead><tr><th>Product</th><th class="text-end">Units</th><th class="text-end">Sales</th></tr></thead><tbody>
+            {% for p in top_products %}<tr><td>{{ p.product_title }}</td><td class="text-end">{{ p.units }}</td><td class="text-end">{{ p.revenue|taka }}</td></tr>{% empty %}<tr><td colspan="3" class="text-body-secondary">No sales in this period.</td></tr>{% endfor %}
+        </tbody></table></div></div></div>
+    <div class="col-lg-6"><div class="store-card h-100"><div class="store-card-header"><h2>Top customers</h2></div>
+        <div class="table-responsive"><table class="table store-table small"><thead><tr><th>Customer</th><th class="text-end">Orders</th><th class="text-end">Spent</th></tr></thead><tbody>
+            {% for c in top_customers %}<tr><td>{{ c.full_name }}<br><span class="text-body-secondary">{{ c.phone }}</span></td><td class="text-end">{{ c.orders }}</td><td class="text-end">{{ c.spent|taka }}</td></tr>{% empty %}<tr><td colspan="3" class="text-body-secondary">No sales in this period.</td></tr>{% endfor %}
+        </tbody></table></div></div></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const c = {{ charts|safe }};
+    const palette = ['#2563eb', '#f59e0b', '#16a34a', '#dc2626', '#7c3aed', '#0891b2', '#db2777', '#65a30d', '#ea580c', '#475569'];
+    new Chart(document.getElementById('dailyChart'), { data: { labels: c.daily.labels, datasets: [
+        { type: 'bar', label: 'Sales (৳)', data: c.daily.revenue, backgroundColor: 'rgba(37,99,235,.65)', borderRadius: 4, yAxisID: 'y' },
+        { type: 'line', label: 'Orders', data: c.daily.orders, borderColor: '#f59e0b', tension: .3, yAxisID: 'y1' } ] },
+        options: { interaction: { mode: 'index', intersect: false }, scales: { y: { beginAtZero: true }, y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { precision: 0 } } } } });
+    new Chart(document.getElementById('categoryChart'), { type: 'doughnut', data: { labels: c.category.labels, datasets: [{ data: c.category.data, backgroundColor: palette }] }, options: { plugins: { legend: { position: 'bottom' } } } });
+    new Chart(document.getElementById('districtChart'), { type: 'bar', data: { labels: c.district.labels, datasets: [{ label: 'Orders', data: c.district.data, backgroundColor: '#16a34a', borderRadius: 4 }] }, options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { precision: 0 } } } } });
+    new Chart(document.getElementById('paymentChart'), { type: 'pie', data: { labels: c.payment.labels, datasets: [{ data: c.payment.data, backgroundColor: palette }] }, options: { plugins: { legend: { position: 'bottom' } } } });
+</script>
+{% endblock %}
