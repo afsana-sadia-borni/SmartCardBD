@@ -70,7 +70,7 @@ class CustomerProfile(models.Model):
     referred_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                     related_name='referrals')
     referral_rewarded = models.BooleanField(default=False)
-    # Mobile number for logging in (01XXXXXXXXX). Not verified by SMS yet (no SMS gateway).
+    # Mobile number for logging in (01XXXXXXXXX). phone_verified is set once the sign-up SMS code is confirmed.
     phone = models.CharField(max_length=11, unique=True, null=True, blank=True)
     phone_verified = models.BooleanField(default=False)
 
