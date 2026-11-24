@@ -2608,3 +2608,25 @@ msgstr "দারুণ সব অফার অপেক্ষা করছে�
 
 msgid "Go to the shop"
 msgstr "শপে যান"
+
+msgid "Trending now:"
+msgstr "এখন ট্রেন্ডিং:"
+
+msgid "Added to cart"
+msgstr "কার্টে যোগ হয়েছে"
+
+msgid "Pay when it arrives"
+msgstr "পণ্য হাতে পেয়ে টাকা দিন"
+
+msgid "Payment received"
+msgstr "পেমেন্ট সম্পন্ন"
+
+msgid "On the way!"
+msgstr "পথে আছে!"
+
+#, python-format
+msgid "Free delivery over %(amount)s"
+msgstr "%(amount)s-এর বেশি অর্ডারে ফ্রি ডেলিভারি"
+
+msgid "7-day easy returns"
+msgstr "৭ দিনের সহজ রিটার্ন"

@@ -48,7 +48,7 @@ def landing(request):
     categories = list(
         Category.objects.annotate(
             product_count=Count('products', filter=Q(products__is_active=True)),
-        ).filter(product_count__gt=0).order_by('-product_count', 'name')[:6]
+        ).filter(product_count__gt=0).order_by('-product_count', 'name')[:5]
     )
     covers = {}
     for p in with_photo.filter(category__in=categories).order_by('-is_featured', '-created_at'):
@@ -57,14 +57,14 @@ def landing(request):
         c.cover_url = covers.get(c.id)
 
     return render(request, 'products/landing.html', {
-        'hero_products': spotlight[:3],
+        'hero_products': spotlight[:6],
         'spotlight': spotlight,
         'landing_categories': categories,
         'flash_sale': FlashSale.current(),
         'reviews': Review.objects.filter(rating__gte=4).exclude(comment='')
                                  .select_related('user', 'product')[:3],
         'product_count': Product.objects.active().count(),
-        'category_count': len(categories),
+        'category_count': Category.objects.filter(products__is_active=True).distinct().count(),
         'free_shipping_min': settings.FREE_SHIPPING_MIN,
     })
 
