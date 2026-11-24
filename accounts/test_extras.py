@@ -103,7 +103,7 @@ class NotificationTests(TestCase):
         user = User.objects.create_user('n', 'n@example.com', 'x')
         Notification.objects.create(user=user, message='Your order shipped', url='/orders/')
         self.client.force_login(user)
-        self.assertContains(self.client.get('/'), 'Your order shipped')
+        self.assertContains(self.client.get('/home/'), 'Your order shipped')
         self.assertContains(self.client.get(reverse('notifications')), 'Your order shipped')
         self.assertFalse(Notification.objects.filter(is_read=False).exists())
 
