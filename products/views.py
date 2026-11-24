@@ -39,6 +39,19 @@ def shop_products():
 
 PRODUCTS_PER_PAGE = 12
 
+# Product photos for the laptop and phone drawn in the landing page hero. They ship with the
+# code (static files), so the hero always has pictures even when the shop has no products yet
+# or the host lost its uploaded media. Credits: /image-credits/ (same files as the demo data).
+LANDING_SHOWCASE = [
+    {'title': 'iPhone 13 128GB', 'price': 84999, 'image': 'img/landing/iphone-13.webp'},
+    {'title': 'HP 15s Ryzen 5 Laptop', 'price': 58500, 'image': 'img/landing/hp-15s.webp'},
+    {'title': 'Samsung Galaxy A15', 'price': 19999, 'image': 'img/landing/galaxy-a15.webp'},
+    {'title': 'Cotton Panjabi', 'price': 2750, 'image': 'img/landing/panjabi.webp'},
+    {'title': 'Logitech M331 Silent Mouse', 'price': 1750, 'image': 'img/landing/mouse.webp'},
+    {'title': 'Anker 20W USB-C Charger', 'price': 1399, 'image': 'img/landing/charger.webp'},
+]
+
+
 def landing(request):
     """The first page people see at /: what SmartCart BD is, with a way into the shop."""
     base = shop_products()
@@ -57,7 +70,7 @@ def landing(request):
         c.cover_url = covers.get(c.id)
 
     return render(request, 'products/landing.html', {
-        'hero_products': spotlight[:6],
+        'showcase': LANDING_SHOWCASE,
         'spotlight': spotlight,
         'landing_categories': categories,
         'flash_sale': FlashSale.current(),
