@@ -41,12 +41,12 @@ class SiteTests(TestCase):
                          ['999', '1,000', '1,25,000', '1,25,00,000'])
 
     def test_whatsapp_button_only_when_configured(self):
-        self.assertNotContains(self.client.get('/'), 'wa.me/88')
+        self.assertNotContains(self.client.get('/home/'), 'wa.me/88')
         with self.settings(WHATSAPP_NUMBER='8801712345678'):
-            self.assertContains(self.client.get('/'), 'https://wa.me/8801712345678')
+            self.assertContains(self.client.get('/home/'), 'https://wa.me/8801712345678')
 
     def test_skip_link_and_layout_landmarks(self):
-        response = self.client.get('/')
+        response = self.client.get('/home/')
         self.assertContains(response, 'href="#main-content"')
         self.assertContains(response, 'id="miniCart"')
         self.assertContains(response, 'id="quickViewModal"')

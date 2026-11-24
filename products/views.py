@@ -2,7 +2,8 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Prefetch, Q
+from django.conf import settings
+from django.db.models import Count, Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -17,7 +18,7 @@ from recommendations.engine import bought_together, similar_products
 
 from .filters import SORT_OPTIONS, filter_products
 from .forms import QuestionForm, ReviewForm
-from .models import Banner, Bundle, Category, FlashSale, PriceAlert, Product, Question, ReviewImage
+from .models import Banner, Bundle, Category, FlashSale, PriceAlert, Product, Question, Review, ReviewImage
 from .templatetags.shop_tags import taka
 
 COMPARE_SESSION_KEY = 'compare'
@@ -37,6 +38,36 @@ def shop_products():
     )
 
 PRODUCTS_PER_PAGE = 12
+
+def landing(request):
+    """The first page people see at /: what SmartCart BD is, with a way into the shop."""
+    base = shop_products()
+    with_photo = base.exclude(image='').exclude(image__isnull=True)
+    spotlight = list(with_photo.filter(is_featured=True)[:8]) or list(with_photo[:8]) or list(base[:8])
+
+    categories = list(
+        Category.objects.annotate(
+            product_count=Count('products', filter=Q(products__is_active=True)),
+        ).filter(product_count__gt=0).order_by('-product_count', 'name')[:6]
+    )
+    covers = {}
+    for p in with_photo.filter(category__in=categories).order_by('-is_featured', '-created_at'):
+        covers.setdefault(p.category_id, p.image.url)
+    for c in categories:
+        c.cover_url = covers.get(c.id)
+
+    return render(request, 'products/landing.html', {
+        'hero_products': spotlight[:3],
+        'spotlight': spotlight,
+        'landing_categories': categories,
+        'flash_sale': FlashSale.current(),
+        'reviews': Review.objects.filter(rating__gte=4).exclude(comment='')
+                                 .select_related('user', 'product')[:3],
+        'product_count': Product.objects.active().count(),
+        'category_count': len(categories),
+        'free_shipping_min': settings.FREE_SHIPPING_MIN,
+    })
+
 
 def home(request):
     base = shop_products()

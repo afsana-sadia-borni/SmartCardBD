@@ -69,11 +69,11 @@ class AccessTests(StoreTestCase):
     def test_staff_login_lands_in_store_and_shop_shows_store_button(self):
         response = self.client.post(reverse('account_login'), {'login': 'owner@example.com', 'password': 'Str0ng-pass!'})
         self.assertRedirects(response, reverse('store:dashboard'), fetch_redirect_response=False)
-        self.assertContains(self.client.get('/'), 'Store panel')
+        self.assertContains(self.client.get('/home/'), 'Store panel')
         self.client.logout()
         response = self.client.post(reverse('account_login'), {'login': 'cust@example.com', 'password': 'Str0ng-pass!'})
         self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)
-        self.assertNotContains(self.client.get('/'), 'Store panel')
+        self.assertNotContains(self.client.get('/home/'), 'Store panel')
 
     def test_old_dashboard_url_redirects(self):
         self.client.force_login(self.owner)

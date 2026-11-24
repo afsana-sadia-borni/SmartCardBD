@@ -2485,3 +2485,126 @@ msgstr "পেজ"
 #: templates/partials/product_card.html:43
 msgid "Choose options"
 msgstr "অপশন বেছে নিন"
+
+#: products/templates/products/landing.html
+msgid "Genuine electronics, fashion and more at fair prices. Cash on Delivery to all 64 districts of Bangladesh, or pay with bKash, Nagad or card."
+msgstr "ন্যায্য দামে আসল ইলেকট্রনিক্স, ফ্যাশন ও আরও অনেক কিছু। বাংলাদেশের ৬৪ জেলায় ক্যাশ অন ডেলিভারি, অথবা বিকাশ, নগদ বা কার্ডে পেমেন্ট।"
+
+msgid "Smart shopping, delivered to your door."
+msgstr "স্মার্ট কেনাকাটা, পৌঁছে যাবে আপনার দরজায়।"
+
+msgid "Why us"
+msgstr "কেন আমরা"
+
+msgid "How it works"
+msgstr "কীভাবে কাজ করে"
+
+msgid "Genuine phones, laptops, gadgets and fashion at honest prices. Order in a minute, pay when it arrives, or pay online with bKash, Nagad or card."
+msgstr "সৎ দামে আসল ফোন, ল্যাপটপ, গ্যাজেট ও ফ্যাশন। এক মিনিটে অর্ডার করুন, পণ্য হাতে পেয়ে টাকা দিন, অথবা বিকাশ, নগদ বা কার্ডে অনলাইনে পেমেন্ট করুন।"
+
+msgid "Start shopping"
+msgstr "কেনাকাটা শুরু করুন"
+
+msgid "Browse all products"
+msgstr "সব পণ্য দেখুন"
+
+msgid "Products"
+msgstr "পণ্য"
+
+msgid "Districts we deliver to"
+msgstr "জেলায় ডেলিভারি"
+
+msgid "Days to return"
+msgstr "দিনের মধ্যে রিটার্ন"
+
+msgid "Find what you need"
+msgstr "যা দরকার খুঁজে নিন"
+
+msgid "Why SmartCart BD"
+msgstr "কেন SmartCart BD"
+
+msgid "Shopping you can trust"
+msgstr "নিশ্চিন্তে কেনাকাটা"
+
+msgid "Check the parcel, then pay the delivery person. No advance payment needed."
+msgstr "পার্সেল দেখে তারপর ডেলিভারিম্যানকে টাকা দিন। কোনো অগ্রিম পেমেন্ট লাগবে না।"
+
+#, python-format
+msgid "Delivery to all 64 districts, free on orders over %(amount)s."
+msgstr "৬৪ জেলায় ডেলিভারি, %(amount)s-এর বেশি অর্ডারে ফ্রি।"
+
+msgid "Genuine products"
+msgstr "আসল পণ্য"
+
+msgid "Original brands with real reviews from customers who bought them."
+msgstr "অরিজিনাল ব্র্যান্ড, আর যাঁরা কিনেছেন তাঁদের আসল রিভিউ।"
+
+msgid "Pay online with bKash, Nagad, Rocket or card through SSLCommerz."
+msgstr "SSLCommerz-এর মাধ্যমে বিকাশ, নগদ, রকেট বা কার্ডে অনলাইনে পেমেন্ট করুন।"
+
+msgid "Something wrong? Ask for a return within 7 days of delivery."
+msgstr "কোনো সমস্যা? ডেলিভারির ৭ দিনের মধ্যে রিটার্নের অনুরোধ করুন।"
+
+msgid "Rewards on every order"
+msgstr "প্রতিটি অর্ডারে রিওয়ার্ড"
+
+msgid "Earn points when you shop and get a coupon for every friend you invite."
+msgstr "কেনাকাটায় পয়েন্ট জমান, আর প্রতিটি বন্ধুকে আমন্ত্রণ জানালে পান কুপন।"
+
+#, python-format
+msgid "Up to %(percent)s%% off, for a short time only."
+msgstr "সর্বোচ্চ %(percent)s%% ছাড়, শুধু অল্প সময়ের জন্য।"
+
+msgid "See the deals"
+msgstr "অফারগুলো দেখুন"
+
+msgid "Popular now"
+msgstr "এখন জনপ্রিয়"
+
+msgid "Customers' favourites"
+msgstr "ক্রেতাদের পছন্দের"
+
+msgid "Order in four easy steps"
+msgstr "চারটি সহজ ধাপে অর্ডার"
+
+msgid "Pick a product"
+msgstr "পণ্য বেছে নিন"
+
+msgid "Search, filter, compare and read reviews."
+msgstr "খুঁজুন, ফিল্টার করুন, তুলনা করুন আর রিভিউ পড়ুন।"
+
+msgid "Check out"
+msgstr "চেকআউট করুন"
+
+msgid "No account needed. Just your name, phone and address."
+msgstr "অ্যাকাউন্ট লাগবে না। শুধু নাম, ফোন নম্বর আর ঠিকানা।"
+
+msgid "Choose how to pay"
+msgstr "পেমেন্টের উপায় বেছে নিন"
+
+msgid "Cash on Delivery, bKash, Nagad, Rocket or card."
+msgstr "ক্যাশ অন ডেলিভারি, বিকাশ, নগদ, রকেট বা কার্ড।"
+
+msgid "Get it delivered"
+msgstr "ডেলিভারি নিন"
+
+msgid "Follow your parcel with your order number and phone."
+msgstr "অর্ডার নম্বর আর ফোন নম্বর দিয়ে পার্সেল ট্র্যাক করুন।"
+
+msgid "Reviews"
+msgstr "রিভিউ"
+
+msgid "What our customers say"
+msgstr "ক্রেতারা যা বলছেন"
+
+msgid "Verified buyer"
+msgstr "যাচাইকৃত ক্রেতা"
+
+msgid "Ready to shop?"
+msgstr "কেনাকাটার জন্য তৈরি?"
+
+msgid "Great deals are waiting. Create a free account to save addresses, track orders and collect reward points."
+msgstr "দারুণ সব অফার অপেক্ষা করছে। ফ্রি অ্যাকাউন্ট খুলে ঠিকানা সেভ করুন, অর্ডার ট্র্যাক করুন আর রিওয়ার্ড পয়েন্ট জমান।"
+
+msgid "Go to the shop"
+msgstr "শপে যান"

@@ -116,3 +116,27 @@ class ReviewTests(TestCase):
 
         response = self.client.get(self.product.get_absolute_url())
         self.assertEqual(response.context['product'].avg_rating, 2)
+
+
+class LandingPageTests(TestCase):
+    def test_landing_is_the_front_page_and_links_to_the_shop(self):
+        phones = Category.objects.create(name='Phones')
+        Category.objects.create(name='Empty')
+        make_product(phones, title='Featured Phone', is_featured=True)
+        make_product(phones, title='Hidden Phone', is_active=False)
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'products/landing.html')
+        self.assertContains(response, reverse('home'))
+        self.assertEqual(response.context['product_count'], 1)
+        self.assertEqual([c.name for c in response.context['landing_categories']], ['Phones'])
+        self.assertEqual([p.title for p in response.context['spotlight']], ['Featured Phone'])
+
+    def test_landing_works_with_an_empty_shop(self):
+        response = self.client.get(reverse('landing'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_shop_home_moved_to_its_own_url(self):
+        self.assertEqual(reverse('home'), '/home/')
+        response = self.client.get(reverse('home'))
+        self.assertTemplateUsed(response, 'products/home.html')

@@ -6,6 +6,7 @@ from django.db import DatabaseError, connection
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.templatetags.static import static
+from django.urls import reverse
 from django.views.decorators.cache import cache_control
 
 CREDITS_FILE = settings.BASE_DIR / 'products' / 'demo_media' / 'credits.json'
@@ -32,7 +33,7 @@ def manifest(request):
         'name': settings.SITE_NAME,
         'short_name': 'SmartCart',
         'description': 'Smart online shopping for Bangladesh. Cash on Delivery across all 64 districts.',
-        'start_url': '/?source=pwa',
+        'start_url': reverse('home') + '?source=pwa',
         'scope': '/',
         'display': 'standalone',
         'background_color': '#212529',
