@@ -19,11 +19,12 @@
     <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{% static 'img/icons/apple-touch-icon.png' %}">
     <link rel="manifest" href="{% url 'pwa_manifest' %}">
-    <meta name="theme-color" content="#212529">
+    <meta name="theme-color" content="#ffc629">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    {% if LANGUAGE_CODE == 'bn' %}<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">{% endif %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800{% if LANGUAGE_CODE == 'bn' %}&family=Hind+Siliguri:wght@400;600;700{% endif %}&display=swap" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <link href="{% static 'css/landing.css' %}" rel="stylesheet">
 </head>
@@ -34,32 +35,43 @@
 {% url 'product_list' as shop_url %}
 {% url 'track_order' as track_url %}
 
+{# Shopping bag drawing, reused in the hero and the closing banner. #}
+<svg width="0" height="0" class="position-absolute" aria-hidden="true" focusable="false">
+    <symbol id="lx-bag" viewBox="0 0 100 130">
+        <path d="M32 40 C32 8 68 8 68 40" fill="none" stroke-width="5" stroke-linecap="round" style="stroke: var(--h, #5e0f27)"/>
+        <path d="M14 34 H86 L92 126 H8 Z" style="fill: var(--c, #9b1d42)"/>
+        <path d="M14 34 H86 L87 46 H13 Z" fill="#0000001f"/>
+        <circle cx="32" cy="40" r="3" fill="#00000033"/><circle cx="68" cy="40" r="3" fill="#00000033"/>
+    </symbol>
+</svg>
+
 {# ---------- Navigation ---------- #}
-<header class="lp-nav sticky-top">
-    <nav class="navbar navbar-expand-lg navbar-dark" aria-label="{% translate "Main" %}">
+<header class="lx-nav js-lx-nav">
+    <nav class="navbar navbar-expand-lg" aria-label="{% translate "Main" %}">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'landing' %}"><i class="bi bi-bag-heart-fill text-warning"></i> SmartCart BD</a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#lpNav" aria-controls="lpNav" aria-expanded="false" aria-label="{% translate "Open menu" %}">
-                <span class="navbar-toggler-icon"></span>
+            <a class="navbar-brand lx-brand" href="{% url 'landing' %}"><span class="lx-brand-mark"><i class="bi bi-bag-heart-fill"></i></span> SmartCart <span class="lx-brand-bd">BD</span></a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#lxNav" aria-controls="lxNav" aria-expanded="false" aria-label="{% translate "Open menu" %}">
+                <i class="bi bi-list fs-2"></i>
             </button>
-            <div class="collapse navbar-collapse" id="lpNav">
-                <ul class="navbar-nav mx-auto gap-lg-2">
+            <div class="collapse navbar-collapse" id="lxNav">
+                <ul class="navbar-nav mx-auto gap-lg-1">
                     {% if landing_categories %}<li class="nav-item"><a class="nav-link" href="#categories">{% translate "Categories" %}</a></li>{% endif %}
+                    {% if spotlight %}<li class="nav-item"><a class="nav-link" href="#trending">{% translate "Popular now" %}</a></li>{% endif %}
                     <li class="nav-item"><a class="nav-link" href="#why">{% translate "Why us" %}</a></li>
                     <li class="nav-item"><a class="nav-link" href="#how">{% translate "How it works" %}</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ track_url }}">{% translate "Track an order" %}</a></li>
                 </ul>
-                <div class="d-flex align-items-center gap-2 pb-3 pb-lg-0">
-                    {% include 'partials/language_switch.html' with css='btn btn-link text-white px-2 fw-semibold' %}
-                    <button type="button" class="btn btn-link text-white px-2 js-theme-toggle" aria-label="{% translate "Toggle dark mode" %}" title="{% translate "Dark mode" %}">
+                <div class="d-flex align-items-center gap-1 pb-3 pb-lg-0">
+                    {% include 'partials/language_switch.html' with css='btn lx-icon-btn fw-bold' %}
+                    <button type="button" class="btn lx-icon-btn js-theme-toggle" aria-label="{% translate "Toggle dark mode" %}" title="{% translate "Dark mode" %}">
                         <i class="bi bi-moon-stars js-theme-icon"></i>
                     </button>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-person-circle"></i> {% translate "My account" %}</a>
+                        <a href="{% url 'profile' %}" class="btn lx-btn-ghost btn-sm"><i class="bi bi-person-circle"></i> {% translate "My account" %}</a>
                     {% else %}
-                        <a href="{% url 'account_login' %}" class="btn btn-outline-light btn-sm">{% translate "Log in" %}</a>
+                        <a href="{% url 'account_login' %}" class="btn lx-btn-ghost btn-sm">{% translate "Log in" %}</a>
                     {% endif %}
-                    <a href="{{ shop_home }}" class="btn btn-warning btn-sm fw-semibold">{% translate "Shop now" %} <i class="bi bi-arrow-right"></i></a>
+                    <a href="{{ shop_home }}" class="btn lx-btn-dark btn-sm">{% translate "Shop now" %} <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
@@ -69,150 +81,204 @@
 <main id="main-content" tabindex="-1">
 
     {# ---------- Hero ---------- #}
-    <section class="lp-hero">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-6" data-aos="fade-up">
-                    <span class="lp-eyebrow"><i class="bi bi-geo-alt-fill"></i> {% translate "Cash on Delivery · All 64 districts" %}</span>
-                    <h1 class="lp-title">{% translate "Smart shopping," %}<br><span class="text-warning">{% translate "delivered to your door." %}</span></h1>
-                    <p class="lp-lead">{% translate "Genuine phones, laptops, gadgets and fashion at honest prices. Order in a minute, pay when it arrives, or pay online with bKash, Nagad or card." %}</p>
-                    <div class="d-flex flex-wrap gap-2 mb-4">
-                        <a href="{{ shop_home }}" class="btn btn-warning btn-lg fw-semibold px-4">{% translate "Start shopping" %} <i class="bi bi-arrow-right"></i></a>
-                        <a href="{{ shop_url }}" class="btn btn-outline-light btn-lg px-4"><i class="bi bi-grid"></i> {% translate "Browse all products" %}</a>
+    <section class="lx-hero js-lx-hero">
+        <div class="lx-hero-deco" aria-hidden="true">
+            <span class="lx-sun"></span>
+            <span class="lx-ring"></span>
+            <span class="lx-dots"></span>
+            <span class="lx-squiggle"><svg viewBox="0 0 200 40"><path d="M2 20 Q 27 2 52 20 T 102 20 T 152 20 T 198 20" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg></span>
+        </div>
+        <div class="container position-relative">
+            <div class="row align-items-center gy-5">
+                <div class="col-lg-6 lx-hero-copy">
+                    <span class="lx-pill lx-rise" style="--d:0"><span class="lx-pill-dot"></span> {% translate "Cash on Delivery · All 64 districts" %}</span>
+                    <h1 class="lx-title">
+                        <span class="lx-rise" style="--d:1">{% translate "Smart shopping," %}</span>
+                        <span class="lx-rise" style="--d:2"><span class="lx-title-mark">{% translate "delivered to your door." %}</span></span>
+                    </h1>
+                    {% if landing_categories %}
+                        <p class="lx-rotator lx-rise" style="--d:3">
+                            <span>{% translate "Trending now:" %}</span>
+                            <span class="lx-words js-lx-words">
+                                {% for c in landing_categories %}<a href="{{ c.get_absolute_url }}" class="lx-word {% if forloop.first %}is-active{% endif %}">{{ c.name }}</a>{% endfor %}
+                            </span>
+                        </p>
+                    {% endif %}
+                    <p class="lx-lead lx-rise" style="--d:4">{% translate "Genuine phones, laptops, gadgets and fashion at honest prices. Order in a minute, pay when it arrives, or pay online with bKash, Nagad or card." %}</p>
+                    <div class="d-flex flex-wrap gap-2 mb-4 lx-rise" style="--d:5">
+                        <a href="{{ shop_home }}" class="btn lx-btn-dark btn-lg lx-btn-shine">{% translate "Start shopping" %} <i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ shop_url }}" class="btn lx-btn-outline btn-lg"><i class="bi bi-grid"></i> {% translate "Browse all products" %}</a>
                     </div>
-                    <form class="lp-search" action="{{ shop_url }}" method="get" role="search">
+                    <form class="lx-search lx-rise" style="--d:6" action="{{ shop_url }}" method="get" role="search">
                         <i class="bi bi-search" aria-hidden="true"></i>
                         <input type="search" name="q" placeholder="{% translate "Search products, brands, categories..." %}" aria-label="{% translate "Search" %}">
-                        <button type="submit" class="btn btn-warning fw-semibold">{% translate "Search" %}</button>
+                        <button type="submit" class="btn lx-btn-dark">{% translate "Search" %}</button>
                     </form>
+                    <ul class="lx-trust lx-rise" style="--d:7">
+                        <li><i class="bi bi-patch-check-fill"></i> {% translate "Genuine products" %}</li>
+                        <li><i class="bi bi-arrow-repeat"></i> {% translate "Easy returns" %}</li>
+                        <li><i class="bi bi-shield-lock-fill"></i> {% translate "Secure payment" %}</li>
+                    </ul>
                 </div>
-                <div class="col-lg-6" data-aos="fade-left" data-aos-delay="100">
-                    {% if hero_products %}
-                        <div class="lp-collage">
-                            {% for p in hero_products %}
-                                <a href="{{ p.get_absolute_url }}" class="lp-collage-item lp-collage-{{ forloop.counter }}">
-                                    {% if p.image %}
-                                        <img src="{{ p.image.url|webp:400 }}" alt="{{ p.title }}" {% if not forloop.first %}loading="lazy"{% endif %}>
-                                    {% else %}
-                                        <img src="{% static 'img/no-image.svg' %}" alt="">
-                                    {% endif %}
-                                    <span class="lp-price-tag">
-                                        <span class="text-truncate">{{ p.title }}</span>
-                                        <strong>{{ p.final_price|taka }}</strong>
-                                    </span>
-                                </a>
-                            {% endfor %}
+
+                <div class="col-lg-6">
+                    <div class="lx-stage" aria-hidden="true">
+                        <svg class="lx-bag lx-bag-1 js-depth" data-depth="18"><use href="#lx-bag"/></svg>
+                        <svg class="lx-bag lx-bag-2 js-depth" data-depth="28"><use href="#lx-bag"/></svg>
+                        <svg class="lx-bag lx-bag-3 js-depth" data-depth="12"><use href="#lx-bag"/></svg>
+
+                        {# Laptop showing the shop #}
+                        <div class="lx-laptop js-depth" data-depth="8">
+                            <div class="lx-screen">
+                                <div class="lx-browser">
+                                    <span class="lx-browser-dots"><i></i><i></i><i></i></span>
+                                    <span class="lx-browser-url"><i class="bi bi-lock-fill"></i> smartcartbd.com</span>
+                                </div>
+                                <div class="lx-shopbar"><span><i class="bi bi-bag-heart-fill"></i> SmartCart BD</span><span class="lx-shopbar-search"></span><span class="lx-shopbar-cart"><i class="bi bi-cart3"></i></span></div>
+                                <div class="lx-mini-grid">
+                                    {% for p in hero_products %}
+                                        <div class="lx-mini-card" style="--i:{{ forloop.counter0 }}">
+                                            <span class="lx-mini-img">{% if p.image %}<img src="{{ p.image.url|webp:400 }}" alt="">{% else %}<i class="bi bi-image"></i>{% endif %}</span>
+                                            <span class="lx-mini-title">{{ p.title }}</span>
+                                            <span class="lx-mini-price">{{ p.final_price|taka }}</span>
+                                        </div>
+                                    {% empty %}
+                                        {% for i in "123456" %}<div class="lx-mini-card lx-mini-skeleton" style="--i:{{ forloop.counter0 }}"><span class="lx-mini-img"></span><span class="lx-mini-title"></span><span class="lx-mini-price"></span></div>{% endfor %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="lx-laptop-base"></div>
                         </div>
-                    {% else %}
-                        <div class="text-center"><i class="bi bi-bag-heart-fill text-warning lp-hero-icon"></i></div>
-                    {% endif %}
+
+                        {# Phone with the cart #}
+                        <div class="lx-phone js-depth" data-depth="22">
+                            <div class="lx-phone-notch"></div>
+                            <div class="lx-phone-screen">
+                                <div class="lx-phone-head">{% translate "Your cart" %}</div>
+                                <div class="lx-phone-added"><i class="bi bi-check-circle-fill"></i> {% translate "Added to cart" %}</div>
+                                {% with p=hero_products.0 %}
+                                    <div class="lx-phone-item">
+                                        <span class="lx-phone-thumb">{% if p and p.image %}<img src="{{ p.image.url|webp:400 }}" alt="">{% else %}<i class="bi bi-bag"></i>{% endif %}</span>
+                                        <span class="lx-phone-meta"><span>{% if p %}{{ p.title }}{% else %}SmartCart BD{% endif %}</span><strong>{% if p %}{{ p.final_price|taka }}{% endif %}</strong></span>
+                                    </div>
+                                {% endwith %}
+                                <div class="lx-phone-row"><span>{% translate "Delivery" %}</span><span><i class="bi bi-truck"></i></span></div>
+                                <div class="lx-phone-pay"><span>COD</span><span class="lx-bkash">bKash</span><span class="lx-nagad">Nagad</span></div>
+                                <div class="lx-phone-checkout">{% translate "Check out" %} <i class="bi bi-arrow-right"></i></div>
+                            </div>
+                        </div>
+
+                        {# Floating notes #}
+                        <div class="lx-float lx-float-1 js-depth" data-depth="34"><span class="lx-float-icon lx-green"><i class="bi bi-cash-coin"></i></span><span><strong>{% translate "Cash on Delivery" %}</strong><small>{% translate "Pay when it arrives" %}</small></span></div>
+                        <div class="lx-float lx-float-2 js-depth" data-depth="26"><span class="lx-float-icon lx-pink"><i class="bi bi-phone-fill"></i></span><span><strong>{% translate "Payment received" %}</strong><small>bKash · Nagad · {% translate "Card" %}</small></span></div>
+                        <div class="lx-float lx-float-3 js-depth" data-depth="40"><span class="lx-float-icon lx-blue"><i class="bi bi-truck"></i></span><span><strong>{% translate "On the way!" %}</strong><small>{% translate "All 64 districts" %}</small></span></div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
+    {# ---------- Ticker ---------- #}
+    <div class="lx-ticker" aria-hidden="true">
+        <div class="lx-ticker-track">
+            {% for i in "12" %}
+                <span><i class="bi bi-asterisk"></i> {% translate "Cash on Delivery" %}</span>
+                <span><i class="bi bi-asterisk"></i> {% blocktranslate with amount=free_shipping_min|taka %}Free delivery over {{ amount }}{% endblocktranslate %}</span>
+                <span><i class="bi bi-asterisk"></i> bKash · Nagad · Rocket</span>
+                <span><i class="bi bi-asterisk"></i> {% translate "7-day easy returns" %}</span>
+                <span><i class="bi bi-asterisk"></i> {% translate "Genuine products" %}</span>
+                <span><i class="bi bi-asterisk"></i> {% translate "All 64 districts" %}</span>
+            {% endfor %}
+        </div>
+    </div>
+
     {# ---------- Numbers ---------- #}
-    <section class="lp-stats">
+    <section class="lx-stats">
         <div class="container">
-            <div class="row g-3 text-center">
-                {% if product_count %}
-                    <div class="col-6 col-md-3"><div class="lp-stat"><strong>{{ product_count|num }}+</strong><span>{% translate "Products" %}</span></div></div>
-                {% endif %}
-                {% if category_count %}
-                    <div class="col-6 col-md-3"><div class="lp-stat"><strong>{{ category_count|num }}</strong><span>{% translate "Categories" %}</span></div></div>
-                {% endif %}
-                <div class="col-6 col-md-3"><div class="lp-stat"><strong>{{ 64|num }}</strong><span>{% translate "Districts we deliver to" %}</span></div></div>
-                <div class="col-6 col-md-3"><div class="lp-stat"><strong>{{ 7|num }}</strong><span>{% translate "Days to return" %}</span></div></div>
+            <div class="lx-stats-grid">
+                {% if product_count %}<div class="lx-stat" data-aos="fade-up"><strong><span class="js-count" data-to="{{ product_count }}">{{ product_count|num }}</span>+</strong><span>{% translate "Products" %}</span></div>{% endif %}
+                {% if category_count %}<div class="lx-stat" data-aos="fade-up" data-aos-delay="80"><strong class="js-count" data-to="{{ category_count }}">{{ category_count|num }}</strong><span>{% translate "Categories" %}</span></div>{% endif %}
+                <div class="lx-stat" data-aos="fade-up" data-aos-delay="160"><strong class="js-count" data-to="64">{{ 64|num }}</strong><span>{% translate "Districts we deliver to" %}</span></div>
+                <div class="lx-stat" data-aos="fade-up" data-aos-delay="240"><strong class="js-count" data-to="7">{{ 7|num }}</strong><span>{% translate "Days to return" %}</span></div>
             </div>
         </div>
     </section>
 
     {# ---------- Categories ---------- #}
     {% if landing_categories %}
-        <section class="lp-section" id="categories">
+        <section class="lx-section" id="categories">
             <div class="container">
-                <div class="lp-heading" data-aos="fade-up">
-                    <span class="lp-kicker">{% translate "Categories" %}</span>
+                <div class="lx-heading" data-aos="fade-up">
+                    <span class="lx-kicker">{% translate "Categories" %}</span>
                     <h2>{% translate "Find what you need" %}</h2>
                 </div>
-                <div class="row g-3">
+                <div class="lx-bento lx-bento-{{ landing_categories|length }}">
                     {% for c in landing_categories %}
-                        <div class="col-6 col-md-4" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 60 %}">
-                            <a href="{{ c.get_absolute_url }}" class="lp-cat">
-                                {% if c.cover_url %}<img src="{{ c.cover_url|webp:400 }}" alt="" loading="lazy">{% endif %}
-                                <span class="lp-cat-body">
-                                    <strong>{{ c.name }}</strong>
-                                    <small>{% blocktranslate count n=c.product_count with shown=c.product_count|num %}{{ shown }} product{% plural %}{{ shown }} products{% endblocktranslate %}</small>
-                                </span>
-                            </a>
-                        </div>
+                        <a href="{{ c.get_absolute_url }}" class="lx-cat" data-aos="zoom-in" data-aos-delay="{% widthratio forloop.counter0 1 70 %}">
+                            {% if c.cover_url %}<img src="{{ c.cover_url|webp:800 }}" alt="" loading="lazy">{% endif %}
+                            <span class="lx-cat-body">
+                                <strong>{{ c.name }}</strong>
+                                <small>{% blocktranslate count n=c.product_count with shown=c.product_count|num %}{{ shown }} product{% plural %}{{ shown }} products{% endblocktranslate %}</small>
+                            </span>
+                            <span class="lx-cat-arrow"><i class="bi bi-arrow-up-right"></i></span>
+                        </a>
                     {% endfor %}
                 </div>
             </div>
         </section>
     {% endif %}
 
-    {# ---------- Why us ---------- #}
-    <section class="lp-section lp-alt" id="why">
-        <div class="container">
-            <div class="lp-heading" data-aos="fade-up">
-                <span class="lp-kicker">{% translate "Why SmartCart BD" %}</span>
-                <h2>{% translate "Shopping you can trust" %}</h2>
-            </div>
-            <div class="row g-4">
-                <div class="col-sm-6 col-lg-4" data-aos="fade-up"><div class="lp-feature"><i class="bi bi-cash-coin"></i><h3>{% translate "Cash on Delivery" %}</h3><p>{% translate "Check the parcel, then pay the delivery person. No advance payment needed." %}</p></div></div>
-                <div class="col-sm-6 col-lg-4" data-aos="fade-up" data-aos-delay="60"><div class="lp-feature"><i class="bi bi-truck"></i><h3>{% translate "Nationwide delivery" %}</h3><p>{% blocktranslate with amount=free_shipping_min|taka %}Delivery to all 64 districts, free on orders over {{ amount }}.{% endblocktranslate %}</p></div></div>
-                <div class="col-sm-6 col-lg-4" data-aos="fade-up" data-aos-delay="120"><div class="lp-feature"><i class="bi bi-patch-check"></i><h3>{% translate "Genuine products" %}</h3><p>{% translate "Original brands with real reviews from customers who bought them." %}</p></div></div>
-                <div class="col-sm-6 col-lg-4" data-aos="fade-up"><div class="lp-feature"><i class="bi bi-shield-lock"></i><h3>{% translate "Secure payment" %}</h3><p>{% translate "Pay online with bKash, Nagad, Rocket or card through SSLCommerz." %}</p></div></div>
-                <div class="col-sm-6 col-lg-4" data-aos="fade-up" data-aos-delay="60"><div class="lp-feature"><i class="bi bi-arrow-repeat"></i><h3>{% translate "Easy returns" %}</h3><p>{% translate "Something wrong? Ask for a return within 7 days of delivery." %}</p></div></div>
-                <div class="col-sm-6 col-lg-4" data-aos="fade-up" data-aos-delay="120"><div class="lp-feature"><i class="bi bi-gift"></i><h3>{% translate "Rewards on every order" %}</h3><p>{% translate "Earn points when you shop and get a coupon for every friend you invite." %}</p></div></div>
-            </div>
-        </div>
-    </section>
-
     {# ---------- Flash sale ---------- #}
     {% if flash_sale %}
-        <section class="lp-section pb-0">
+        <section class="lx-section pt-0">
             <div class="container">
-                <div class="lp-flash" data-aos="zoom-in">
-                    <div>
-                        <span class="badge text-bg-warning mb-2"><i class="bi bi-lightning-charge-fill"></i> {% translate "Flash sale" %}</span>
-                        <h2 class="h3 fw-bold text-white mb-1">{{ flash_sale.title }}</h2>
-                        <p class="text-white-50 mb-0">{% blocktranslate with percent=flash_sale.discount_percent|num %}Up to {{ percent }}% off, for a short time only.{% endblocktranslate %}</p>
+                <div class="lx-flash" data-aos="zoom-in">
+                    <div class="lx-flash-bolt" aria-hidden="true"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div class="flex-grow-1">
+                        <span class="lx-flash-tag">{% translate "Flash sale" %}</span>
+                        <h2>{{ flash_sale.title }}</h2>
+                        <p>{% blocktranslate with percent=flash_sale.discount_percent|num %}Up to {{ percent }}% off, for a short time only.{% endblocktranslate %}</p>
                     </div>
-                    <div class="d-flex flex-column align-items-start align-items-md-end gap-2">
+                    <div class="d-flex flex-column align-items-start align-items-md-end gap-3">
                         {% include 'partials/countdown.html' with ends_at=flash_sale.ends_at label='Ends in' %}
-                        <a href="{{ shop_home }}#flash-sale" class="btn btn-warning fw-semibold">{% translate "See the deals" %} <i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ shop_home }}#flash-sale" class="btn lx-btn-yellow">{% translate "See the deals" %} <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
         </section>
     {% endif %}
 
-    {# ---------- Product spotlight ---------- #}
+    {# ---------- Products ---------- #}
     {% if spotlight %}
-        <section class="lp-section">
+        <section class="lx-section lx-alt" id="trending">
             <div class="container">
-                <div class="lp-heading d-flex flex-wrap justify-content-between align-items-end gap-2" data-aos="fade-up">
+                <div class="lx-heading d-flex flex-wrap justify-content-between align-items-end gap-3" data-aos="fade-up">
                     <div>
-                        <span class="lp-kicker">{% translate "Popular now" %}</span>
+                        <span class="lx-kicker">{% translate "Popular now" %}</span>
                         <h2 class="mb-0">{% translate "Customers' favourites" %}</h2>
                     </div>
-                    <a href="{{ shop_url }}" class="btn btn-outline-dark btn-sm">{% translate "View all" %} <i class="bi bi-arrow-right"></i></a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="lx-arrow js-lx-prev" aria-label="{% translate "Previous" %}"><i class="bi bi-arrow-left"></i></button>
+                        <button type="button" class="lx-arrow js-lx-next" aria-label="{% translate "Next" %}"><i class="bi bi-arrow-right"></i></button>
+                        <a href="{{ shop_url }}" class="btn lx-btn-dark">{% translate "View all" %}</a>
+                    </div>
                 </div>
-                <div class="lp-products">
+                <div class="lx-rail js-lx-rail">
                     {% for p in spotlight %}
-                        <a href="{{ p.get_absolute_url }}" class="lp-product" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 50 %}">
-                            <span class="lp-product-img">
+                        <a href="{{ p.get_absolute_url }}" class="lx-product" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 60 %}">
+                            <span class="lx-product-img">
                                 <img src="{% if p.image %}{{ p.image.url|webp:400 }}{% else %}{% static 'img/no-image.svg' %}{% endif %}" alt="{{ p.title }}" loading="lazy">
-                                {% if p.discount_percent %}<span class="badge bg-danger">-{{ p.discount_percent|num }}%</span>{% endif %}
+                                {% if p.discount_percent %}<span class="lx-off">-{{ p.discount_percent|num }}%</span>{% endif %}
                             </span>
-                            <span class="lp-product-body">
-                                {% if p.brand %}<small class="text-body-secondary">{{ p.brand }}</small>{% endif %}
-                                <span class="lp-product-title">{{ p.title }}</span>
-                                <span>
-                                    <strong>{{ p.final_price|taka }}</strong>
-                                    {% if p.has_discount %}<del class="text-body-secondary small ms-1">{{ p.price|taka }}</del>{% endif %}
+                            <span class="lx-product-body">
+                                {% if p.brand %}<small>{{ p.brand }}</small>{% endif %}
+                                <span class="lx-product-title">{{ p.title }}</span>
+                                <span class="lx-product-foot">
+                                    <span>
+                                        <strong>{{ p.final_price|taka }}</strong>
+                                        {% if p.has_discount %}<del>{{ p.price|taka }}</del>{% endif %}
+                                    </span>
+                                    <span class="lx-product-go"><i class="bi bi-arrow-right"></i></span>
                                 </span>
                             </span>
                         </a>
@@ -222,53 +288,78 @@
         </section>
     {% endif %}
 
-    {# ---------- How it works ---------- #}
-    <section class="lp-section lp-alt" id="how">
+    {# ---------- Why us ---------- #}
+    <section class="lx-section" id="why">
         <div class="container">
-            <div class="lp-heading" data-aos="fade-up">
-                <span class="lp-kicker">{% translate "How it works" %}</span>
-                <h2>{% translate "Order in four easy steps" %}</h2>
+            <div class="lx-heading" data-aos="fade-up">
+                <span class="lx-kicker">{% translate "Why SmartCart BD" %}</span>
+                <h2>{% translate "Shopping you can trust" %}</h2>
             </div>
-            <ol class="lp-steps">
-                <li data-aos="fade-up"><span class="lp-step-num">{{ 1|num }}</span><i class="bi bi-search"></i><h3>{% translate "Pick a product" %}</h3><p>{% translate "Search, filter, compare and read reviews." %}</p></li>
-                <li data-aos="fade-up" data-aos-delay="80"><span class="lp-step-num">{{ 2|num }}</span><i class="bi bi-cart-check"></i><h3>{% translate "Check out" %}</h3><p>{% translate "No account needed. Just your name, phone and address." %}</p></li>
-                <li data-aos="fade-up" data-aos-delay="160"><span class="lp-step-num">{{ 3|num }}</span><i class="bi bi-wallet2"></i><h3>{% translate "Choose how to pay" %}</h3><p>{% translate "Cash on Delivery, bKash, Nagad, Rocket or card." %}</p></li>
-                <li data-aos="fade-up" data-aos-delay="240"><span class="lp-step-num">{{ 4|num }}</span><i class="bi bi-box-seam"></i><h3>{% translate "Get it delivered" %}</h3><p>{% translate "Follow your parcel with your order number and phone." %}</p></li>
-            </ol>
+            <div class="lx-features">
+                <div class="lx-feature lx-feature-hero" data-aos="fade-up">
+                    <div>
+                        <span class="lx-feature-icon"><i class="bi bi-cash-coin"></i></span>
+                        <h3>{% translate "Cash on Delivery" %}</h3>
+                        <p>{% translate "Check the parcel, then pay the delivery person. No advance payment needed." %}</p>
+                        <a href="{{ shop_home }}" class="btn lx-btn-dark">{% translate "Start shopping" %} <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="lx-cod-art" aria-hidden="true">
+                        <span class="lx-box"><i class="bi bi-box-seam-fill"></i></span>
+                        <span class="lx-taka">৳</span>
+                        <span class="lx-check"><i class="bi bi-check-lg"></i></span>
+                    </div>
+                </div>
+                <div class="lx-feature" data-aos="fade-up" data-aos-delay="60"><span class="lx-feature-icon"><i class="bi bi-truck"></i></span><h3>{% translate "Nationwide delivery" %}</h3><p>{% blocktranslate with amount=free_shipping_min|taka %}Delivery to all 64 districts, free on orders over {{ amount }}.{% endblocktranslate %}</p></div>
+                <div class="lx-feature" data-aos="fade-up" data-aos-delay="120"><span class="lx-feature-icon"><i class="bi bi-patch-check"></i></span><h3>{% translate "Genuine products" %}</h3><p>{% translate "Original brands with real reviews from customers who bought them." %}</p></div>
+                <div class="lx-feature" data-aos="fade-up"><span class="lx-feature-icon"><i class="bi bi-arrow-repeat"></i></span><h3>{% translate "Easy returns" %}</h3><p>{% translate "Something wrong? Ask for a return within 7 days of delivery." %}</p></div>
+                <div class="lx-feature" data-aos="fade-up" data-aos-delay="60"><span class="lx-feature-icon"><i class="bi bi-gift"></i></span><h3>{% translate "Rewards on every order" %}</h3><p>{% translate "Earn points when you shop and get a coupon for every friend you invite." %}</p></div>
+            </div>
         </div>
     </section>
 
-    {# ---------- Payment methods ---------- #}
-    <section class="lp-section py-4">
+    {# ---------- How it works ---------- #}
+    <section class="lx-section lx-dark" id="how">
         <div class="container">
-            <div class="lp-pay" data-aos="fade-up">
-                <span class="fw-semibold">{% translate "We accept" %}</span>
-                <span class="lp-pay-chip"><i class="bi bi-cash-coin"></i> {% translate "Cash on Delivery" %}</span>
-                <span class="lp-pay-chip lp-bkash">bKash</span>
-                <span class="lp-pay-chip lp-nagad">Nagad</span>
-                <span class="lp-pay-chip lp-rocket">Rocket</span>
-                <span class="lp-pay-chip"><i class="bi bi-credit-card"></i> {% translate "Card" %}</span>
+            <div class="lx-heading text-center" data-aos="fade-up">
+                <span class="lx-kicker">{% translate "How it works" %}</span>
+                <h2>{% translate "Order in four easy steps" %}</h2>
+            </div>
+            <ol class="lx-steps js-lx-steps">
+                <li><span class="lx-step-dot"><i class="bi bi-search"></i></span><span class="lx-step-num">{{ 1|num }}</span><h3>{% translate "Pick a product" %}</h3><p>{% translate "Search, filter, compare and read reviews." %}</p></li>
+                <li><span class="lx-step-dot"><i class="bi bi-cart-check"></i></span><span class="lx-step-num">{{ 2|num }}</span><h3>{% translate "Check out" %}</h3><p>{% translate "No account needed. Just your name, phone and address." %}</p></li>
+                <li><span class="lx-step-dot"><i class="bi bi-wallet2"></i></span><span class="lx-step-num">{{ 3|num }}</span><h3>{% translate "Choose how to pay" %}</h3><p>{% translate "Cash on Delivery, bKash, Nagad, Rocket or card." %}</p></li>
+                <li><span class="lx-step-dot"><i class="bi bi-box-seam"></i></span><span class="lx-step-num">{{ 4|num }}</span><h3>{% translate "Get it delivered" %}</h3><p>{% translate "Follow your parcel with your order number and phone." %}</p></li>
+            </ol>
+            <div class="lx-pay" data-aos="fade-up">
+                <span>{% translate "We accept" %}</span>
+                <span class="lx-pay-chip"><i class="bi bi-cash-coin"></i> {% translate "Cash on Delivery" %}</span>
+                <span class="lx-pay-chip lx-bkash">bKash</span>
+                <span class="lx-pay-chip lx-nagad">Nagad</span>
+                <span class="lx-pay-chip lx-rocket">Rocket</span>
+                <span class="lx-pay-chip"><i class="bi bi-credit-card"></i> {% translate "Card" %}</span>
             </div>
         </div>
     </section>
 
     {# ---------- Reviews ---------- #}
     {% if reviews %}
-        <section class="lp-section lp-alt">
+        <section class="lx-section">
             <div class="container">
-                <div class="lp-heading" data-aos="fade-up">
-                    <span class="lp-kicker">{% translate "Reviews" %}</span>
+                <div class="lx-heading" data-aos="fade-up">
+                    <span class="lx-kicker">{% translate "Reviews" %}</span>
                     <h2>{% translate "What our customers say" %}</h2>
                 </div>
                 <div class="row g-4">
                     {% for r in reviews %}
                         <div class="col-md-4" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 80 %}">
-                            <figure class="lp-review">
+                            <figure class="lx-review">
+                                <i class="bi bi-quote lx-review-quote" aria-hidden="true"></i>
                                 {% stars r.rating %}
-                                <blockquote class="mt-2">{{ r.comment|truncatewords:40 }}</blockquote>
+                                <blockquote>{{ r.comment|truncatewords:40 }}</blockquote>
                                 <figcaption>
-                                    <strong>{{ r.user.first_name|default:_("Verified buyer") }}</strong>
-                                    <a href="{{ r.product.get_absolute_url }}" class="small text-body-secondary d-block text-truncate">{{ r.product.title }}</a>
+                                    <span class="lx-avatar">{{ r.user.first_name|default:"S"|first|upper }}</span>
+                                    <span><strong>{{ r.user.first_name|default:_("Verified buyer") }}</strong>
+                                    <a href="{{ r.product.get_absolute_url }}">{{ r.product.title }}</a></span>
                                 </figcaption>
                             </figure>
                         </div>
@@ -278,31 +369,35 @@
         </section>
     {% endif %}
 
-    {# ---------- Final call to action ---------- #}
-    <section class="lp-section">
+    {# ---------- Closing banner ---------- #}
+    <section class="lx-section">
         <div class="container">
-            <div class="lp-cta" data-aos="fade-up">
-                <div class="row align-items-center g-4">
+            <div class="lx-cta" data-aos="zoom-in">
+                <svg class="lx-bag lx-cta-bag-1" aria-hidden="true"><use href="#lx-bag"/></svg>
+                <svg class="lx-bag lx-cta-bag-2" aria-hidden="true"><use href="#lx-bag"/></svg>
+                <div class="row align-items-center g-4 position-relative">
                     <div class="col-lg-7">
-                        <h2 class="fw-bold text-white">{% translate "Ready to shop?" %}</h2>
-                        <p class="text-white-50 mb-4">{% translate "Great deals are waiting. Create a free account to save addresses, track orders and collect reward points." %}</p>
+                        <h2>{% translate "Ready to shop?" %}</h2>
+                        <p class="lx-cta-text">{% translate "Great deals are waiting. Create a free account to save addresses, track orders and collect reward points." %}</p>
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{{ shop_home }}" class="btn btn-warning btn-lg fw-semibold">{% translate "Go to the shop" %} <i class="bi bi-arrow-right"></i></a>
-                            {% if not user.is_authenticated %}<a href="{% url 'account_signup' %}" class="btn btn-outline-light btn-lg">{% translate "Create account" %}</a>{% endif %}
+                            <a href="{{ shop_home }}" class="btn lx-btn-dark btn-lg lx-btn-shine">{% translate "Go to the shop" %} <i class="bi bi-arrow-right"></i></a>
+                            {% if not user.is_authenticated %}<a href="{% url 'account_signup' %}" class="btn lx-btn-outline btn-lg">{% translate "Create account" %}</a>{% endif %}
                         </div>
                     </div>
                     <div class="col-lg-5">
-                        <h3 class="h6 text-white">{% translate "Get deals in your inbox" %}</h3>
-                        <form method="post" action="{% url 'newsletter_subscribe' %}" class="js-newsletter" novalidate>
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                            <div class="hp-wrap" aria-hidden="true"><label>{% translate "Leave this field empty" %} <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-                            <div class="input-group">
-                                <input type="email" name="email" class="form-control" placeholder="{% translate "your@email.com" %}" aria-label="{% translate "Email address" %}" required>
-                                <button class="btn btn-warning fw-semibold" type="submit">{% translate "Subscribe" %}</button>
-                            </div>
-                            <div class="small mt-1 js-newsletter-msg" role="status"></div>
-                        </form>
+                        <div class="lx-newsletter">
+                            <h3><i class="bi bi-envelope-heart"></i> {% translate "Get deals in your inbox" %}</h3>
+                            <form method="post" action="{% url 'newsletter_subscribe' %}" class="js-newsletter" novalidate>
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                <div class="hp-wrap" aria-hidden="true"><label>{% translate "Leave this field empty" %} <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+                                <div class="input-group">
+                                    <input type="email" name="email" class="form-control" placeholder="{% translate "your@email.com" %}" aria-label="{% translate "Email address" %}" required>
+                                    <button class="btn lx-btn-dark" type="submit">{% translate "Subscribe" %}</button>
+                                </div>
+                                <div class="small mt-1 js-newsletter-msg" role="status"></div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -311,15 +406,15 @@
 </main>
 
 {# ---------- Footer ---------- #}
-<footer class="bg-dark text-white-50 py-4">
+<footer class="lx-footer">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 small">
-        <div><i class="bi bi-bag-heart-fill text-warning"></i> <span class="text-white fw-semibold">SmartCart BD</span> &middot; &copy; {% now "Y" %}</div>
+        <div><span class="lx-brand-mark lx-brand-mark-sm"><i class="bi bi-bag-heart-fill"></i></span> <span class="text-white fw-bold">SmartCart BD</span> &middot; &copy; {% now "Y" %}</div>
         <nav class="d-flex flex-wrap justify-content-center gap-3" aria-label="{% translate "Policies" %}">
-            <a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'about' %}">{% translate "About us" %}</a>
-            <a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'shipping' %}">{% translate "Delivery" %}</a>
-            <a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'returns' %}">{% translate "Returns &amp; refunds" %}</a>
-            <a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'privacy' %}">{% translate "Privacy" %}</a>
-            <a class="link-light link-opacity-50 link-opacity-100-hover text-decoration-none" href="{% url 'policy_page' 'terms' %}">{% translate "Terms" %}</a>
+            <a href="{% url 'policy_page' 'about' %}">{% translate "About us" %}</a>
+            <a href="{% url 'policy_page' 'shipping' %}">{% translate "Delivery" %}</a>
+            <a href="{% url 'policy_page' 'returns' %}">{% translate "Returns &amp; refunds" %}</a>
+            <a href="{% url 'policy_page' 'privacy' %}">{% translate "Privacy" %}</a>
+            <a href="{% url 'policy_page' 'terms' %}">{% translate "Terms" %}</a>
         </nav>
     </div>
 </footer>
@@ -336,5 +431,6 @@
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static 'js/script.js' %}" data-suggest-url="{% url 'search_suggest' %}" data-geo-url="{% static 'data/bd-geo.json' %}" data-sw-url="{% url 'service_worker' %}" id="app-script"></script>
+<script src="{% static 'js/landing.js' %}"></script>
 </body>
 </html>
