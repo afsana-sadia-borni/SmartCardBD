@@ -16,7 +16,7 @@ class PolicyPageTests(TestCase):
             self.assertEqual(response.status_code, 200, slug)
             self.assertContains(response, 'id="miniCart"')  # inside the normal layout
         self.assertContains(self.client.get(reverse('policy_page', args=['shipping'])), 'Inside Dhaka')
-        self.assertContains(self.client.get('/'), reverse('policy_page', args=['privacy']))
+        self.assertContains(self.client.get('/home/'), reverse('policy_page', args=['privacy']))
         self.assertEqual(self.client.get('/pages/nope/').status_code, 404)
 
     @override_settings(SUPPORT_EMAIL='help@example.com')

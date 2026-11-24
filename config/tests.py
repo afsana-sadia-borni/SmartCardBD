@@ -38,7 +38,7 @@ class LayoutTests(TestCase):
         self.assertContains(response, 'id="appSidebar"')
 
     def test_public_pages_have_topbar_and_sidebar(self):
-        for url in ['/', '/shop/', self.category.get_absolute_url(), self.product.get_absolute_url(),
+        for url in ['/home/', '/shop/', self.category.get_absolute_url(), self.product.get_absolute_url(),
                     '/cart/', '/accounts/login/', '/accounts/signup/', '/accounts/password/reset/']:
             with self.subTest(url=url):
                 self.assertHasLayout(self.client.get(url))
@@ -54,9 +54,9 @@ class LayoutTests(TestCase):
         self.assertContains(response, f'sidebar-link active" href="{self.category.get_absolute_url()}"')
 
     def test_sidebar_shows_account_links_only_when_logged_in(self):
-        self.assertNotContains(self.client.get('/'), 'Profile &amp; rewards')
+        self.assertNotContains(self.client.get('/home/'), 'Profile &amp; rewards')
         self.client.force_login(self.user)
-        self.assertContains(self.client.get('/'), 'Profile &amp; rewards')
+        self.assertContains(self.client.get('/home/'), 'Profile &amp; rewards')
 
 
 @override_settings(DEBUG=False)

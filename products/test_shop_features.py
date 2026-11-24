@@ -92,7 +92,7 @@ class FlashSaleTests(ShopTestCase):
         mouse = Product.objects.get(pk=self.mouse.pk)
         self.assertEqual(mouse.final_price, Decimal('400.00'))
         self.assertEqual(mouse.discount_percent, 20)
-        self.assertContains(self.client.get('/'), 'js-countdown')
+        self.assertContains(self.client.get('/home/'), 'js-countdown')
 
         FlashSale.objects.filter(pk=sale.pk).update(ends_at=timezone.now() - timedelta(seconds=1))
         cache.clear()
