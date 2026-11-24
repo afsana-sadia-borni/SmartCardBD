@@ -136,14 +136,12 @@
                                 </div>
                                 <div class="lx-shopbar"><span><i class="bi bi-bag-heart-fill"></i> SmartCart BD</span><span class="lx-shopbar-search"></span><span class="lx-shopbar-cart"><i class="bi bi-cart3"></i></span></div>
                                 <div class="lx-mini-grid">
-                                    {% for p in hero_products %}
+                                    {% for p in showcase %}
                                         <div class="lx-mini-card" style="--i:{{ forloop.counter0 }}">
-                                            <span class="lx-mini-img">{% if p.image %}<img src="{{ p.image.url|webp:400 }}" alt="">{% else %}<i class="bi bi-image"></i>{% endif %}</span>
+                                            <span class="lx-mini-img"><img src="{% static p.image %}" alt=""></span>
                                             <span class="lx-mini-title">{{ p.title }}</span>
-                                            <span class="lx-mini-price">{{ p.final_price|taka }}</span>
+                                            <span class="lx-mini-price">{{ p.price|taka }}</span>
                                         </div>
-                                    {% empty %}
-                                        {% for i in "123456" %}<div class="lx-mini-card lx-mini-skeleton" style="--i:{{ forloop.counter0 }}"><span class="lx-mini-img"></span><span class="lx-mini-title"></span><span class="lx-mini-price"></span></div>{% endfor %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -156,13 +154,14 @@
                             <div class="lx-phone-screen">
                                 <div class="lx-phone-head">{% translate "Your cart" %}</div>
                                 <div class="lx-phone-added"><i class="bi bi-check-circle-fill"></i> {% translate "Added to cart" %}</div>
-                                {% with p=hero_products.0 %}
+                                {% for p in showcase|slice:":4" %}{% if forloop.first or forloop.counter == 4 %}
                                     <div class="lx-phone-item">
-                                        <span class="lx-phone-thumb">{% if p and p.image %}<img src="{{ p.image.url|webp:400 }}" alt="">{% else %}<i class="bi bi-bag"></i>{% endif %}</span>
-                                        <span class="lx-phone-meta"><span>{% if p %}{{ p.title }}{% else %}SmartCart BD{% endif %}</span><strong>{% if p %}{{ p.final_price|taka }}{% endif %}</strong></span>
+                                        <span class="lx-phone-thumb"><img src="{% static p.image %}" alt=""></span>
+                                        <span class="lx-phone-meta"><span>{{ p.title }}</span><strong>{{ p.price|taka }}</strong></span>
                                     </div>
-                                {% endwith %}
+                                {% endif %}{% endfor %}
                                 <div class="lx-phone-row"><span>{% translate "Delivery" %}</span><span><i class="bi bi-truck"></i></span></div>
+                                <div class="lx-phone-row lx-phone-total"><span>{% translate "Total" %}</span><strong>{{ 87749|taka }}</strong></div>
                                 <div class="lx-phone-pay"><span>COD</span><span class="lx-bkash">bKash</span><span class="lx-nagad">Nagad</span></div>
                                 <div class="lx-phone-checkout">{% translate "Check out" %} <i class="bi bi-arrow-right"></i></div>
                             </div>
